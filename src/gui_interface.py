@@ -5,8 +5,9 @@ from tkinter import messagebox
 from tkinter import filedialog
 from tkinter import colorchooser
 
+from visa_scpi import vna_measure
+
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
-# Implement the default Matplotlib key bindings.
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -24,7 +25,6 @@ wb = Workbook()
 sheet = wb.active
 
 class Frame_examples_program():
-
 	
     def __init__(self):
         self.window = tk.Tk()
@@ -66,6 +66,37 @@ class Frame_examples_program():
             self.window.destroy()
             return
 
+    def create_plot(self):
+        # - - - - - - - - - - - - - - - - - - - - -
+        # Plot
+        plt.style.use('bmh')
+        
+        fig = Figure()
+
+        dataArray = vna_measure()
+        print(dataArray)
+        x = np.arange(len(dataArray))
+        
+        fig.add_subplot(111).plot(x, dataArray)
+
+        canvas = FigureCanvasTkAgg(fig, master=self.window)
+        canvas.draw()
+        canvas.get_tk_widget().grid(row=1, column=1, sticky=tk.W, pady=3)
+                                          
+        # - - - - - - - - - - - - - - - - - - - - -
+        # Plot 2       
+        fig1 = Figure()
+
+        dataArray = vna_measure()
+        print(dataArray)
+        x = np.arange(len(dataArray))
+        
+        fig1.add_subplot(111).plot(x, dataArray)
+
+        canvas1 = FigureCanvasTkAgg(fig1, master=self.window)
+        canvas1.draw()
+        canvas1.get_tk_widget().grid(row=3, column=1, sticky=tk.W, pady=3)
+        
 
     def create_widgets(self):
         # Create some room around all the internal frames
@@ -121,7 +152,7 @@ class Frame_examples_program():
         details_field = Entry(frame)
         details_field.grid(row=4, column=0, sticky = E + W, columnspan=2)
         
-        submit = Button(frame, text='Submit', fg='Black')
+        submit = Button(frame, text='Submit', fg='Black', command= self.create_plot)
         submit.grid(row=10, column=0, columnspan=2, padx=0, pady = 5)
 
 
@@ -147,29 +178,9 @@ class Frame_examples_program():
 
         self.create_buttons(tab1, "J", "K", "L")
         self.create_buttons(tab2, "M", "N", "O")
-        
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot
-        plt.style.use('bmh')
-        
-        fig = Figure(figsize=(5, 4), dpi=100)
-        t = np.arange(0, 3, .01)
-        fig.add_subplot(111).plot(t, 2 * np.sin(2 * np.pi * t))
-
-        canvas = FigureCanvasTkAgg(fig, master=self.window)
-        canvas.draw()
-        canvas.get_tk_widget().grid(row=1, column=1, sticky=tk.W, pady=3)
-
-
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Plot 2       
-        fig = Figure(figsize=(5, 4), dpi=100)
-        t = np.arange(0, 3, .01)
-        fig.add_subplot(111).plot(t, 2 * np.sin(4 * np.pi * t))
-
-        canvas1 = FigureCanvasTkAgg(fig, master=self.window)
-        canvas1.draw()
-        canvas1.get_tk_widget().grid(row=3, column=1, sticky=tk.W, pady=3)
+        #self.create_plot()
         
       

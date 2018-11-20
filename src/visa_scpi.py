@@ -1,6 +1,5 @@
-import time
 import visa
-import numpy as npStimulusArray
+import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -9,6 +8,8 @@ numPoints = 201
 startFreq = 0.3
 stopFreq = 3
 
+#xValuesArray = 0
+#traceDataArray = 0
 
 def vna_measure():   
     rm = visa.ResourceManager()
@@ -73,22 +74,26 @@ def vna_measure():
     maxResponseVal= max(traceDataArray)
     minResponseVal = min(traceDataArray)
 
-    traceDataArray = list(npStimulusArray.float_(traceDataArray))
+    traceDataArray = list(np.float_(traceDataArray))
     print(traceDataArray)
 
     print ("Max value = " + maxResponseVal + " Min Value = " + minResponseVal)
 
-    xValuesArray = npStimulusArray.linspace(float(startFreq),float(stopFreq),int(numPoints))
+    xValuesArray = np.linspace(float(startFreq),float(stopFreq),int(numPoints))
     print(xValuesArray)
+   
+    #x = np.arange(len(traceDataArray))
 
-    #x = npStimulusArray.arange(len(traceDataArray))
-
+    """
     plt.title ("Trace Data via Python - PyVisa - SCPI")
     plt.xlabel("Frequency")
     plt.ylabel("Amplitude (dBm)")
     plt.plot(xValuesArray, traceDataArray)
     plt.show()
+    """
 
+    return traceDataArray
 
-vna_measure()
+# Enable to test
+#vna_measure()
 
