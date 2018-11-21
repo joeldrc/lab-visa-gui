@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-ip_address = '128.141.154.167'
+ip_address = '128.141.154.7'
 numPoints = 201
 startFreq = 0.3
 stopFreq = 3
