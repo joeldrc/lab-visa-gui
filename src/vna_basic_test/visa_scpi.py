@@ -21,10 +21,12 @@ def vna_measure():
     scope.write("CALC1:PAR:DEF 'Trc1', S21")
     scope.write('DISP:WIND:STAT ON')
     scope.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+
+    # marker
+    scope.write('CALC1:MARK ON')
+    scope.write('CALCulate1:MARKer1:X 2Ghz')
     
     scope.write('CALC1:FORM GDELay')
-
-    scope.query('*OPC?')
    
     time.sleep(1)
     scope.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
@@ -35,11 +37,13 @@ def vna_measure():
     scope.write("CALC1:PAR:DEF 'Trc1', S21")
     scope.write('DISP:WIND:STAT ON')
     scope.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+
+    # marker
+    scope.write('CALC1:MARK ON')
+    scope.write('CALCulate1:MARKer1:X 2Ghz')
     
     scope.write('CALC1:FORM MLOG')
-
-    scope.query('*OPC?')
-   
+  
     time.sleep(1)
     scope.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
     time.sleep(1)
@@ -50,10 +54,12 @@ def vna_measure():
     scope.write('DISP:WIND:STAT ON')
     scope.write("DISP:WIND:TRAC1:FEED 'Trc1'")
 
+    # marker
+    scope.write('CALC1:MARK ON')
+    scope.write('CALCulate1:MARKer1:X 2Ghz')
+
     scope.write('CALC1:FORM SWR')
-    
-    scope.query('*OPC?')
-   
+      
     time.sleep(1)
     scope.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
     time.sleep(1)
@@ -64,10 +70,12 @@ def vna_measure():
     scope.write('DISP:WIND:STAT ON')
     scope.write("DISP:WIND:TRAC1:FEED 'Trc1'")
 
+    # marker
+    scope.write('CALC1:MARK ON')
+    scope.write('CALCulate1:MARKer1:X 2Ghz')
+
     scope.write('CALC1:FORM SWR')
-    
-    scope.query('*OPC?')
-   
+      
     time.sleep(1)
     scope.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
     time.sleep(1)
@@ -87,6 +95,8 @@ def vna_measure():
     time.sleep(1)    
     scope.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
     time.sleep(1)
+
+    # -----------------------------------------------------------
     
     # measure
     scope.write("CALC1:PAR:SEL 'Trc1'")
