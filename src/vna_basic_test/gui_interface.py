@@ -69,36 +69,79 @@ class Frame_examples_program():
 
     def create_plot(self):
         # - - - - - - - - - - - - - - - - - - - - -
-        # Plot
+        # Plot 0
         plt.style.use('bmh')
         
-        fig = Figure()
+        fig0 = Figure()
         
-        xValue, yValue = vna_measure()
+        xValue, yValue = vna_measure(0)
         print(xValue)
         print(yValue)
-        
-        fig.add_subplot(111).plot(xValue, yValue)
 
-        canvas = FigureCanvasTkAgg(fig, master=self.window)
+        fig0.add_subplot(111).plot(xValue, yValue)
+
+        canvas = FigureCanvasTkAgg(fig0, master=self.window)
         canvas.draw()
         canvas.get_tk_widget().grid(row=1, column=1, sticky=tk.W, pady=3)
                                           
         # - - - - - - - - - - - - - - - - - - - - -
-        # Plot 2       
+        # Plot 1       
         fig1 = Figure()
-        
-        xValue, yValue = vna_measure()
+
+        xValue, yValue = vna_measure(1)
         print(xValue)
         print(yValue)
-               
+                       
         fig1.add_subplot(111).plot(xValue, yValue)
 
         canvas1 = FigureCanvasTkAgg(fig1, master=self.window)
         canvas1.draw()
         canvas1.get_tk_widget().grid(row=3, column=1, sticky=tk.W, pady=3)
 
+        # - - - - - - - - - - - - - - - - - - - - -
+        # Plot 2       
+        fig2 = Figure()
 
+        xValue, yValue = vna_measure(2)
+        print(xValue)
+        print(yValue)
+                       
+        fig2.add_subplot(111).plot(xValue, yValue)
+
+        canvas1 = FigureCanvasTkAgg(fig2, master=self.window)
+        canvas1.draw()
+        canvas1.get_tk_widget().grid(row=1, column=2, sticky=tk.W, pady=3)
+
+        # - - - - - - - - - - - - - - - - - - - - -
+        # Plot 3       
+        fig3 = Figure()
+
+        xValue, yValue = vna_measure(3)
+        print(xValue)
+        print(yValue)
+                       
+        fig3.add_subplot(111).plot(xValue, yValue)
+
+        canvas1 = FigureCanvasTkAgg(fig3, master=self.window)
+        canvas1.draw()
+        canvas1.get_tk_widget().grid(row=3, column=2, sticky=tk.W, pady=3)
+
+        # - - - - - - - - - - - - - - - - - - - - -
+        # Plot 4       
+        fig4 = Figure()
+
+        xValue, yValue = vna_measure(4)
+        print(xValue)
+        print(yValue)
+                       
+        fig4.add_subplot(111).plot(xValue, yValue)
+
+        canvas1 = FigureCanvasTkAgg(fig4, master=self.window)
+        canvas1.draw()
+        canvas1.get_tk_widget().grid(row=1, column=3, sticky=tk.W, pady=3)
+
+        # - - - - - - - - - - - - - - - - - - - - -
+        
         # resize the width of columns in excel spreadsheet
         sheet.column_dimensions['A'].width = 30
         sheet.column_dimensions['B'].width = 30
@@ -196,6 +239,6 @@ class Frame_examples_program():
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot
-        #self.create_plot()
+        self.create_plot()
         
       
