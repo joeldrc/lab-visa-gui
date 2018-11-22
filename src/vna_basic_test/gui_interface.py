@@ -74,11 +74,9 @@ class Frame_examples_program():
         
         fig0 = Figure()
         
-        xValue, yValue = vna_measure(0)
-        print(xValue)
-        print(yValue)
+        xValue0, yValue0 = vna_measure(0)
 
-        fig0.add_subplot(111).plot(xValue, yValue)
+        fig0.add_subplot(111).plot(xValue0, yValue0)
 
         canvas = FigureCanvasTkAgg(fig0, master=self.window)
         canvas.draw()
@@ -88,11 +86,9 @@ class Frame_examples_program():
         # Plot 1       
         fig1 = Figure()
 
-        xValue, yValue = vna_measure(1)
-        print(xValue)
-        print(yValue)
+        xValue1, yValue1 = vna_measure(1)
                        
-        fig1.add_subplot(111).plot(xValue, yValue)
+        fig1.add_subplot(111).plot(xValue1, yValue1)
 
         canvas1 = FigureCanvasTkAgg(fig1, master=self.window)
         canvas1.draw()
@@ -102,11 +98,9 @@ class Frame_examples_program():
         # Plot 2       
         fig2 = Figure()
 
-        xValue, yValue = vna_measure(2)
-        print(xValue)
-        print(yValue)
+        xValue2, yValue2 = vna_measure(2)
                        
-        fig2.add_subplot(111).plot(xValue, yValue)
+        fig2.add_subplot(111).plot(xValue2, yValue2)
 
         canvas1 = FigureCanvasTkAgg(fig2, master=self.window)
         canvas1.draw()
@@ -116,11 +110,9 @@ class Frame_examples_program():
         # Plot 3       
         fig3 = Figure()
 
-        xValue, yValue = vna_measure(3)
-        print(xValue)
-        print(yValue)
+        xValue3, yValue3 = vna_measure(3)
                        
-        fig3.add_subplot(111).plot(xValue, yValue)
+        fig3.add_subplot(111).plot(xValue3, yValue3)
 
         canvas1 = FigureCanvasTkAgg(fig3, master=self.window)
         canvas1.draw()
@@ -130,30 +122,43 @@ class Frame_examples_program():
         # Plot 4       
         fig4 = Figure()
 
-        xValue, yValue = vna_measure(4)
-        print(xValue)
-        print(yValue)
+        xValue4, yValue4 = vna_measure(4)
                        
-        fig4.add_subplot(111).plot(xValue, yValue)
+        fig4.add_subplot(111).plot(xValue4, yValue4)
 
         canvas1 = FigureCanvasTkAgg(fig4, master=self.window)
         canvas1.draw()
         canvas1.get_tk_widget().grid(row=1, column=3, sticky=tk.W, pady=3)
 
         # - - - - - - - - - - - - - - - - - - - - -
-        
+
+        """
         # resize the width of columns in excel spreadsheet
         sheet.column_dimensions['A'].width = 30
         sheet.column_dimensions['B'].width = 30
+        """
 
         # write given data to an excel spreadsheet at particular location
         sheet.cell(row=1, column=1).value = file_name = self.name_field.get() + self.serial_name_field.get() + self.serial_number_field.get() + self.details_field.get()
         sheet.cell(row=2, column=1).value = 'x'
         sheet.cell(row=2, column=2).value = 'y'
         
-        for i in range(0, len(xValue), 1):
-            sheet.cell(row=i + 3, column=1).value = xValue[i]
-            sheet.cell(row=i + 3, column=2).value = yValue[i]
+        for i in range(0, len(xValue0), 1):
+            sheet.cell(row=i + 3, column=1).value = xValue0[i]
+            sheet.cell(row=i + 3, column=2).value = yValue0[i]
+
+            sheet.cell(row=i + 3, column=4).value = xValue1[i]
+            sheet.cell(row=i + 3, column=5).value = yValue1[i]
+
+            sheet.cell(row=i + 3, column=7).value = xValue2[i]
+            sheet.cell(row=i + 3, column=8).value = yValue2[i]
+
+            sheet.cell(row=i + 3, column=10).value = xValue3[i]
+            sheet.cell(row=i + 3, column=11).value = yValue3[i]
+
+            sheet.cell(row=i + 3, column=13).value = xValue4[i]
+            sheet.cell(row=i + 3, column=14).value = yValue4[i]
+            
         
 
     def create_widgets(self):
