@@ -17,10 +17,12 @@ def vna_measure():
     # -----------------------------------------------------------
     # Basic Settings:
     # -----------------------------------------------------------
-  
+    
     scope.write("CALC1:PAR:DEF 'Trc1', S11")
     scope.write('DISP:WIND:STAT ON')
     scope.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+
+    scope.write('CALC1:FORM PHAS')
     
     scope.query('*OPC?')
     time.sleep(1)
