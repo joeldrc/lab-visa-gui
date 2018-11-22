@@ -1,3 +1,4 @@
+import time
 import visa
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,37 +17,14 @@ def vna_measure():
     # -----------------------------------------------------------
     # Basic Settings:
     # -----------------------------------------------------------
-
-    """
-    # Sweep channel 1 only
-    scope.write('INIT:SCOP SING')
-
-    # Set START & STOP frequency
-    scope.write('SENS1:FREQ:STAR ' + str(startFreq) + 'Ghz')
-    scope.write('SENS1:FREQ:STOP ' + str(stopFreq) + 'Ghz')
-
-    scope.write('SENS1:SWE:TYPE LIN')
-    scope.write('SENS1:SWE:POIN ' + str(numPoints))
-    print(scope.query('SENS1:SWE:POIN?'))
-
-    # Set 10 sweeps per "INIT",
-    # Average all 10 sweeps
-    scope.write('SENS1:SWE:COUNT 10')
-    scope.write('SENS1:AVER:COUN 10')
-    scope.write('SENS1:AVER ON')
-
-    # Manual sweep mode
-    scope.write('INIT1:CONT OFF')
-
-    # Start sweep         
-    scope.write('INIT1')
-
-    # Wait for sweeps to finish
-    # Note: Set appropriate VISA timeout      
-    opc_result = scope.query('*OPC?')
-    print(opc_result)
-    """
-
+  
+    scope.write("CALC1:PAR:DEF 'Trc1', S11")
+    scope.write('DISP:WIND:STAT ON')
+    scope.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+    
+    scope.query('*OPC?')
+    time.sleep(1)
+    
     # measure
     scope.write("CALC1:PAR:SEL 'Trc1'")
     scope.write('CALC1:DATA? FDAT')
@@ -64,14 +42,15 @@ def vna_measure():
     yDataArray = list(np.float_(yDataArray))
     xDataArray = list(np.float_(xDataArray))
 
-    """  
+
+    """ 
     plt.title ("Trace Data via Python - PyVisa - SCPI")
     plt.xlabel("Frequency")
     plt.ylabel("Amplitude (dBm)")
     plt.plot(xDataArray, yDataArray)
     plt.show()
     """
-
+    
     return(xDataArray, yDataArray)
 
 # Enable to test
