@@ -17,14 +17,75 @@ def vna_measure():
     # -----------------------------------------------------------
     # Basic Settings:
     # -----------------------------------------------------------
+
+    scope.write("CALC1:PAR:DEF 'Trc1', S21")
+    scope.write('DISP:WIND:STAT ON')
+    scope.write("DISP:WIND:TRAC1:FEED 'Trc1'")
     
+    scope.write('CALC1:FORM GDELay')
+
+    scope.query('*OPC?')
+   
+    time.sleep(1)
+    scope.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
+    time.sleep(1)
+
+    # -----------------------------------------------------------
+    
+    scope.write("CALC1:PAR:DEF 'Trc1', S21")
+    scope.write('DISP:WIND:STAT ON')
+    scope.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+    
+    scope.write('CALC1:FORM MLOG')
+
+    scope.query('*OPC?')
+   
+    time.sleep(1)
+    scope.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
+    time.sleep(1)
+
+    # -----------------------------------------------------------
+
     scope.write("CALC1:PAR:DEF 'Trc1', S11")
     scope.write('DISP:WIND:STAT ON')
     scope.write("DISP:WIND:TRAC1:FEED 'Trc1'")
 
-    scope.write('CALC1:FORM PHAS')
+    scope.write('CALC1:FORM SWR')
     
     scope.query('*OPC?')
+   
+    time.sleep(1)
+    scope.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
+    time.sleep(1)
+
+    # -----------------------------------------------------------
+
+    scope.write("CALC1:PAR:DEF 'Trc1', S22")
+    scope.write('DISP:WIND:STAT ON')
+    scope.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+
+    scope.write('CALC1:FORM SWR')
+    
+    scope.query('*OPC?')
+   
+    time.sleep(1)
+    scope.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
+    time.sleep(1)
+
+    # -----------------------------------------------------------
+
+    scope.write("CALC1:PAR:DEF 'Trc1', S11")
+    scope.write('DISP:WIND:STAT ON')
+    scope.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+
+    scope.write('CALC1:FORM REAL')
+
+    # time domain
+    scope.write('CALC1:TRAN:TIME:STAT ON')   
+    scope.write('CALC1:TRAN:TIME LPAS; TIME:STIM STEP')
+    
+    time.sleep(1)    
+    scope.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
     time.sleep(1)
     
     # measure
