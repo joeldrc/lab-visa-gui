@@ -50,7 +50,7 @@ class Frame_examples_program():
         return
 
 
-    def new_file(self):
+    def save_file(self):
         global file_position      
         file_name = self.name_field.get() + self.serial_name_field.get() + self.serial_number_field.get() + self.details_field.get()   
         file_position = filedialog.asksaveasfilename(initialdir = "/",initialfile=file_name, title = "Select file",filetypes = (("Microsoft Excel Worksheet","*.xlsx"),("all files","*.*")), defaultextension = ' ')
@@ -174,12 +174,13 @@ class Frame_examples_program():
             self.sheet.cell(row=i + 3, column=13).value = xValue4[i]
             self.sheet.cell(row=i + 3, column=14).value = yValue4[i]
 
+        self.save_file()
+
             
     def create_widgets(self):
         # Create some room around all the internal frames
         self.window['padx'] = 5
         self.window['pady'] = 5
-
 
         # - - - - - - - - - - - - - - - - - - - - -
         # MenuBar
@@ -188,7 +189,7 @@ class Frame_examples_program():
         myFileMenu = Menu (myMenuBar , tearoff = 0)
         myFileMenu.add_command(label = "Exit", command = self.close_file)
         myFileMenu.add_command(label = "Open", command = self.open_file)
-        myFileMenu.add_command(label = "Save as", command = self.new_file)
+        myFileMenu.add_command(label = "Save as", command = self.save_file)
         myMenuBar.add_cascade(label = "File", menu = myFileMenu)
 
         myFileMenu = Menu (myMenuBar , tearoff = 0)
@@ -196,13 +197,11 @@ class Frame_examples_program():
         myMenuBar.add_cascade(label = "Help", menu = myFileMenu)
 
         self.window.config(menu = myMenuBar)
-        
-       
+              
         # - - - - - - - - - - - - - - - - - - - - -
         # Title
         labeled_frame_label = ttk.Label(self.window, text="TEST")
         labeled_frame_label.grid(row=0, column=0, sticky=W)
-
 
         # - - - - - - - - - - - - - - - - - - - - -
         # User data
