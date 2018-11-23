@@ -28,7 +28,7 @@ class Frame_examples_program():
     def __init__(self):
         self.window = tk.Tk()
         #self.window.geometry('600x600') 
-        self.window.title("BUTTON TEST")
+        self.window.title("TEST GUI - V.1.0")
         self.create_widgets()
 
         # opening the existing excel file
@@ -221,6 +221,7 @@ class Frame_examples_program():
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot 0        
         self.fig0 = Figure()
+        self.fig0.add_subplot(111).set_title('S21 - delay')
 
         canvas = FigureCanvasTkAgg(self.fig0, master=self.window)
         canvas.draw()
@@ -229,6 +230,7 @@ class Frame_examples_program():
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot 1       
         self.fig1 = Figure()
+        self.fig1.add_subplot(111).set_title('S21 - dB')
 
         canvas1 = FigureCanvasTkAgg(self.fig1, master=self.window)
         canvas1.draw()
@@ -237,6 +239,7 @@ class Frame_examples_program():
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot 2       
         self.fig2 = Figure()
+        self.fig2.add_subplot(111).set_title('S11 - SWR')
 
         canvas2 = FigureCanvasTkAgg(self.fig2, master=self.window)
         canvas2.draw()
@@ -245,6 +248,7 @@ class Frame_examples_program():
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot 3       
         self.fig3 = Figure()
+        self.fig3.add_subplot(111).set_title('S22 - SWR')
 
         canvas3 = FigureCanvasTkAgg(self.fig3, master=self.window)
         canvas3.draw()
@@ -253,6 +257,7 @@ class Frame_examples_program():
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot 4       
         self.fig4 = Figure()
+        self.fig4.add_subplot(111).set_title('S11 - TDR')
                       
         canvas4 = FigureCanvasTkAgg(self.fig4, master=self.window)
         canvas4.draw()
