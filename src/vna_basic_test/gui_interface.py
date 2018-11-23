@@ -1,3 +1,5 @@
+import time
+
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk
@@ -16,14 +18,9 @@ import numpy as np
 
 from openpyxl import *
 
-#global variables
+# variables
 file_position = ' '
-
-# opening the existing excel file
-wb = Workbook()
-# create the sheet object
-sheet = wb.active
-
+        
 class Frame_examples_program():
 	
     def __init__(self):
@@ -32,6 +29,10 @@ class Frame_examples_program():
         self.window.title("BUTTON TEST")
         self.create_widgets()
 
+        # opening the existing excel file
+        self.wb = Workbook()
+        # create the sheet object
+        self.sheet = self.wb.active
 
     def create_buttons(self, parent, a, b, c):
         button1 = ttk.Button(parent, text="do task " + a)
@@ -53,7 +54,7 @@ class Frame_examples_program():
         global file_position      
         file_name = self.name_field.get() + self.serial_name_field.get() + self.serial_number_field.get() + self.details_field.get()   
         file_position = filedialog.asksaveasfilename(initialdir = "/",initialfile=file_name, title = "Select file",filetypes = (("Microsoft Excel Worksheet","*.xlsx"),("all files","*.*")), defaultextension = ' ')
-        wb.save(file_position)
+        self.wb.save(file_position)
 
 
     def open_file(self):
@@ -68,14 +69,22 @@ class Frame_examples_program():
             return
 
     def create_plot(self):
+        # masure
+        xValue0, yValue0 = vna_measure(0)
+        xValue1, yValue1 = vna_measure(1)
+        xValue2, yValue2 = vna_measure(2)
+        xValue3, yValue3 = vna_measure(3)
+        xValue4, yValue4 = vna_measure(4)
+      
+        # - - - - - - - - - - - - - - - - - - - - -
+        # Plot setup
+        plt.style.use('bmh')
+
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot 0
-        plt.style.use('bmh')
         
         fig0 = Figure()
         
-        xValue0, yValue0 = vna_measure(0)
-
         fig0.add_subplot(111).plot(xValue0, yValue0)
 
         canvas = FigureCanvasTkAgg(fig0, master=self.window)
@@ -85,9 +94,7 @@ class Frame_examples_program():
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot 1       
         fig1 = Figure()
-
-        xValue1, yValue1 = vna_measure(1)
-                       
+                      
         fig1.add_subplot(111).plot(xValue1, yValue1)
 
         canvas1 = FigureCanvasTkAgg(fig1, master=self.window)
@@ -97,70 +104,77 @@ class Frame_examples_program():
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot 2       
         fig2 = Figure()
-
-        xValue2, yValue2 = vna_measure(2)
                        
         fig2.add_subplot(111).plot(xValue2, yValue2)
 
-        canvas1 = FigureCanvasTkAgg(fig2, master=self.window)
-        canvas1.draw()
-        canvas1.get_tk_widget().grid(row=1, column=2, sticky=tk.W, pady=3)
+        canvas2 = FigureCanvasTkAgg(fig2, master=self.window)
+        canvas2.draw()
+        canvas2.get_tk_widget().grid(row=1, column=2, sticky=tk.W, pady=3)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot 3       
         fig3 = Figure()
-
-        xValue3, yValue3 = vna_measure(3)
                        
         fig3.add_subplot(111).plot(xValue3, yValue3)
 
-        canvas1 = FigureCanvasTkAgg(fig3, master=self.window)
-        canvas1.draw()
-        canvas1.get_tk_widget().grid(row=3, column=2, sticky=tk.W, pady=3)
+        canvas3 = FigureCanvasTkAgg(fig3, master=self.window)
+        canvas3.draw()
+        canvas3.get_tk_widget().grid(row=3, column=2, sticky=tk.W, pady=3)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot 4       
         fig4 = Figure()
-
-        xValue4, yValue4 = vna_measure(4)
-                       
+                      
         fig4.add_subplot(111).plot(xValue4, yValue4)
 
-        canvas1 = FigureCanvasTkAgg(fig4, master=self.window)
-        canvas1.draw()
-        canvas1.get_tk_widget().grid(row=1, column=3, sticky=tk.W, pady=3)
+        canvas4 = FigureCanvasTkAgg(fig4, master=self.window)
+        canvas4.draw()
+        canvas4.get_tk_widget().grid(row=1, column=3, sticky=tk.W, pady=3)
 
         # - - - - - - - - - - - - - - - - - - - - -
 
         """
         # resize the width of columns in excel spreadsheet
-        sheet.column_dimensions['A'].width = 30
-        sheet.column_dimensions['B'].width = 30
+        self.sheet.column_dimensions['A'].width = 30
+        self.sheet.column_dimensions['B'].width = 30
         """
 
         # write given data to an excel spreadsheet at particular location
-        sheet.cell(row=1, column=1).value = file_name = self.name_field.get() + self.serial_name_field.get() + self.serial_number_field.get() + self.details_field.get()
-        sheet.cell(row=2, column=1).value = 'x'
-        sheet.cell(row=2, column=2).value = 'y'
+        file_name = self.name_field.get() + self.serial_name_field.get() + self.serial_number_field.get() + self.details_field.get()
+        self.sheet.cell(row=1, column=1).value = file_name
+
+        self.sheet.cell(row=2, column=1).value = 'x'
+        self.sheet.cell(row=2, column=2).value = 'y'
+
+        self.sheet.cell(row=2, column=4).value = 'x'
+        self.sheet.cell(row=2, column=5).value = 'y'
+
+        self.sheet.cell(row=2, column=7).value = 'x'
+        self.sheet.cell(row=2, column=8).value = 'y'
+
+        self.sheet.cell(row=2, column=10).value = 'x'
+        self.sheet.cell(row=2, column=11).value = 'y'
+
+        self.sheet.cell(row=2, column=13).value = 'x'
+        self.sheet.cell(row=2, column=14).value = 'y'
         
         for i in range(0, len(xValue0), 1):
-            sheet.cell(row=i + 3, column=1).value = xValue0[i]
-            sheet.cell(row=i + 3, column=2).value = yValue0[i]
+            self.sheet.cell(row=i + 3, column=1).value = xValue0[i]
+            self.sheet.cell(row=i + 3, column=2).value = yValue0[i]
 
-            sheet.cell(row=i + 3, column=4).value = xValue1[i]
-            sheet.cell(row=i + 3, column=5).value = yValue1[i]
+            self.sheet.cell(row=i + 3, column=4).value = xValue1[i]
+            self.sheet.cell(row=i + 3, column=5).value = yValue1[i]
 
-            sheet.cell(row=i + 3, column=7).value = xValue2[i]
-            sheet.cell(row=i + 3, column=8).value = yValue2[i]
+            self.sheet.cell(row=i + 3, column=7).value = xValue2[i]
+            self.sheet.cell(row=i + 3, column=8).value = yValue2[i]
 
-            sheet.cell(row=i + 3, column=10).value = xValue3[i]
-            sheet.cell(row=i + 3, column=11).value = yValue3[i]
+            self.sheet.cell(row=i + 3, column=10).value = xValue3[i]
+            self.sheet.cell(row=i + 3, column=11).value = yValue3[i]
 
-            sheet.cell(row=i + 3, column=13).value = xValue4[i]
-            sheet.cell(row=i + 3, column=14).value = yValue4[i]
+            self.sheet.cell(row=i + 3, column=13).value = xValue4[i]
+            self.sheet.cell(row=i + 3, column=14).value = yValue4[i]
+
             
-        
-
     def create_widgets(self):
         # Create some room around all the internal frames
         self.window['padx'] = 5
@@ -218,12 +232,13 @@ class Frame_examples_program():
         submit = Button(frame, text='Submit', fg='Black', command= self.create_plot)
         submit.grid(row=10, column=0, columnspan=2, padx=0, pady = 5)
 
+        display_info = ttk.Label(frame, text= 'test')
+        display_info.grid(row=11, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=20)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Title
         notebook_label = ttk.Label(self.window, text="Notebook")
         notebook_label.grid(row=2, column=0, sticky=tk.W, pady=3)
-
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Setup
@@ -234,16 +249,14 @@ class Frame_examples_program():
         tab1 = tk.Frame(frame2)
         tab2 = tk.Frame(frame2)
 
-
         frame2.add(tab1, text="TEST", compound=tk.TOP)
         frame2.add(tab2, text="SETUP", compound=tk.TOP)
         
-
         self.create_buttons(tab1, "J", "K", "L")
         self.create_buttons(tab2, "M", "N", "O")
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot
-        self.create_plot()
+        #self.create_plot()
         
       
