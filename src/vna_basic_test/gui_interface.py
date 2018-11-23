@@ -21,6 +21,7 @@ from openpyxl import *
 
 # variables
 file_position = ' '
+reference = False
 
         
 class Frame_examples_program():
@@ -70,8 +71,19 @@ class Frame_examples_program():
         if exit > 0:
             self.window.destroy()
             return
-        
 
+    def save_ref(self):
+        self.ref0 = vna_measure(0)
+        self.ref1 = vna_measure(1)
+        self.ref2 = vna_measure(2)
+        self.ref3 = vna_measure(3)
+        self.ref4 = vna_measure(4)
+        
+        global reference
+        reference = True
+        self.create_plot()
+
+        
     def create_plot(self):
         self.display_info.config(text='START TEST')
         
@@ -81,13 +93,59 @@ class Frame_examples_program():
         xValue2, yValue2 = vna_measure(2)
         xValue3, yValue3 = vna_measure(3)
         xValue4, yValue4 = vna_measure(4)
+       
+        # clean plot line
+        self.plot0.cla()
+        self.plot1.cla()
+        self.plot2.cla()
+        self.plot3.cla()
+        self.plot4.cla()
 
-        # set data on the plot
-        self.fig0.add_subplot(111).plot(xValue0, yValue0)
-        self.fig1.add_subplot(111).plot(xValue1, yValue1)
-        self.fig2.add_subplot(111).plot(xValue2, yValue2)
-        self.fig3.add_subplot(111).plot(xValue3, yValue3)
-        self.fig4.add_subplot(111).plot(xValue4, yValue4)
+        # plot values
+        self.plot0.set_title('S21 - delay')
+        self.plot0.set_xlabel('X axis label')
+        self.plot0.set_ylabel('Y label')
+
+        self.plot1.set_title('S21 - dB')
+        self.plot1.set_xlabel('X axis label')
+        self.plot1.set_ylabel('Y label')
+
+        self.plot2.set_title('S11 - SWR')
+        self.plot2.set_xlabel('X axis label')
+        self.plot2.set_ylabel('Y label')
+
+        self.plot3.set_title('S22 - SWR')
+        self.plot3.set_xlabel('X axis label')
+        self.plot3.set_ylabel('Y label')
+
+        self.plot4.set_title('S11 - TDR')
+        self.plot4.set_xlabel('X axis label')
+        self.plot4.set_ylabel('Y label')
+        
+        # set data on plot
+        self.plot0.plot(xValue0, yValue0)        
+        self.plot1.plot(xValue1, yValue1)
+        self.plot2.plot(xValue2, yValue2)
+        self.plot3.plot(xValue3, yValue3)
+        self.plot4.plot(xValue4, yValue4)
+
+        global reference
+        if reference == True:
+            # set reference data on plot
+            xRef0, yRef0 = self.ref0
+            xRef1, yRef1 = self.ref1
+            xRef2, yRef2 = self.ref2
+            xRef3, yRef3 = self.ref3
+            xRef4, yRef4 = self.ref4
+        
+            self.plot0.plot(xRef0, yRef0)        
+            self.plot1.plot(xRef1, yRef1)
+            self.plot2.plot(xRef2, yRef2)
+            self.plot3.plot(xRef3, yRef3)
+            self.plot4.plot(xRef4, yRef4)
+
+        # update plot    
+        self.canvas.draw()
         
         # - - - - - - - - - - - - - - - - - - - - -
         # Create sheet
@@ -190,8 +248,11 @@ class Frame_examples_program():
         submit = Button(frame, text='Submit', fg='Black', command= self.create_plot)
         submit.grid(row=10, column=0, columnspan=2, padx=0, pady = 5)
 
+        save_ref = Button(frame, text='Save ref.', fg='Black', command= self.save_ref)
+        save_ref.grid(row=11, column=0, columnspan=2, padx=0, pady = 5)
+
         self.display_info = ttk.Label(frame, text= 'PRESS TO START')
-        self.display_info.grid(row=11, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=20)
+        self.display_info.grid(row=12, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=20)
 
         """
         # - - - - - - - - - - - - - - - - - - - - -
@@ -217,50 +278,33 @@ class Frame_examples_program():
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot setup
         plt.style.use('bmh')
-
+        
+        self.fig = Figure()       
+        self.fig.set_size_inches(18.5, 10.5)
+        
         # - - - - - - - - - - - - - - - - - - - - -
-        # Plot 0        
-        self.fig0 = Figure()
-        self.fig0.add_subplot(111).set_title('S21 - delay')
-
-        canvas = FigureCanvasTkAgg(self.fig0, master=self.window)
-        canvas.draw()
-        canvas.get_tk_widget().grid(row=1, column=1, sticky=tk.W, pady=3)
-                                          
+        # Plot 0
+        self.plot0 = self.fig.add_subplot(231)
+                                               
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot 1       
-        self.fig1 = Figure()
-        self.fig1.add_subplot(111).set_title('S21 - dB')
-
-        canvas1 = FigureCanvasTkAgg(self.fig1, master=self.window)
-        canvas1.draw()
-        canvas1.get_tk_widget().grid(row=3, column=1, sticky=tk.W, pady=3)
+        self.plot1 = self.fig.add_subplot(232)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot 2       
-        self.fig2 = Figure()
-        self.fig2.add_subplot(111).set_title('S11 - SWR')
-
-        canvas2 = FigureCanvasTkAgg(self.fig2, master=self.window)
-        canvas2.draw()
-        canvas2.get_tk_widget().grid(row=1, column=2, sticky=tk.W, pady=3)
+        self.plot2 = self.fig.add_subplot(233)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot 3       
-        self.fig3 = Figure()
-        self.fig3.add_subplot(111).set_title('S22 - SWR')
-
-        canvas3 = FigureCanvasTkAgg(self.fig3, master=self.window)
-        canvas3.draw()
-        canvas3.get_tk_widget().grid(row=3, column=2, sticky=tk.W, pady=3)
+        self.plot3 = self.fig.add_subplot(234)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot 4       
-        self.fig4 = Figure()
-        self.fig4.add_subplot(111).set_title('S11 - TDR')
-                      
-        canvas4 = FigureCanvasTkAgg(self.fig4, master=self.window)
-        canvas4.draw()
-        canvas4.get_tk_widget().grid(row=1, column=3, sticky=tk.W, pady=3)
-        
-      
+        self.plot4 = self.fig.add_subplot(235)
+
+        # - - - - - - - - - - - - - - - - - - - - -
+        # Draw        
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.window)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().grid(row=1, column=2, sticky=tk.E + tk.W + tk.N + tk.S, padx=0, pady=0)
+
