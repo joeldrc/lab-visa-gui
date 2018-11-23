@@ -18,8 +18,10 @@ import numpy as np
 
 from openpyxl import *
 
+
 # variables
 file_position = ' '
+
         
 class Frame_examples_program():
 	
@@ -33,6 +35,7 @@ class Frame_examples_program():
         self.wb = Workbook()
         # create the sheet object
         self.sheet = self.wb.active
+        
 
     def create_buttons(self, parent, a, b, c):
         button1 = ttk.Button(parent, text="do task " + a)
@@ -67,9 +70,10 @@ class Frame_examples_program():
         if exit > 0:
             self.window.destroy()
             return
+        
 
     def create_plot(self):
-        # masure
+        # masure vna
         xValue0, yValue0 = vna_measure(0)
         xValue1, yValue1 = vna_measure(1)
         xValue2, yValue2 = vna_measure(2)
@@ -81,8 +85,7 @@ class Frame_examples_program():
         plt.style.use('bmh')
 
         # - - - - - - - - - - - - - - - - - - - - -
-        # Plot 0
-        
+        # Plot 0        
         fig0 = Figure()
         
         fig0.add_subplot(111).plot(xValue0, yValue0)
@@ -132,7 +135,7 @@ class Frame_examples_program():
         canvas4.get_tk_widget().grid(row=1, column=3, sticky=tk.W, pady=3)
 
         # - - - - - - - - - - - - - - - - - - - - -
-
+        # Create sheet
         """
         # resize the width of columns in excel spreadsheet
         self.sheet.column_dimensions['A'].width = 30
@@ -241,7 +244,6 @@ class Frame_examples_program():
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Setup
-
         frame2 = ttk.Notebook(self.window)
         frame2.grid(row=3, column=0, sticky=tk.E + tk.W + tk.N + tk.S, padx=0, pady=0)
 
