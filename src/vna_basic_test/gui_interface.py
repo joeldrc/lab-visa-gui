@@ -81,61 +81,14 @@ class Frame_examples_program():
         xValue2, yValue2 = vna_measure(2)
         xValue3, yValue3 = vna_measure(3)
         xValue4, yValue4 = vna_measure(4)
-      
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Plot setup
-        plt.style.use('bmh')
 
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Plot 0        
-        fig0 = Figure()
+        # set data on the plot
+        self.fig0.add_subplot(111).plot(xValue0, yValue0)
+        self.fig1.add_subplot(111).plot(xValue1, yValue1)
+        self.fig2.add_subplot(111).plot(xValue2, yValue2)
+        self.fig3.add_subplot(111).plot(xValue3, yValue3)
+        self.fig4.add_subplot(111).plot(xValue4, yValue4)
         
-        fig0.add_subplot(111).plot(xValue0, yValue0)
-
-        canvas = FigureCanvasTkAgg(fig0, master=self.window)
-        canvas.draw()
-        canvas.get_tk_widget().grid(row=1, column=1, sticky=tk.W, pady=3)
-                                          
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Plot 1       
-        fig1 = Figure()
-                      
-        fig1.add_subplot(111).plot(xValue1, yValue1)
-
-        canvas1 = FigureCanvasTkAgg(fig1, master=self.window)
-        canvas1.draw()
-        canvas1.get_tk_widget().grid(row=3, column=1, sticky=tk.W, pady=3)
-
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Plot 2       
-        fig2 = Figure()
-                       
-        fig2.add_subplot(111).plot(xValue2, yValue2)
-
-        canvas2 = FigureCanvasTkAgg(fig2, master=self.window)
-        canvas2.draw()
-        canvas2.get_tk_widget().grid(row=1, column=2, sticky=tk.W, pady=3)
-
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Plot 3       
-        fig3 = Figure()
-                       
-        fig3.add_subplot(111).plot(xValue3, yValue3)
-
-        canvas3 = FigureCanvasTkAgg(fig3, master=self.window)
-        canvas3.draw()
-        canvas3.get_tk_widget().grid(row=3, column=2, sticky=tk.W, pady=3)
-
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Plot 4       
-        fig4 = Figure()
-                      
-        fig4.add_subplot(111).plot(xValue4, yValue4)
-
-        canvas4 = FigureCanvasTkAgg(fig4, master=self.window)
-        canvas4.draw()
-        canvas4.get_tk_widget().grid(row=1, column=3, sticky=tk.W, pady=3)
-
         # - - - - - - - - - - - - - - - - - - - - -
         # Create sheet
         """
@@ -237,13 +190,15 @@ class Frame_examples_program():
         submit = Button(frame, text='Submit', fg='Black', command= self.create_plot)
         submit.grid(row=10, column=0, columnspan=2, padx=0, pady = 5)
 
-        self.display_info = ttk.Label(frame, text= ' ')
+        self.display_info = ttk.Label(frame, text= 'PRESS TO START')
         self.display_info.grid(row=11, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=20)
 
+        """
         # - - - - - - - - - - - - - - - - - - - - -
         # Title
         notebook_label = ttk.Label(self.window, text="Notebook")
         notebook_label.grid(row=2, column=0, sticky=tk.W, pady=3)
+        """
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Setup
@@ -260,7 +215,47 @@ class Frame_examples_program():
         self.create_buttons(tab2, "M", "N", "O")
 
         # - - - - - - - - - - - - - - - - - - - - -
-        # Plot
-        #self.create_plot()
+        # Plot setup
+        plt.style.use('bmh')
+
+        # - - - - - - - - - - - - - - - - - - - - -
+        # Plot 0        
+        self.fig0 = Figure()
+
+        canvas = FigureCanvasTkAgg(self.fig0, master=self.window)
+        canvas.draw()
+        canvas.get_tk_widget().grid(row=1, column=1, sticky=tk.W, pady=3)
+                                          
+        # - - - - - - - - - - - - - - - - - - - - -
+        # Plot 1       
+        self.fig1 = Figure()
+
+        canvas1 = FigureCanvasTkAgg(self.fig1, master=self.window)
+        canvas1.draw()
+        canvas1.get_tk_widget().grid(row=3, column=1, sticky=tk.W, pady=3)
+
+        # - - - - - - - - - - - - - - - - - - - - -
+        # Plot 2       
+        self.fig2 = Figure()
+
+        canvas2 = FigureCanvasTkAgg(self.fig2, master=self.window)
+        canvas2.draw()
+        canvas2.get_tk_widget().grid(row=1, column=2, sticky=tk.W, pady=3)
+
+        # - - - - - - - - - - - - - - - - - - - - -
+        # Plot 3       
+        self.fig3 = Figure()
+
+        canvas3 = FigureCanvasTkAgg(self.fig3, master=self.window)
+        canvas3.draw()
+        canvas3.get_tk_widget().grid(row=3, column=2, sticky=tk.W, pady=3)
+
+        # - - - - - - - - - - - - - - - - - - - - -
+        # Plot 4       
+        self.fig4 = Figure()
+                      
+        canvas4 = FigureCanvasTkAgg(self.fig4, master=self.window)
+        canvas4.draw()
+        canvas4.get_tk_widget().grid(row=1, column=3, sticky=tk.W, pady=3)
         
       
