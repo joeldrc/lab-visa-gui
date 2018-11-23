@@ -1,62 +1,128 @@
+import time
 import visa
 import numpy as np
 import matplotlib.pyplot as plt
 
-ip_address = '128.141.154.7'
 
-def vna_measure():   
-    rm = visa.ResourceManager()
-    scope = rm.open_resource('TCPIP::' + ip_address + '::INSTR')
-    scope.write_termination = '\n'  # Some instruments require LF at the end of each command. In that case, use:
+vna_address = 'TCPIP::128.141.154.7::INSTR'
 
-    print(scope.query('*IDN?'))     # Query the Identification string
-    #scope.write('*RST;*CLS')        # Reset the instrument, clear the Error queue
-    scope.write('SYST:DISP:UPD ON') # Display update ON - switch OFF after debugging
+
+rm = visa.ResourceManager()
+vna = rm.open_resource(vna_address)
+vna.write_termination = '\n'  # Some instruments require LF at the end of each command. In that case, use:
+
+
+"""
+class Vna_measure():
+    def __init__(self):
+        rm = visa.ResourceManager()
+        self.vna = rm.open_resource(vna_address)
+        self.vna.write_termination = '\n'  # Some instruments require LF at the end of each command. In that case, use:
+"""
+
+
+def instrumentName():
+    name = vna.query('*IDN?')   # Query the Identification string
+    print(name)     
+    return name
+
+
+def vna_measure(index):
+    #vna.write('*RST;*CLS')        # Reset the instrument, clear the Error queue
+    vna.write('SYST:DISP:UPD ON') # Display update ON - switch OFF after debugging
 
     # -----------------------------------------------------------
-    # Basic Settings:
+    if index == 0:
+        vna.write("CALC1:PAR:DEF 'Trc1', S21")
+        vna.write('DISP:WIND:STAT ON')
+        vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+
+        # marker
+        vna.write('CALC1:MARK ON')
+        vna.write('CALCulate1:MARKer1:X 2Ghz')
+        
+        vna.write('CALC1:FORM GDELay')
+       
+        time.sleep(1)
+        vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
+        time.sleep(1)
+
     # -----------------------------------------------------------
+    elif index == 1:
+        vna.write("CALC1:PAR:DEF 'Trc1', S21")
+        vna.write('DISP:WIND:STAT ON')
+        vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
 
-    """
-    # Sweep channel 1 only
-    scope.write('INIT:SCOP SING')
+        # marker
+        vna.write('CALC1:MARK ON')
+        vna.write('CALCulate1:MARKer1:X 2Ghz')
+        
+        vna.write('CALC1:FORM MLOG')
+      
+        time.sleep(1)
+        vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
+        time.sleep(1)
 
-    # Set START & STOP frequency
-    scope.write('SENS1:FREQ:STAR ' + str(startFreq) + 'Ghz')
-    scope.write('SENS1:FREQ:STOP ' + str(stopFreq) + 'Ghz')
+    # -----------------------------------------------------------
+    elif index == 2:
+        vna.write("CALC1:PAR:DEF 'Trc1', S11")
+        vna.write('DISP:WIND:STAT ON')
+        vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
 
-    scope.write('SENS1:SWE:TYPE LIN')
-    scope.write('SENS1:SWE:POIN ' + str(numPoints))
-    print(scope.query('SENS1:SWE:POIN?'))
+        # marker
+        vna.write('CALC1:MARK ON')
+        vna.write('CALCulate1:MARKer1:X 2Ghz')
 
-    # Set 10 sweeps per "INIT",
-    # Average all 10 sweeps
-    scope.write('SENS1:SWE:COUNT 10')
-    scope.write('SENS1:AVER:COUN 10')
-    scope.write('SENS1:AVER ON')
+        vna.write('CALC1:FORM SWR')
+          
+        time.sleep(1)
+        vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
+        time.sleep(1)
 
-    # Manual sweep mode
-    scope.write('INIT1:CONT OFF')
+    # -----------------------------------------------------------
+    elif index == 3:
+        vna.write("CALC1:PAR:DEF 'Trc1', S22")
+        vna.write('DISP:WIND:STAT ON')
+        vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
 
-    # Start sweep         
-    scope.write('INIT1')
+        # marker
+        vna.write('CALC1:MARK ON')
+        vna.write('CALCulate1:MARKer1:X 2Ghz')
 
-    # Wait for sweeps to finish
-    # Note: Set appropriate VISA timeout      
-    opc_result = scope.query('*OPC?')
-    print(opc_result)
-    """
+        vna.write('CALC1:FORM SWR')
+          
+        time.sleep(1)
+        vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
+        time.sleep(1)
+
+    # -----------------------------------------------------------
+    elif index == 4:
+        vna.write("CALC1:PAR:DEF 'Trc1', S11")
+        vna.write('DISP:WIND:STAT ON')
+        vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+
+        vna.write('CALC1:FORM REAL')
+
+        # time domain
+        vna.write('CALC1:TRAN:TIME:STAT ON')   
+        vna.write('CALC1:TRAN:TIME LPAS; TIME:STIM STEP')
+        
+        time.sleep(1)    
+        vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
+        time.sleep(1)
+
+    # -----------------------------------------------------------
 
     # measure
-    scope.write("CALC1:PAR:SEL 'Trc1'")
-    scope.write('CALC1:DATA? FDAT')
-    yData = scope.read()
-    print(yData)
+    vna.write("CALC1:PAR:SEL 'Trc1'")
+    vna.write('CALC1:DATA? FDAT')
+    yData = vna.read()
+    #print(yData)
 
     # point of measure
-    scope.write('CALC1:DATA:STIM?')
-    xData = scope.read()
-    print(xData)
+    vna.write('CALC1:DATA:STIM?')
+    xData = vna.read()
+    #print(xData)
     
     yDataArray = yData.split(",")
     xDataArray = xData.split(",")
@@ -64,16 +130,21 @@ def vna_measure():
     yDataArray = list(np.float_(yDataArray))
     xDataArray = list(np.float_(xDataArray))
 
-    """  
+    """ 
     plt.title ("Trace Data via Python - PyVisa - SCPI")
     plt.xlabel("Frequency")
     plt.ylabel("Amplitude (dBm)")
     plt.plot(xDataArray, yDataArray)
     plt.show()
     """
-
+    
     return(xDataArray, yDataArray)
 
-# Enable to test
-#vna_measure()
 
+"""
+# Enable to test
+instrumentName()    
+for i in range(0, 5, 1):
+    print(vna_measure(i))   
+"""
+  
