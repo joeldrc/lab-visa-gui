@@ -267,23 +267,24 @@ class Frame_examples_program():
         self.display_info = ttk.Label(frame, text= 'PRESS TO START')
         self.display_info.grid(row=12, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=20)
 
-        """
         # - - - - - - - - - - - - - - - - - - - - -
         # Title
-        notebook_label = ttk.Label(self.window, text="Notebook")
-        notebook_label.grid(row=2, column=0, sticky=tk.W, pady=3)
-        """
+        notebook_label = ttk.Label(frame, text="Notebook")
+        notebook_label.grid(row=20, column=0, sticky=tk.W, pady=3)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Setup
-        frame2 = ttk.Notebook(self.window)
-        frame2.grid(row=3, column=0, sticky=tk.E + tk.W + tk.N + tk.S, padx=0, pady=0)
-
+        frame2 = ttk.LabelFrame(frame, text="NOTEBOOK", relief=tk.RIDGE)
+        frame2.grid(row=21, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=20)
+       
+        frame3 = ttk.Notebook(frame2)
+        frame3.grid(row=1, column=0, sticky=tk.E + tk.W + tk.N + tk.S, padx=0, pady=0)
+               
         tab1 = tk.Frame(frame2)
         tab2 = tk.Frame(frame2)
 
-        frame2.add(tab1, text="TEST", compound=tk.TOP)
-        frame2.add(tab2, text="SETUP", compound=tk.TOP)
+        frame3.add(tab1, text="TEST", compound=tk.TOP)
+        frame3.add(tab2, text="SETUP", compound=tk.TOP)
         
         self.create_buttons(tab1, "J", "K", "L")
         self.create_buttons(tab2, "M", "N", "O")
@@ -293,7 +294,7 @@ class Frame_examples_program():
         plt.style.use('bmh')
         
         self.fig = Figure()       
-        self.fig.set_size_inches(18.5, 10.5)
+        self.fig.set_size_inches(22, 10)
         
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot 0
