@@ -22,6 +22,7 @@ from openpyxl import *
 # variables
 file_position = ' '
 reference = False
+saveRef = False 
 
         
 class Frame_examples_program():
@@ -36,6 +37,10 @@ class Frame_examples_program():
         self.wb = Workbook()
         # create the sheet object
         self.sheet = self.wb.active
+
+
+    def focus(self, event):
+        self.create_plot()
         
 
     def create_buttons(self, parent, a, b, c):
@@ -72,19 +77,21 @@ class Frame_examples_program():
             self.window.destroy()
             return
 
-    def save_ref(self):
-        self.ref0 = vna_measure(0)
-        self.ref1 = vna_measure(1)
-        self.ref2 = vna_measure(2)
-        self.ref3 = vna_measure(3)
-        self.ref4 = vna_measure(4)
-        
-        global reference
-        reference = True
-        self.create_plot()
 
-        
-    def create_plot(self):
+    def save_ref(self):
+        global saveRef
+        global reference
+
+        # invert the value
+        reference = not reference
+        if reference == True:
+            self.save_ref.config(text='Remove Ref.')
+            saveRef = True
+        else:
+            self.save_ref.config(text='Save Ref.')   
+
+                
+    def create_plot(self):       
         self.display_info.config(text='START TEST')
         
         # masure vna
@@ -93,7 +100,17 @@ class Frame_examples_program():
         xValue2, yValue2 = vna_measure(2)
         xValue3, yValue3 = vna_measure(3)
         xValue4, yValue4 = vna_measure(4)
-       
+
+        global saveRef
+        if saveRef == True:
+            # set reference data on plot
+            self.xRef0, self.yRef0 = xValue0, yValue0
+            self.xRef1, self.yRef1 = xValue1, yValue1
+            self.xRef2, self.yRef2 = xValue2, yValue2
+            self.xRef3, self.yRef3 = xValue3, yValue3
+            self.xRef4, self.yRef4 = xValue4, yValue4
+            saveRef = False           
+            
         # clean plot line
         self.plot0.cla()
         self.plot1.cla()
@@ -130,19 +147,12 @@ class Frame_examples_program():
         self.plot4.plot(xValue4, yValue4)
 
         global reference
-        if reference == True:
-            # set reference data on plot
-            xRef0, yRef0 = self.ref0
-            xRef1, yRef1 = self.ref1
-            xRef2, yRef2 = self.ref2
-            xRef3, yRef3 = self.ref3
-            xRef4, yRef4 = self.ref4
-        
-            self.plot0.plot(xRef0, yRef0)        
-            self.plot1.plot(xRef1, yRef1)
-            self.plot2.plot(xRef2, yRef2)
-            self.plot3.plot(xRef3, yRef3)
-            self.plot4.plot(xRef4, yRef4)
+        if reference == True:     
+            self.plot0.plot(self.xRef0, self.yRef0)        
+            self.plot1.plot(self.xRef1, self.yRef1)
+            self.plot2.plot(self.xRef2, self.yRef2)
+            self.plot3.plot(self.xRef3, self.yRef3)
+            self.plot4.plot(self.xRef4, self.yRef4)
 
         # update plot    
         self.canvas.draw()
@@ -248,8 +258,11 @@ class Frame_examples_program():
         submit = Button(frame, text='Submit', fg='Black', command= self.create_plot)
         submit.grid(row=10, column=0, columnspan=2, padx=0, pady = 5)
 
-        save_ref = Button(frame, text='Save ref.', fg='Black', command= self.save_ref)
-        save_ref.grid(row=11, column=0, columnspan=2, padx=0, pady = 5)
+        # whenever the enter key is pressed then call the focus1 function
+        self.window.bind('<Return>', self.focus)
+
+        self.save_ref = Button(frame, text='Save ref.', fg='Black', command= self.save_ref)
+        self.save_ref.grid(row=11, column=0, columnspan=2, padx=0, pady = 5)
 
         self.display_info = ttk.Label(frame, text= 'PRESS TO START')
         self.display_info.grid(row=12, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=20)
