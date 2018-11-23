@@ -73,6 +73,8 @@ class Frame_examples_program():
         
 
     def create_plot(self):
+        self.display_info.config(text='START TEST')
+        
         # masure vna
         xValue0, yValue0 = vna_measure(0)
         xValue1, yValue1 = vna_measure(1)
@@ -176,7 +178,8 @@ class Frame_examples_program():
 
             self.sheet.cell(row=i + 3, column=13).value = xValue4[i]
             self.sheet.cell(row=i + 3, column=14).value = yValue4[i]
-
+            
+        self.display_info.config(text='TEST DONE')
         self.save_file()
 
             
@@ -234,8 +237,8 @@ class Frame_examples_program():
         submit = Button(frame, text='Submit', fg='Black', command= self.create_plot)
         submit.grid(row=10, column=0, columnspan=2, padx=0, pady = 5)
 
-        display_info = ttk.Label(frame, text= 'test')
-        display_info.grid(row=11, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=20)
+        self.display_info = ttk.Label(frame, text= ' ')
+        self.display_info.grid(row=11, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=20)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Title
