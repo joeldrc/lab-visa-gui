@@ -1,4 +1,5 @@
 import time
+from time import gmtime, strftime
 
 from tkinter import *
 import tkinter as tk
@@ -26,6 +27,7 @@ saveRef = False
 
         
 class Frame_examples_program():
+    
     def __init__(self):
         self.window = tk.Tk()
         #self.window.geometry('600x600') 
@@ -37,6 +39,13 @@ class Frame_examples_program():
         # create the sheet object
         self.sheet = self.wb.active
 
+
+    def update_screen(self):
+        self.clock.config(text="DATE: " + strftime("%d %b %Y %H:%M:%S", gmtime()))
+        
+        # update every 1000ms
+        self.clock.after(1000, self.update_screen)
+        
 
     def configure(self, event):
         w, h = event.width, event.height
@@ -57,6 +66,10 @@ class Frame_examples_program():
         button3.grid(row=3, column=1)
 
         return (button1, button2, button3)
+
+
+    def colorCircle(self, color):
+        self.circle_canvas.create_oval(10, 10, 40, 40, width=0, fill=color)
 	
 	
     def show_info(self):
@@ -98,6 +111,7 @@ class Frame_examples_program():
 
     def start_test(self):
         self.display_info.config(text='START TEST')
+        self.colorCircle('lime')
         self.create_plot()
         
 
@@ -181,6 +195,8 @@ class Frame_examples_program():
         # write given data to an excel spreadsheet at particular location
         file_name = self.name_field.get() + self.serial_name_field.get() + self.serial_number_field.get() + self.details_field.get()
         self.sheet.cell(row=1, column=1).value = file_name
+
+        self.sheet.cell(row=1, column=2).value =strftime("%d %b %Y %H:%M:%S", gmtime())
 
         self.sheet.cell(row=2, column=1).value = 'x'
         self.sheet.cell(row=2, column=2).value = 'y'
@@ -281,6 +297,12 @@ class Frame_examples_program():
         self.display_info = ttk.Label(frame, text= 'PRESS TO START')
         self.display_info.grid(row=12, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=20)
 
+        self.circle_canvas = Canvas(frame, width=40, height=40)
+        self.circle_canvas.grid(row=12, column=1, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=5)
+
+        self.clock = Label(frame)
+        self.clock.grid(row=13, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=5)
+
         """
         # - - - - - - - - - - - - - - - - - - - - -
         # Setup
@@ -348,4 +370,5 @@ class Frame_examples_program():
         # - - - - - - - - - - - - - - - - - - - - -
         # event screen resize
         self.window.bind("<Configure>", self.configure)
+        self.update_screen()
 
