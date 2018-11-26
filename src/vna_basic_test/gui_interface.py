@@ -104,24 +104,24 @@ class Frame_examples_program():
     def set_axis_name(self):
         # set axis names
         self.plot0.set_title('S21 - delay')
-        self.plot0.set_xlabel('X axis label')
-        self.plot0.set_ylabel('Y label')
+        self.plot0.set_xlabel('f')
+        self.plot0.set_ylabel('dB')
 
         self.plot1.set_title('S21 - dB')
-        self.plot1.set_xlabel('X axis label')
-        self.plot1.set_ylabel('Y label')
+        self.plot1.set_xlabel('f')
+        self.plot1.set_ylabel('dB')
 
         self.plot2.set_title('S11 - SWR')
-        self.plot2.set_xlabel('X axis label')
-        self.plot2.set_ylabel('Y label')
+        self.plot2.set_xlabel('f')
+        self.plot2.set_ylabel('dB')
 
         self.plot3.set_title('S22 - SWR')
-        self.plot3.set_xlabel('X axis label')
-        self.plot3.set_ylabel('Y label')
+        self.plot3.set_xlabel('f')
+        self.plot3.set_ylabel('dB')
 
         self.plot4.set_title('S11 - TDR')
-        self.plot4.set_xlabel('X axis label')
-        self.plot4.set_ylabel('Y label')
+        self.plot4.set_xlabel('delay')
+        self.plot4.set_ylabel('dB')
 
                        
     def create_plot(self):              
