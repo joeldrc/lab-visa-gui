@@ -264,7 +264,7 @@ class Frame_examples_program():
         instrument_name, instrument_address = instrument_info()
         str_instrument_info = instrument_name + "\n" + instrument_address
         
-        labeled_frame_label = ttk.Label(self.window, text="VNA - TEST - " + str_instrument_info)
+        labeled_frame_label = ttk.Label(self.window, text=str_instrument_info)
         labeled_frame_label.grid(row=0, column=0, sticky=W, padx=10, pady=5)
 
         # - - - - - - - - - - - - - - - - - - - - -
