@@ -104,19 +104,19 @@ class Frame_examples_program():
     def set_axis_name(self):
         # set axis names
         self.plot0.set_title('S21 - delay')
-        self.plot0.set_xlabel('f')
+        self.plot0.set_xlabel('freq')
         self.plot0.set_ylabel('dB')
 
         self.plot1.set_title('S21 - dB')
-        self.plot1.set_xlabel('f')
+        self.plot1.set_xlabel('freq')
         self.plot1.set_ylabel('dB')
 
         self.plot2.set_title('S11 - SWR')
-        self.plot2.set_xlabel('f')
+        self.plot2.set_xlabel('freq')
         self.plot2.set_ylabel('dB')
 
         self.plot3.set_title('S22 - SWR')
-        self.plot3.set_xlabel('f')
+        self.plot3.set_xlabel('freq')
         self.plot3.set_ylabel('dB')
 
         self.plot4.set_title('S11 - TDR')
@@ -218,10 +218,7 @@ class Frame_examples_program():
 
             
     def create_widgets(self):
-        # Create some room around all the internal frames
-        self.window['padx'] = 5
-        self.window['pady'] = 5
-
+        
         # - - - - - - - - - - - - - - - - - - - - -
         # MenuBar
         myMenuBar = Menu (self.window)
@@ -237,58 +234,58 @@ class Frame_examples_program():
         myMenuBar.add_cascade(label = "Help", menu = myFileMenu)
 
         self.window.config(menu = myMenuBar)
-              
+
+        # Create some room around all the internal frames
+        self.window['padx'] = 10
+        self.window['pady'] = 10      
+
         # - - - - - - - - - - - - - - - - - - - - -
         # Title
-        labeled_frame_label = ttk.Label(self.window, text="TEST")
-        labeled_frame_label.grid(row=0, column=0, sticky=W)
+        labeled_frame_label = ttk.Label(self.window, text="VNA - TEST")
+        labeled_frame_label.grid(row=0, column=0, sticky=W, padx=10, pady=5)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # User data
         frame = ttk.LabelFrame(self.window, text="USER DATA", relief=tk.RIDGE)
-        frame.grid(row=1, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=20)
+        frame.grid(row=1, column=1, sticky = tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
        
         name = Label(frame, text='Name:')
         name.grid(row=0, column=0, sticky = W)
         self.name_field = Entry(frame)
-        self.name_field.grid(row=0, column=1, padx=0, pady = 5)
+        self.name_field.grid(row=0, column=1, padx=5, pady = 5)
 
         serial_name = Label(frame, text='S. Name:')
         serial_name.grid(row=1, column=0, sticky = W)
         self.serial_name_field = Entry(frame)
-        self.serial_name_field.grid(row=1, column=1, padx=0, pady = 5)
+        self.serial_name_field.grid(row=1, column=1, padx=5, pady = 5)
 
         serial_number = Label(frame, text='Ser. Num.:')
         serial_number.grid(row=2, column=0, sticky = W)
         self.serial_number_field = Entry(frame)
-        self.serial_number_field.grid(row=2, column=1, padx=0, pady = 5)
+        self.serial_number_field.grid(row=2, column=1, padx=5, pady = 5)
 
         details = Label(frame, text='Details:')
         details.grid(row=3, column=0, sticky = W)
         self.details_field = Entry(frame)
-        self.details_field.grid(row=4, column=0, sticky = E + W, columnspan=2)
+        self.details_field.grid(row=4, column=0, sticky = E + W, columnspan=2, padx=5, pady = 5)
         
         submit = Button(frame, text='Submit', fg='Black', command= self.start_test)
-        submit.grid(row=10, column=0, columnspan=2, padx=0, pady = 5)
+        submit.grid(row=10, column=0, columnspan=2, padx=5, pady = 5)
 
         # whenever the enter key is pressed then call the focus1 function
         self.window.bind('<Return>', self.focus)
 
         self.save_ref = Button(frame, text='Save ref.', fg='Black', command= self.save_ref)
-        self.save_ref.grid(row=11, column=0, columnspan=2, padx=0, pady = 5)
+        self.save_ref.grid(row=11, column=0, columnspan=2, padx=5, pady = 5)
 
         self.display_info = ttk.Label(frame, text= 'PRESS TO START')
-        self.display_info.grid(row=12, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=20)
+        self.display_info.grid(row=12, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=20)
 
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Title
-        notebook_label = ttk.Label(frame, text="Notebook")
-        notebook_label.grid(row=20, column=0, sticky=tk.W, pady=3)
-
+        """
         # - - - - - - - - - - - - - - - - - - - - -
         # Setup
         frame2 = ttk.LabelFrame(frame, text="NOTEBOOK", relief=tk.RIDGE)
-        frame2.grid(row=21, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=20)
+        frame2.grid(row=21, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=20, pady=20)
        
         frame3 = ttk.Notebook(frame2)
         frame3.grid(row=1, column=0, sticky=tk.E + tk.W + tk.N + tk.S, padx=0, pady=0)
@@ -301,6 +298,7 @@ class Frame_examples_program():
         
         self.create_buttons(tab1, "J", "K", "L")
         self.create_buttons(tab2, "M", "N", "O")
+        """
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot setup
@@ -345,7 +343,7 @@ class Frame_examples_program():
         # Draw        
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.window)
         self.canvas.draw()
-        self.canvas.get_tk_widget().grid(row=1, column=2, sticky=tk.E + tk.W + tk.N + tk.S, padx=0, pady=0)
+        self.canvas.get_tk_widget().grid(row=1, column=0, sticky=tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # event screen resize
