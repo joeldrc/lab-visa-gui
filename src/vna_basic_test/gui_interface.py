@@ -39,6 +39,12 @@ class Frame_examples_program():
         self.sheet = self.wb.active
 
 
+    def configure(self, event):
+        w, h = event.width, event.height
+        #print(w)
+        #print(h)
+
+
     def focus(self, event):
         self.create_plot()
         
@@ -294,7 +300,11 @@ class Frame_examples_program():
         plt.style.use('bmh')
         
         self.fig = Figure()       
-        self.fig.set_size_inches(22, 10)
+        #self.fig.set_size_inches(22, 10)
+
+        self.fig = plt.gcf()
+        DPI = self.fig.get_dpi()
+        self.fig.set_size_inches(1280.0/float(DPI), 720.0/float(DPI))
         
         # - - - - - - - - - - - - - - - - - - - - -
         # Plot 0
@@ -321,4 +331,7 @@ class Frame_examples_program():
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.window)
         self.canvas.draw()
         self.canvas.get_tk_widget().grid(row=1, column=2, sticky=tk.E + tk.W + tk.N + tk.S, padx=0, pady=0)
+
+        # event screen resize
+        self.window.bind("<Configure>", self.configure)
 
