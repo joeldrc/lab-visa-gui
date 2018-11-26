@@ -79,7 +79,7 @@ class Frame_examples_program():
 
     def save_file(self):
         global file_position      
-        file_name = self.name_field.get() + self.serial_name_field.get() + self.serial_number_field.get() + self.details_field.get()   
+        file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()    
         file_position = filedialog.asksaveasfilename(initialdir = "/",initialfile=file_name, title = "Select file",filetypes = (("Microsoft Excel Worksheet","*.xlsx"),("all files","*.*")), defaultextension = ' ')
         self.wb.save(file_position)
 
@@ -193,7 +193,9 @@ class Frame_examples_program():
         """
 
         # write given data to an excel spreadsheet at particular location
-        file_name = self.name_field.get() + self.serial_name_field.get() + self.serial_number_field.get() + self.details_field.get()
+        file_name = self.name_field.get() + '_' +  self.serial_name_field.get() + '_' + \
+        self.serial_number_field.get() + '_' + self.details_field.get()
+
         self.sheet.cell(row=1, column=1).value = file_name
 
         self.sheet.cell(row=1, column=2).value =strftime("%d %b %Y %H:%M:%S", gmtime())
@@ -265,22 +267,22 @@ class Frame_examples_program():
         frame = ttk.LabelFrame(self.window, text="USER DATA", relief=tk.RIDGE)
         frame.grid(row=1, column=1, sticky = tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
        
-        name = Label(frame, text='Name:')
+        name = Label(frame, text='Name (User):')
         name.grid(row=0, column=0, sticky = W)
         self.name_field = Entry(frame)
         self.name_field.grid(row=0, column=1, padx=5, pady = 5)
 
-        serial_name = Label(frame, text='S. Name:')
+        serial_name = Label(frame, text='Serial name:')
         serial_name.grid(row=1, column=0, sticky = W)
         self.serial_name_field = Entry(frame)
         self.serial_name_field.grid(row=1, column=1, padx=5, pady = 5)
 
-        serial_number = Label(frame, text='Ser. Num.:')
+        serial_number = Label(frame, text='Serial num.:')
         serial_number.grid(row=2, column=0, sticky = W)
         self.serial_number_field = Entry(frame)
         self.serial_number_field.grid(row=2, column=1, padx=5, pady = 5)
 
-        details = Label(frame, text='Details:')
+        details = Label(frame, text='Add details:')
         details.grid(row=3, column=0, sticky = W)
         self.details_field = Entry(frame)
         self.details_field.grid(row=4, column=0, sticky = E + W, columnspan=2, padx=5, pady = 5)
