@@ -26,7 +26,6 @@ saveRef = False
 
         
 class Frame_examples_program():
-	
     def __init__(self):
         self.window = tk.Tk()
         #self.window.geometry('600x600') 
@@ -94,12 +93,38 @@ class Frame_examples_program():
             self.save_ref.config(text='Remove Ref.')
             saveRef = True
         else:
-            self.save_ref.config(text='Save Ref.')   
+            self.save_ref.config(text='Save Ref.')
 
-                
-    def create_plot(self):       
+
+    def start_test(self):
         self.display_info.config(text='START TEST')
+        self.create_plot()
         
+
+    def set_axis_name(self):
+        # set axis names
+        self.plot0.set_title('S21 - delay')
+        self.plot0.set_xlabel('X axis label')
+        self.plot0.set_ylabel('Y label')
+
+        self.plot1.set_title('S21 - dB')
+        self.plot1.set_xlabel('X axis label')
+        self.plot1.set_ylabel('Y label')
+
+        self.plot2.set_title('S11 - SWR')
+        self.plot2.set_xlabel('X axis label')
+        self.plot2.set_ylabel('Y label')
+
+        self.plot3.set_title('S22 - SWR')
+        self.plot3.set_xlabel('X axis label')
+        self.plot3.set_ylabel('Y label')
+
+        self.plot4.set_title('S11 - TDR')
+        self.plot4.set_xlabel('X axis label')
+        self.plot4.set_ylabel('Y label')
+
+                       
+    def create_plot(self):              
         # masure vna
         xValue0, yValue0 = vna_measure(0)
         xValue1, yValue1 = vna_measure(1)
@@ -116,13 +141,16 @@ class Frame_examples_program():
             self.xRef3, self.yRef3 = xValue3, yValue3
             self.xRef4, self.yRef4 = xValue4, yValue4
             saveRef = False           
-            
+          
         # clean plot line
         self.plot0.cla()
         self.plot1.cla()
         self.plot2.cla()
         self.plot3.cla()
         self.plot4.cla()
+
+        # set axis names
+        self.set_axis_name()
       
         # set data on plot
         self.plot0.plot(xValue0, yValue0)        
@@ -240,7 +268,7 @@ class Frame_examples_program():
         self.details_field = Entry(frame)
         self.details_field.grid(row=4, column=0, sticky = E + W, columnspan=2)
         
-        submit = Button(frame, text='Submit', fg='Black', command= self.create_plot)
+        submit = Button(frame, text='Submit', fg='Black', command= self.start_test)
         submit.grid(row=10, column=0, columnspan=2, padx=0, pady = 5)
 
         # whenever the enter key is pressed then call the focus1 function
@@ -306,26 +334,8 @@ class Frame_examples_program():
         self.plot4 = self.fig.add_subplot(235)
 
         # - - - - - - - - - - - - - - - - - - - - -
-        # plot values
-        self.plot0.set_title('S21 - delay')
-        self.plot0.set_xlabel('X axis label')
-        self.plot0.set_ylabel('Y label')
-
-        self.plot1.set_title('S21 - dB')
-        self.plot1.set_xlabel('X axis label')
-        self.plot1.set_ylabel('Y label')
-
-        self.plot2.set_title('S11 - SWR')
-        self.plot2.set_xlabel('X axis label')
-        self.plot2.set_ylabel('Y label')
-
-        self.plot3.set_title('S22 - SWR')
-        self.plot3.set_xlabel('X axis label')
-        self.plot3.set_ylabel('Y label')
-
-        self.plot4.set_title('S11 - TDR')
-        self.plot4.set_xlabel('X axis label')
-        self.plot4.set_ylabel('Y label')
+        # set axis names
+        self.set_axis_name()
 
         # - - - - - - - - - - - - - - - - - - - - -
         # autoadapt
