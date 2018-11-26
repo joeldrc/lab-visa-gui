@@ -6,7 +6,6 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
-from tkinter import colorchooser
 
 from visa_scpi import instrument_info
 from visa_scpi import vna_measure
@@ -22,7 +21,6 @@ from openpyxl import *
 
 
 # variables
-file_position = ' '
 reference = False
 saveRef = False 
 
@@ -32,31 +30,28 @@ class Frame_examples_program():
     def __init__(self):
         self.window = tk.Tk()
         #self.window.geometry('600x600')
+
+        # opening the existing excel file & create the sheet object
+        self.wb = Workbook()
+        self.sheet = self.wb.active
      
         self.window.title("TEST GUI - V.1.0")
-        self.create_widgets()
+        self.create_widgets()        
 
-        # opening the existing excel file
-        self.wb = Workbook()
-        # create the sheet object
-        self.sheet = self.wb.active
-
-
-    def update_screen(self):
-        self.clock.config(text="DATE: " + strftime("%d %b %Y %H:%M:%S", gmtime()))
-        
-        # update every 1000ms
-        self.clock.after(1000, self.update_screen)
-        
 
     def configure(self, event):
+        # read screen width & height
         w, h = event.width, event.height
-        #print(w)
-        #print(h)
 
 
     def focus(self, event):
         self.create_plot()
+        
+
+    def update_screen(self):
+        self.clock.config(text="DATE: " + strftime("%d %b %Y %H:%M:%S", gmtime()))        
+        # update every 1000ms
+        self.clock.after(1000, self.update_screen)
         
 
     def create_buttons(self, parent, a, b, c):
@@ -66,42 +61,38 @@ class Frame_examples_program():
         button2.grid(row=2, column=1)
         button3 = ttk.Button(parent, text="do task " + c)
         button3.grid(row=3, column=1)
-
         return (button1, button2, button3)
 
 
-    def colorCircle(self, color):
+    def panel_led(self, color):
         self.circle_canvas.create_oval(10, 10, 40, 40, width=0, fill=color)
 	
 	
     def show_info(self):
         messagebox.showinfo(title = 'About Me!', message = 'joel.daricou@cern.ch 2018')
-        return
 
 
-    def save_file(self):
-        global file_position      
+    def save_file(self):    
         file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()    
-        file_position = filedialog.asksaveasfilename(initialdir = "/",initialfile=file_name, title = "Select file",filetypes = (("Microsoft Excel Worksheet","*.xlsx"),("all files","*.*")), defaultextension = ' ')
-        self.wb.save(file_position)
+        file_position = filedialog.asksaveasfilename(initialdir = "/",initialfile=file_name, \
+        title = "Select file",filetypes = (("Microsoft Excel Worksheet","*.xlsx"),("all files","*.*")), defaultextension = ' ')
+        self.wb.save()
 
 
     def open_file(self):
-        global file_position
-        file_position = filedialog.askopenfile().name
+        #self.file_position = filedialog.askopenfile().name
+        return
         
 
     def close_file(self):
         exit = messagebox.askyesno(title = 'Quit?', message = 'Are you sure?')
         if exit > 0:
             self.window.destroy()
-            return
 
 
     def save_ref(self):
         global saveRef
         global reference
-
         # invert the value
         reference = not reference
         if reference == True:
@@ -113,7 +104,7 @@ class Frame_examples_program():
 
     def start_test(self):
         self.display_info.config(text='START TEST')
-        self.colorCircle('lime')
+        self.panel_led('lime')
         self.create_plot()
         
 
