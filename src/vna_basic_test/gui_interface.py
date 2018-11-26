@@ -123,28 +123,7 @@ class Frame_examples_program():
         self.plot2.cla()
         self.plot3.cla()
         self.plot4.cla()
-
-        # plot values
-        self.plot0.set_title('S21 - delay')
-        self.plot0.set_xlabel('X axis label')
-        self.plot0.set_ylabel('Y label')
-
-        self.plot1.set_title('S21 - dB')
-        self.plot1.set_xlabel('X axis label')
-        self.plot1.set_ylabel('Y label')
-
-        self.plot2.set_title('S11 - SWR')
-        self.plot2.set_xlabel('X axis label')
-        self.plot2.set_ylabel('Y label')
-
-        self.plot3.set_title('S22 - SWR')
-        self.plot3.set_xlabel('X axis label')
-        self.plot3.set_ylabel('Y label')
-
-        self.plot4.set_title('S11 - TDR')
-        self.plot4.set_xlabel('X axis label')
-        self.plot4.set_ylabel('Y label')
-        
+      
         # set data on plot
         self.plot0.plot(xValue0, yValue0)        
         self.plot1.plot(xValue1, yValue1)
@@ -327,11 +306,38 @@ class Frame_examples_program():
         self.plot4 = self.fig.add_subplot(235)
 
         # - - - - - - - - - - - - - - - - - - - - -
+        # plot values
+        self.plot0.set_title('S21 - delay')
+        self.plot0.set_xlabel('X axis label')
+        self.plot0.set_ylabel('Y label')
+
+        self.plot1.set_title('S21 - dB')
+        self.plot1.set_xlabel('X axis label')
+        self.plot1.set_ylabel('Y label')
+
+        self.plot2.set_title('S11 - SWR')
+        self.plot2.set_xlabel('X axis label')
+        self.plot2.set_ylabel('Y label')
+
+        self.plot3.set_title('S22 - SWR')
+        self.plot3.set_xlabel('X axis label')
+        self.plot3.set_ylabel('Y label')
+
+        self.plot4.set_title('S11 - TDR')
+        self.plot4.set_xlabel('X axis label')
+        self.plot4.set_ylabel('Y label')
+
+        # - - - - - - - - - - - - - - - - - - - - -
+        # autoadapt
+        plt.tight_layout()
+
+        # - - - - - - - - - - - - - - - - - - - - -
         # Draw        
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.window)
         self.canvas.draw()
         self.canvas.get_tk_widget().grid(row=1, column=2, sticky=tk.E + tk.W + tk.N + tk.S, padx=0, pady=0)
 
+        # - - - - - - - - - - - - - - - - - - - - -
         # event screen resize
         self.window.bind("<Configure>", self.configure)
 
