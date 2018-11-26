@@ -287,14 +287,14 @@ class Frame_examples_program():
         self.details_field = Entry(frame)
         self.details_field.grid(row=4, column=0, sticky = E + W, columnspan=2, padx=5, pady = 5)
         
-        submit = Button(frame, text='Submit', fg='Black', command= self.start_test)
-        submit.grid(row=10, column=0, columnspan=2, padx=5, pady = 5)
+        self.save_ref = Button(frame, text='Save ref.', fg='Black', command= self.save_ref)
+        self.save_ref.grid(row=10, column=0, columnspan=2, sticky = W, padx=20, pady = 5)
+        
+        submit = Button(frame, text='START MEASURE', fg='Black', command= self.start_test)
+        submit.grid(row=10, column=1, columnspan=2, sticky = E, padx=20, pady = 5)
 
         # whenever the enter key is pressed then call the focus1 function
         self.window.bind('<Return>', self.focus)
-
-        self.save_ref = Button(frame, text='Save ref.', fg='Black', command= self.save_ref)
-        self.save_ref.grid(row=11, column=0, columnspan=2, padx=5, pady = 5)
 
         self.display_info = ttk.Label(frame, text= 'PRESS TO START')
         self.display_info.grid(row=12, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=20)
