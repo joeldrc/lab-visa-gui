@@ -8,6 +8,7 @@ from tkinter import messagebox
 from tkinter import filedialog
 from tkinter import colorchooser
 
+from visa_scpi import instrument_info
 from visa_scpi import vna_measure
 
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
@@ -30,7 +31,8 @@ class Frame_examples_program():
     
     def __init__(self):
         self.window = tk.Tk()
-        #self.window.geometry('600x600') 
+        #self.window.geometry('600x600')
+     
         self.window.title("TEST GUI - V.1.0")
         self.create_widgets()
 
@@ -259,7 +261,10 @@ class Frame_examples_program():
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Title
-        labeled_frame_label = ttk.Label(self.window, text="VNA - TEST")
+        instrument_name, instrument_address = instrument_info()
+        str_instrument_info = "(" + instrument_address + ") - " + instrument_name
+        
+        labeled_frame_label = ttk.Label(self.window, text="VNA - TEST - " + str_instrument_info)
         labeled_frame_label.grid(row=0, column=0, sticky=W, padx=10, pady=5)
 
         # - - - - - - - - - - - - - - - - - - - - -

@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-vna_address = 'TCPIP::128.141.154.7::INSTR'
+vna_address = 'TCPIP::128.141.154.167::INSTR'
 
 
 rm = visa.ResourceManager()
@@ -21,10 +21,11 @@ class Vna_measure():
 """
 
 
-def instrumentName():
+def instrument_info():
     name = vna.query('*IDN?')   # Query the Identification string
+    time.sleep(1)
     print(name)     
-    return name
+    return (name, vna_address)
 
 
 def vna_measure(index):
@@ -143,7 +144,7 @@ def vna_measure(index):
 
 """
 # Enable to test
-instrumentName()    
+instrument_info()    
 for i in range(0, 5, 1):
     print(vna_measure(i))   
 """
