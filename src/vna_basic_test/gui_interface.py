@@ -1,4 +1,5 @@
 from multi_thread import Progress
+from visa_scpi import Vna_measure
 
 import time
 from time import gmtime, strftime
@@ -9,8 +10,6 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
 
-from visa_scpi import instrument_info
-from visa_scpi import vna_measure
 
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.backend_bases import key_press_handler
@@ -36,6 +35,8 @@ class Frame_examples_program():
         # opening the existing excel file & create the sheet object
         self.wb = Workbook()
         self.sheet = self.wb.active
+
+        self.vna = Vna_measure()
      
         self.window.title("TEST GUI - V.1.0")
         self.create_widgets()        
@@ -135,11 +136,11 @@ class Frame_examples_program():
                        
     def create_plot(self):              
         # masure vna
-        xValue0, yValue0 = vna_measure(0)
-        xValue1, yValue1 = vna_measure(1)
-        xValue2, yValue2 = vna_measure(2)
-        xValue3, yValue3 = vna_measure(3)
-        xValue4, yValue4 = vna_measure(4)
+        xValue0, yValue0 = self.vna.read_measure(0)
+        xValue1, yValue1 = self.vna.read_measure(1)
+        xValue2, yValue2 = self.vna.read_measure(2)
+        xValue3, yValue3 = self.vna.read_measure(3)
+        xValue4, yValue4 = self.vna.read_measure(4)
 
         global saveRef
         if saveRef == True:
@@ -254,7 +255,7 @@ class Frame_examples_program():
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Title
-        instrument_name, instrument_address = instrument_info()
+        instrument_name, instrument_address = self.vna.instrument_info()
         str_instrument_info = instrument_name + "\n" + instrument_address
         
         labeled_frame_label = ttk.Label(self.window, text=str_instrument_info)
