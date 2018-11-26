@@ -1,3 +1,5 @@
+from multi_thread import Progress
+
 import time
 from time import gmtime, strftime
 
@@ -300,6 +302,29 @@ class Frame_examples_program():
 
         self.clock = Label(frame)
         self.clock.grid(row=13, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=5)
+
+        # - - - - - - - - - - - - - - - - - - - - -
+        # test thread
+        parent = ttk.LabelFrame(frame, text="NOTEBOOK", relief=tk.RIDGE)
+        parent.grid(row=21, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
+        
+        prog_bar = Progress(parent, row=0, column=0, columnspan=2)
+        # Button 1
+        start_button = ttk.Button(parent, text="start",
+                                  command=prog_bar.pb_start)
+        start_button.grid(row=1, column=0)
+        # Button 2
+        stop_button = ttk.Button(parent, text="stop",
+                                 command=prog_bar.pb_stop)
+        stop_button.grid(row=1, column=1)
+        # Button 3
+        complete_button = ttk.Button(parent, text="complete",
+                                     command=prog_bar.pb_complete)
+        complete_button.grid(row=2, column=0)
+        # Button 4
+        clear_button = ttk.Button(parent, text="clear",
+                                  command=prog_bar.pb_clear)
+        clear_button.grid(row=2, column=1)
 
         """
         # - - - - - - - - - - - - - - - - - - - - -

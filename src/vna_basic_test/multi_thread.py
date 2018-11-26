@@ -51,33 +51,6 @@ class Progress():
             self.progressbar.configure(mode="determinate",
                                        maximum=self.maximum,
                                        value=self.maximum)
-            
-class AppGUI(tk.Frame):
-    """ class to define tkinter GUI"""
-    def __init__(self, parent,):
-        tk.Frame.__init__(self, master=parent)
-        prog_bar = Progress(parent, row=0, column=0, columnspan=2)
-        # Button 1
-        start_button = ttk.Button(parent, text="start",
-                                  command=prog_bar.pb_start)
-        start_button.grid(row=1, column=0)
-        # Button 2
-        stop_button = ttk.Button(parent, text="stop",
-                                 command=prog_bar.pb_stop)
-        stop_button.grid(row=1, column=1)
-        # Button 3
-        complete_button = ttk.Button(parent, text="complete",
-                                     command=prog_bar.pb_complete)
-        complete_button.grid(row=2, column=0)
-        # Button 4
-        clear_button = ttk.Button(parent, text="clear",
-                                  command=prog_bar.pb_clear)
-        clear_button.grid(row=2, column=1)
 
 
-"""
-ROOT = tk.Tk()
-APP = AppGUI(ROOT)
-ROOT.mainloop()
-"""
 
