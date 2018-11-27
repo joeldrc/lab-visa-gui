@@ -1,6 +1,8 @@
 from multi_thread import Progress
 from visa_scpi import Vna_measure
 
+import threading 
+
 import time
 from time import gmtime, strftime
 
@@ -36,12 +38,12 @@ class User_gui():
         self.wb = Workbook()
         self.sheet = self.wb.active
 
-        self.vna = Vna_measure('TCPIP::128.141.154.167::INSTR')
+        self.vna = Vna_measure('TCPIP::CFO-MD-BQPVNA1::INSTR')
      
         self.window.title("TEST GUI - V.1.0")
-        self.create_widgets()        
-
-
+        self.create_widgets()
+            
+        
     def configure(self, event):
         # read screen width & height
         w, h = event.width, event.height
@@ -109,7 +111,7 @@ class User_gui():
         self.display_info.config(text='START TEST')
         self.panel_led('lime')
         self.create_plot()
-        
+       
 
     def set_axis_name(self):
         # set axis names
@@ -133,8 +135,8 @@ class User_gui():
         self.plot4.set_xlabel('delay')
         self.plot4.set_ylabel('dB')
 
-                       
-    def create_plot(self):              
+
+    def create_plot(self):
         # masure vna
         xValue0, yValue0 = self.vna.read_measure(0)
         xValue1, yValue1 = self.vna.read_measure(1)
