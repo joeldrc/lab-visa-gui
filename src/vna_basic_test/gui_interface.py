@@ -1,7 +1,7 @@
-from multi_thread import Progress
-from visa_scpi import Vna_measure
+from threading import Thread
+from multi_thread import *
 
-import threading 
+from visa_scpi import Vna_measure
 
 import time
 from time import gmtime, strftime
@@ -27,7 +27,41 @@ from openpyxl import *
 reference = False
 saveRef = False 
 
-        
+
+class MyThread(Thread):
+    
+    def __init__(self, val):
+        #Thread.__init__(self)
+        Thread.__init__(self)
+
+        self.val = val
+        self.data_ready = False
+
+        self.vna = Vna_measure('TCPIP::CFO-MD-BQPVNA1::INSTR')
+        self.instrument_info = self.vna.instrument_info()
+
+    # run all the time
+    def run(self):
+        while 1:
+            if self.val:
+
+                self.data_ready = False
+                
+                # masure vna
+                self.measure0 = self.vna.read_measure(0)
+                self.measure1 = self.vna.read_measure(1)
+                self.measure2 = self.vna.read_measure(2)
+                self.measure3 = self.vna.read_measure(3)
+                self.measure4 = self.vna.read_measure(4)
+
+                self.data_ready = True
+                
+                self.val = not self.val
+                
+            # Sleep
+            secondsToSleep = 0.1
+
+   
 class User_gui():
     
     def __init__(self):
@@ -38,12 +72,17 @@ class User_gui():
         self.wb = Workbook()
         self.sheet = self.wb.active
 
-        self.vna = Vna_measure('TCPIP::CFO-MD-BQPVNA1::INSTR')
+        # Declare objects of MyThread class
+        self.myThreadOb1 = MyThread(False)
+        # Start running the threads!
+        self.myThreadOb1.start()
+        # Wait for the threads to finish...
+        #myThreadOb1.join()
      
         self.window.title("TEST GUI - V.1.0")
         self.create_widgets()
             
-        
+               
     def configure(self, event):
         # read screen width & height
         w, h = event.width, event.height
@@ -54,6 +93,12 @@ class User_gui():
         
 
     def update_screen(self):
+        if self.myThreadOb1.data_ready == True:
+            self.panel_led('lime')
+            #self.create_plot()
+        else:
+            self.panel_led('red')
+        
         self.clock.config(text="DATE: " + strftime("%d %b %Y %H:%M:%S", gmtime()))        
         # update every 1000ms
         self.clock.after(1000, self.update_screen)
@@ -95,9 +140,9 @@ class User_gui():
             self.window.destroy()
 
 
-    def save_ref(self):
+    def save_ref(self):                
         global saveRef
-        global reference
+        global reference       
         # invert the value
         reference = not reference
         if reference == True:
@@ -109,10 +154,12 @@ class User_gui():
 
     def start_test(self):
         self.display_info.config(text='START TEST')
-        self.panel_led('lime')
-        self.create_plot()
-       
+        
+        """ +++++++++ """
+        self.myThreadOb1.val = not self.myThreadOb1.val
+        """ +++++++++ """
 
+        
     def set_axis_name(self):
         # set axis names
         self.plot0.set_title('S21 - delay')
@@ -138,11 +185,11 @@ class User_gui():
 
     def create_plot(self):
         # masure vna
-        xValue0, yValue0 = self.vna.read_measure(0)
-        xValue1, yValue1 = self.vna.read_measure(1)
-        xValue2, yValue2 = self.vna.read_measure(2)
-        xValue3, yValue3 = self.vna.read_measure(3)
-        xValue4, yValue4 = self.vna.read_measure(4)
+        xValue0, yValue0 = self.myThreadOb1.measure0
+        xValue1, yValue1 = self.myThreadOb1.measure1
+        xValue2, yValue2 = self.myThreadOb1.measure2
+        xValue3, yValue3 = self.myThreadOb1.measure3
+        xValue4, yValue4 = self.myThreadOb1.measure4
 
         global saveRef
         if saveRef == True:
@@ -257,7 +304,7 @@ class User_gui():
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Title
-        instrument_name, instrument_address = self.vna.instrument_info()
+        instrument_name, instrument_address = self.myThreadOb1.instrument_info
         str_instrument_info = instrument_name + "\n" + instrument_address
         
         labeled_frame_label = ttk.Label(self.window, text=str_instrument_info)
