@@ -4,22 +4,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-vna_address = 'TCPIP::128.141.154.167::INSTR'
-
-
 class Vna_measure():
-    def __init__(self):
+    
+    def __init__(self, address):
+        self.instrument_address = address
         rm = visa.ResourceManager()
-        self.vna = rm.open_resource(vna_address)
+        self.vna = rm.open_resource(self.instrument_address)
         self.vna.write_termination = '\n'  # Some instruments require LF at the end of each command. In that case, use:
-
 
 
     def instrument_info(self):
         name = self.vna.query('*IDN?')   # Query the Identification string
         time.sleep(1)
-        print(name)     
-        return (name, vna_address)
+        #print(name)     
+        return (name, self.instrument_address)
 
 
     def read_measure(self, index):
@@ -124,23 +122,23 @@ class Vna_measure():
 
         yDataArray = list(np.float_(yDataArray))
         xDataArray = list(np.float_(xDataArray))
-
-        """ 
-        plt.title ("Trace Data via Python - PyVisa - SCPI")
-        plt.xlabel("Frequency")
-        plt.ylabel("Amplitude (dBm)")
-        plt.plot(xDataArray, yDataArray)
-        plt.show()
-        """
-        
+       
         return(xDataArray, yDataArray)
 
 
 """
 # Enable to test
-test = Vna_measure()
-test.instrument_info()
+address = 'TCPIP::128.141.154.167::INSTR'
+test = Vna_measure(address)
+print(test.instrument_info())
 for i in range(0, 5, 1):
-    print(test.read_measure(i))   
+    print(test.read_measure(i))
+
+x, y = test.read_measure(0)
+
+plt.title ("Trace Data via Python - PyVisa - SCPI")
+plt.xlabel("Frequency")
+plt.ylabel("Amplitude (dBm)")
+plt.plot(x, y)
+plt.show()
 """
-  
