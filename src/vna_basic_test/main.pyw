@@ -1,7 +1,7 @@
-from gui_interface import Frame_examples_program
+from gui_interface import User_gui
 
 # Create the entire GUI program
-program = Frame_examples_program()
+program = User_gui()
  
 # Start the GUI event loop
 program.window.mainloop()

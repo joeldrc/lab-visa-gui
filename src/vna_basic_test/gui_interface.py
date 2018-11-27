@@ -26,7 +26,7 @@ reference = False
 saveRef = False 
 
         
-class Frame_examples_program():
+class User_gui():
     
     def __init__(self):
         self.window = tk.Tk()
@@ -36,7 +36,7 @@ class Frame_examples_program():
         self.wb = Workbook()
         self.sheet = self.wb.active
 
-        self.vna = Vna_measure()
+        self.vna = Vna_measure('TCPIP::128.141.154.167::INSTR')
      
         self.window.title("TEST GUI - V.1.0")
         self.create_widgets()        
