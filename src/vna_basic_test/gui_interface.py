@@ -28,13 +28,14 @@ reference = False
 saveRef = False 
 
 
-class MyThread(Thread):
+class New_thread(Thread):
     
     def __init__(self, val):
         #Thread.__init__(self)
         Thread.__init__(self)
 
         self.val = val
+        self.file_name = "_null_"
         self.data_ready = False
 
         self.vna = Vna_measure('TCPIP::CFO-MD-BQPVNA1::INSTR')
@@ -47,25 +48,23 @@ class MyThread(Thread):
 
     # run all the time
     def run(self):
-        while 1:
-            if self.val:
+        if self.val:
 
-                self.data_ready = False
-                
-                # masure vna
-                self.measure0 = self.vna.read_measure(0)
-                self.measure1 = self.vna.read_measure(1)
-                self.measure2 = self.vna.read_measure(2)
-                self.measure3 = self.vna.read_measure(3)
-                self.measure4 = self.vna.read_measure(4)
+            self.data_ready = False
+            
+            # masure vna
+            self.measure0 = self.vna.read_measure(0)
+            self.measure1 = self.vna.read_measure(1)
+            self.measure2 = self.vna.read_measure(2)
+            self.measure3 = self.vna.read_measure(3)
+            self.measure4 = self.vna.read_measure(4)
 
-                self.data_ready = True                
-                self.val = not self.val
+            self.data_ready = True                
+            self.val = not self.val
 
-                self.create_sheet()
-                
-            # Sleep
-            secondsToSleep = 1
+            self.create_sheet()
+
+        #time.sleep(1)
 
 
     def create_sheet(self):
@@ -83,14 +82,8 @@ class MyThread(Thread):
         self.sheet.column_dimensions['A'].width = 30
         self.sheet.column_dimensions['B'].width = 30
         """
-
-        """
-        # write given data to an excel spreadsheet at particular location
-        file_name = self.name_field.get() + '_' +  self.serial_name_field.get() + '_' + \
-        self.serial_number_field.get() + '_' + self.details_field.get()
-
-        self.sheet.cell(row=1, column=1).value = file_name
-        """
+        
+        self.sheet.cell(row=1, column=1).value = self.file_name
 
         self.sheet.cell(row=1, column=2).value =strftime("%d %b %Y %H:%M:%S", gmtime())
 
@@ -124,12 +117,11 @@ class MyThread(Thread):
 
             self.sheet.cell(row=i + 3, column=13).value = xValue4[i]
             self.sheet.cell(row=i + 3, column=14).value = yValue4[i]
-            
-        file_position = filedialog.asksaveasfilename(initialdir = "/","""initialfile=" ",""" \
-        title = "Select file",filetypes = (("Microsoft Excel Worksheet","*.xlsx"),("all files","*.*")), defaultextension = ' ')
-        self.wb.save()
+                    
+        file_position = filedialog.asksaveasfilename(initialdir = "/",initialfile=self.file_name, title = "Select file",filetypes = (("Microsoft Excel Worksheet","*.xlsx"),("all files","*.*")), defaultextension = ' ')
+        self.wb.save(file_position)
 
-   
+       
 class User_gui():
     
     def __init__(self):
@@ -137,7 +129,7 @@ class User_gui():
         #self.window.geometry('600x600')
 
         # Declare objects of MyThread class
-        self.myThreadOb1 = MyThread(False)
+        self.myThreadOb1 = New_thread(False)
         # Start running the threads!
         self.myThreadOb1.start()
         # Wait for the threads to finish...
@@ -145,53 +137,21 @@ class User_gui():
      
         self.window.title("TEST GUI - V.1.0")
         self.create_widgets()
-            
+        
                
-    def configure(self, event):
-        # read screen width & height
-        w, h = event.width, event.height
-
-
     def focus(self, event):
-        self.create_plot()
-        
-
-    def update_screen(self):
-        if self.myThreadOb1.data_ready == True:
-            self.panel_led('lime')
-            self.display_info.config(text='TEST DONE')
-            #self.create_plot()
-        else:
-            self.panel_led('red')
-        
-        self.clock.config(text="DATE: " + strftime("%d %b %Y %H:%M:%S", gmtime()))        
-        # update every 1000ms
-        self.clock.after(1000, self.update_screen)
-        
-
-    def create_buttons(self, parent, a, b, c):
-        button1 = ttk.Button(parent, text="do task " + a)
-        button1.grid(row=1, column=1)
-        button2 = ttk.Button(parent, text="do task " + b)
-        button2.grid(row=2, column=1)
-        button3 = ttk.Button(parent, text="do task " + c)
-        button3.grid(row=3, column=1)
-        return (button1, button2, button3)
+        self.start_test()
 
 
-    def panel_led(self, color):
-        self.circle_canvas.create_oval(10, 10, 40, 40, width=0, fill=color)
-	
-	
+    # - - - - - - - - - - - - - - - - - - - - -
+    # menuBar	
     def show_info(self):
         messagebox.showinfo(title = 'About Me!', message = 'joel.daricou@cern.ch 2018')
 
 
     def save_file(self):    
-        file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()    
-        file_position = filedialog.asksaveasfilename(initialdir = "/",initialfile=file_name, \
-        title = "Select file",filetypes = (("Microsoft Excel Worksheet","*.xlsx"),("all files","*.*")), defaultextension = ' ')
-        self.wb.save()
+        #file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
+        return
 
 
     def open_file(self):
@@ -205,6 +165,27 @@ class User_gui():
             self.window.destroy()
 
 
+    # - - - - - - - - - - - - - - - - - - - - -
+    # autoupdate
+    def update_screen(self):
+        if self.myThreadOb1.data_ready:
+            self.panel_led('lime')
+            self.prog_bar.pb_complete()
+            self.create_plot()
+        else:
+            self.panel_led('red')
+            #self.prog_bar.pb_start()
+        
+        self.clock.config(text="DATE: " + strftime("%d %b %Y %H:%M:%S", gmtime()))        
+        self.clock.after(1000, self.update_screen)
+
+
+    # - - - - - - - - - - - - - - - - - - - - -
+    # user pannel   
+    def panel_led(self, color):
+        self.circle_canvas.create_oval(10, 10, 40, 40, width=0, fill=color)
+
+
     def save_ref(self):                
         global saveRef
         global reference       
@@ -214,15 +195,20 @@ class User_gui():
             self.save_ref.config(text='Remove Ref.')
             saveRef = True
         else:
-            self.save_ref.config(text='Save Ref.')
+            self.save_ref.config(text='Set Ref.')
 
 
     def start_test(self):
-        self.display_info.config(text='START TEST')
-        
-        """ +++++++++ """
-        self.myThreadOb1.val = not self.myThreadOb1.val
-        """ +++++++++ """
+        self.prog_bar.pb_start()
+                
+        if not self.myThreadOb1.isAlive():
+            self.myThreadOb1 = New_thread(True)
+            self.myThreadOb1.start()
+        else:
+            self.myThreadOb1.val = True
+
+        self.myThreadOb1.file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
+        #print(self.myThreadOb1.isAlive())
 
         
     def set_axis_name(self):
@@ -297,7 +283,7 @@ class User_gui():
             
     def create_widgets(self):       
         # - - - - - - - - - - - - - - - - - - - - -
-        # MenuBar
+        # menuBar
         myMenuBar = Menu (self.window)
 
         myFileMenu = Menu (myMenuBar , tearoff = 0)
@@ -312,12 +298,12 @@ class User_gui():
 
         self.window.config(menu = myMenuBar)
 
-        # Create some room around all the internal frames
+        # create some room around all the internal frames
         self.window['padx'] = 10
         self.window['pady'] = 10      
 
         # - - - - - - - - - - - - - - - - - - - - -
-        # Title
+        # title
         instrument_name, instrument_address = self.myThreadOb1.instrument_info
         str_instrument_info = instrument_name + "\n" + instrument_address
         
@@ -325,7 +311,7 @@ class User_gui():
         labeled_frame_label.grid(row=0, column=0, sticky=W, padx=10, pady=5)
 
         # - - - - - - - - - - - - - - - - - - - - -
-        # User data
+        # user data
         frame = ttk.LabelFrame(self.window, text="USER DATA", relief=tk.RIDGE)
         frame.grid(row=1, column=1, sticky = tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
        
@@ -355,107 +341,55 @@ class User_gui():
         submit = Button(frame, text='START MEASURE', fg='Black', command= self.start_test)
         submit.grid(row=10, column=1, columnspan=2, sticky = E, padx=20, pady = 5)
 
-        # whenever the enter key is pressed then call the focus1 function
-        self.window.bind('<Return>', self.focus)
-
-        self.display_info = ttk.Label(frame, text= 'PRESS TO START')
-        self.display_info.grid(row=12, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=20)
-
         self.circle_canvas = Canvas(frame, width=40, height=40)
         self.circle_canvas.grid(row=12, column=1, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=5)
 
+        # display time
         self.clock = Label(frame)
         self.clock.grid(row=13, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=5)
 
-        # - - - - - - - - - - - - - - - - - - - - -
-        # test thread
-        parent = ttk.LabelFrame(frame, text="NOTEBOOK", relief=tk.RIDGE)
-        parent.grid(row=21, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
-        
-        prog_bar = Progress(parent, row=0, column=0, columnspan=2)
-        # Button 1
-        start_button = ttk.Button(parent, text="start",
-                                  command=prog_bar.pb_start)
-        start_button.grid(row=1, column=0)
-        # Button 2
-        stop_button = ttk.Button(parent, text="stop",
-                                 command=prog_bar.pb_stop)
-        stop_button.grid(row=1, column=1)
-        # Button 3
-        complete_button = ttk.Button(parent, text="complete",
-                                     command=prog_bar.pb_complete)
-        complete_button.grid(row=2, column=0)
-        # Button 4
-        clear_button = ttk.Button(parent, text="clear",
-                                  command=prog_bar.pb_clear)
-        clear_button.grid(row=2, column=1)
-
-        """
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Setup
-        frame2 = ttk.LabelFrame(frame, text="NOTEBOOK", relief=tk.RIDGE)
-        frame2.grid(row=21, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=20, pady=20)
-       
-        frame3 = ttk.Notebook(frame2)
-        frame3.grid(row=1, column=0, sticky=tk.E + tk.W + tk.N + tk.S, padx=0, pady=0)
-               
-        tab1 = tk.Frame(frame2)
-        tab2 = tk.Frame(frame2)
-
-        frame3.add(tab1, text="TEST", compound=tk.TOP)
-        frame3.add(tab2, text="SETUP", compound=tk.TOP)
-        
-        self.create_buttons(tab1, "J", "K", "L")
-        self.create_buttons(tab2, "M", "N", "O")
-        """
+        # create loading bar
+        self.prog_bar = Progress(frame, columnspan=2, sticky = tk.E + tk.W + tk.N + tk.S)
 
         # - - - - - - - - - - - - - - - - - - - - -
-        # Plot setup
+        # plot setup
         plt.style.use('bmh')
         
         self.fig = Figure()       
-        #self.fig.set_size_inches(22, 10)
-
         self.fig = plt.gcf()
         DPI = self.fig.get_dpi()
         self.fig.set_size_inches(1280.0/float(DPI), 720.0/float(DPI))
         
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Plot 0
-        self.plot0 = self.fig.add_subplot(231)
-                                               
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Plot 1       
-        self.plot1 = self.fig.add_subplot(232)
-
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Plot 2       
-        self.plot2 = self.fig.add_subplot(233)
-
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Plot 3       
-        self.plot3 = self.fig.add_subplot(234)
-
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Plot 4       
+        # subplot
+        self.plot0 = self.fig.add_subplot(231)     
+        self.plot1 = self.fig.add_subplot(232)    
+        self.plot2 = self.fig.add_subplot(233)      
+        self.plot3 = self.fig.add_subplot(234)     
         self.plot4 = self.fig.add_subplot(235)
 
-        # - - - - - - - - - - - - - - - - - - - - -
         # set axis names
         self.set_axis_name()
-
-        # - - - - - - - - - - - - - - - - - - - - -
+        
         # autoadapt
         plt.tight_layout()
 
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Draw        
+        # draw        
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.window)
         self.canvas.draw()
         self.canvas.get_tk_widget().grid(row=1, column=0, sticky=tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
 
         # - - - - - - - - - - - - - - - - - - - - -
-        # event screen resize
-        self.window.bind("<Configure>", self.configure)
+        # event
         self.update_screen()
+               
+        # whenever the enter key is pressed then call the focus1 function
+        self.window.bind('<Return>', self.focus)
 
+        """
+        # screen resize
+        self.window.bind("<Configure>", self.configure)
+        
+    def configure(self, event):
+        # read screen width & height
+        w, h = event.width, event.height
+        """
