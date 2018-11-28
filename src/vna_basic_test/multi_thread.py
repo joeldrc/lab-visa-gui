@@ -5,11 +5,11 @@ from tkinter import ttk
 
 class Progress():
     # threaded progress bar for tkinter gui
-    def __init__(self, parent, columnspan, sticky):
+    def __init__(self, parent, row, columnspan, sticky, padx, pady):
         self.maximum = 100
         self.interval = 10
         self.progressbar = ttk.Progressbar(parent, orient=tk.HORIZONTAL, mode="indeterminate", maximum=self.maximum)
-        self.progressbar.grid(columnspan=columnspan, sticky=sticky)
+        self.progressbar.grid(row= row, columnspan=columnspan, sticky=sticky, padx=padx, pady=pady)
         self.thread = threading.Thread()
         self.thread.__init__(target=self.progressbar.start(self.interval), args=())
         self.pb_clear()

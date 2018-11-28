@@ -315,10 +315,6 @@ class User_gui():
         frame = ttk.LabelFrame(self.window, text="USER DATA", relief=tk.RIDGE)
         frame.grid(row=1, column=1, sticky = tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
 
-        # display time
-        self.clock = Label(frame)
-        self.clock.grid(row=0, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=5)
-
         # display label
         name = Label(frame, text='Name (User):')
         name.grid(row=1, column=0, sticky = W)
@@ -354,7 +350,11 @@ class User_gui():
         """
 
         # create loading bar
-        self.prog_bar = Progress(frame, columnspan=2, sticky = tk.E + tk.W + tk.N + tk.S)
+        self.prog_bar = Progress(frame, row=20, columnspan=2, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=5)
+
+        # display time
+        self.clock = Label(frame)
+        self.clock.grid(row=30, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=5)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # plot setup
