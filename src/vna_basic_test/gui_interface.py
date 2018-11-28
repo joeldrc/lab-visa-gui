@@ -338,7 +338,7 @@ class User_gui():
         details = Label(frame, text='Add details:')
         details.grid(row=4, column=0, sticky = W)
         self.details_field = Entry(frame)
-        self.details_field.grid(row=4, column=0, sticky = E + W, columnspan=2, padx=5, pady = 5)
+        self.details_field.grid(row=5, column=0, sticky = E + W, columnspan=2, padx=5, pady = 5)
 
         # display button
         self.save_ref = Button(frame, text='Save ref.', fg='Black', command= self.save_ref)
