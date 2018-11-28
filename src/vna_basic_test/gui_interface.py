@@ -169,14 +169,14 @@ class User_gui():
     # autoupdate
     def update_screen(self):
         if self.myThreadOb1.data_ready:
-            self.panel_led('lime')
+            #self.panel_led('lime')
             self.prog_bar.pb_complete()
             self.create_plot()
-        else:
-            self.panel_led('red')
+        #else:
+            #self.panel_led('red')
             #self.prog_bar.pb_start()
         
-        self.clock.config(text="DATE: " + strftime("%d %b %Y %H:%M:%S", gmtime()))        
+        self.clock.config(text=strftime("%d %b %Y %H:%M:%S", gmtime()))        
         self.clock.after(1000, self.update_screen)
 
 
@@ -310,43 +310,48 @@ class User_gui():
         labeled_frame_label = ttk.Label(self.window, text=str_instrument_info)
         labeled_frame_label.grid(row=0, column=0, sticky=W, padx=10, pady=5)
 
-        # - - - - - - - - - - - - - - - - - - - - -
-        # user data
+        # - - - - - - - - - - - - - - - - - - - - -    
+        # user data frame
         frame = ttk.LabelFrame(self.window, text="USER DATA", relief=tk.RIDGE)
         frame.grid(row=1, column=1, sticky = tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
-       
+
+        # display time
+        self.clock = Label(frame)
+        self.clock.grid(row=0, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=5)
+
+        # display label
         name = Label(frame, text='Name (User):')
-        name.grid(row=0, column=0, sticky = W)
+        name.grid(row=1, column=0, sticky = W)
         self.name_field = Entry(frame)
-        self.name_field.grid(row=0, column=1, padx=5, pady = 5)
+        self.name_field.grid(row=1, column=1, padx=5, pady = 5)
 
         serial_name = Label(frame, text='Serial name:')
-        serial_name.grid(row=1, column=0, sticky = W)
+        serial_name.grid(row=2, column=0, sticky = W)
         self.serial_name_field = Entry(frame)
-        self.serial_name_field.grid(row=1, column=1, padx=5, pady = 5)
+        self.serial_name_field.grid(row=2, column=1, padx=5, pady = 5)
 
         serial_number = Label(frame, text='Serial num.:')
-        serial_number.grid(row=2, column=0, sticky = W)
+        serial_number.grid(row=3, column=0, sticky = W)
         self.serial_number_field = Entry(frame)
-        self.serial_number_field.grid(row=2, column=1, padx=5, pady = 5)
+        self.serial_number_field.grid(row=3, column=1, padx=5, pady = 5)
 
         details = Label(frame, text='Add details:')
-        details.grid(row=3, column=0, sticky = W)
+        details.grid(row=4, column=0, sticky = W)
         self.details_field = Entry(frame)
         self.details_field.grid(row=4, column=0, sticky = E + W, columnspan=2, padx=5, pady = 5)
-        
+
+        # display button
         self.save_ref = Button(frame, text='Save ref.', fg='Black', command= self.save_ref)
         self.save_ref.grid(row=10, column=0, columnspan=2, sticky = W, padx=20, pady = 5)
         
         submit = Button(frame, text='START MEASURE', fg='Black', command= self.start_test)
         submit.grid(row=10, column=1, columnspan=2, sticky = E, padx=20, pady = 5)
 
+        """
+        # display led
         self.circle_canvas = Canvas(frame, width=40, height=40)
-        self.circle_canvas.grid(row=12, column=1, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=5)
-
-        # display time
-        self.clock = Label(frame)
-        self.clock.grid(row=13, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=5)
+        self.circle_canvas.grid(row=20, column=1, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=5)
+        """
 
         # create loading bar
         self.prog_bar = Progress(frame, columnspan=2, sticky = tk.E + tk.W + tk.N + tk.S)
