@@ -40,6 +40,11 @@ class MyThread(Thread):
         self.vna = Vna_measure('TCPIP::CFO-MD-BQPVNA1::INSTR')
         self.instrument_info = self.vna.instrument_info()
 
+        # opening the existing excel file & create the sheet object
+        self.wb = Workbook()
+        self.sheet = self.wb.active
+
+
     # run all the time
     def run(self):
         while 1:
@@ -54,12 +59,75 @@ class MyThread(Thread):
                 self.measure3 = self.vna.read_measure(3)
                 self.measure4 = self.vna.read_measure(4)
 
-                self.data_ready = True
-                
+                self.data_ready = True                
                 self.val = not self.val
+
+                self.create_sheet()
                 
             # Sleep
-            secondsToSleep = 0.1
+            secondsToSleep = 1
+
+
+    def create_sheet(self):
+        # masure vna
+        xValue0, yValue0 = self.measure0
+        xValue1, yValue1 = self.measure1
+        xValue2, yValue2 = self.measure2
+        xValue3, yValue3 = self.measure3
+        xValue4, yValue4 = self.measure4
+
+        # - - - - - - - - - - - - - - - - - - - - -
+        # Create sheet
+        """
+        # resize the width of columns in excel spreadsheet
+        self.sheet.column_dimensions['A'].width = 30
+        self.sheet.column_dimensions['B'].width = 30
+        """
+
+        """
+        # write given data to an excel spreadsheet at particular location
+        file_name = self.name_field.get() + '_' +  self.serial_name_field.get() + '_' + \
+        self.serial_number_field.get() + '_' + self.details_field.get()
+
+        self.sheet.cell(row=1, column=1).value = file_name
+        """
+
+        self.sheet.cell(row=1, column=2).value =strftime("%d %b %Y %H:%M:%S", gmtime())
+
+        self.sheet.cell(row=2, column=1).value = 'x'
+        self.sheet.cell(row=2, column=2).value = 'y'
+
+        self.sheet.cell(row=2, column=4).value = 'x'
+        self.sheet.cell(row=2, column=5).value = 'y'
+
+        self.sheet.cell(row=2, column=7).value = 'x'
+        self.sheet.cell(row=2, column=8).value = 'y'
+
+        self.sheet.cell(row=2, column=10).value = 'x'
+        self.sheet.cell(row=2, column=11).value = 'y'
+
+        self.sheet.cell(row=2, column=13).value = 'x'
+        self.sheet.cell(row=2, column=14).value = 'y'
+
+        for i in range(0, len(xValue0), 1):
+            self.sheet.cell(row=i + 3, column=1).value = xValue0[i]
+            self.sheet.cell(row=i + 3, column=2).value = yValue0[i]
+
+            self.sheet.cell(row=i + 3, column=4).value = xValue1[i]
+            self.sheet.cell(row=i + 3, column=5).value = yValue1[i]
+
+            self.sheet.cell(row=i + 3, column=7).value = xValue2[i]
+            self.sheet.cell(row=i + 3, column=8).value = yValue2[i]
+
+            self.sheet.cell(row=i + 3, column=10).value = xValue3[i]
+            self.sheet.cell(row=i + 3, column=11).value = yValue3[i]
+
+            self.sheet.cell(row=i + 3, column=13).value = xValue4[i]
+            self.sheet.cell(row=i + 3, column=14).value = yValue4[i]
+            
+        file_position = filedialog.asksaveasfilename(initialdir = "/","""initialfile=" ",""" \
+        title = "Select file",filetypes = (("Microsoft Excel Worksheet","*.xlsx"),("all files","*.*")), defaultextension = ' ')
+        self.wb.save()
 
    
 class User_gui():
@@ -67,10 +135,6 @@ class User_gui():
     def __init__(self):
         self.window = tk.Tk()
         #self.window.geometry('600x600')
-
-        # opening the existing excel file & create the sheet object
-        self.wb = Workbook()
-        self.sheet = self.wb.active
 
         # Declare objects of MyThread class
         self.myThreadOb1 = MyThread(False)
@@ -95,6 +159,7 @@ class User_gui():
     def update_screen(self):
         if self.myThreadOb1.data_ready == True:
             self.panel_led('lime')
+            self.display_info.config(text='TEST DONE')
             #self.create_plot()
         else:
             self.panel_led('red')
@@ -228,60 +293,9 @@ class User_gui():
 
         # update plot    
         self.canvas.draw()
-        
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Create sheet
-        """
-        # resize the width of columns in excel spreadsheet
-        self.sheet.column_dimensions['A'].width = 30
-        self.sheet.column_dimensions['B'].width = 30
-        """
-
-        # write given data to an excel spreadsheet at particular location
-        file_name = self.name_field.get() + '_' +  self.serial_name_field.get() + '_' + \
-        self.serial_number_field.get() + '_' + self.details_field.get()
-
-        self.sheet.cell(row=1, column=1).value = file_name
-
-        self.sheet.cell(row=1, column=2).value =strftime("%d %b %Y %H:%M:%S", gmtime())
-
-        self.sheet.cell(row=2, column=1).value = 'x'
-        self.sheet.cell(row=2, column=2).value = 'y'
-
-        self.sheet.cell(row=2, column=4).value = 'x'
-        self.sheet.cell(row=2, column=5).value = 'y'
-
-        self.sheet.cell(row=2, column=7).value = 'x'
-        self.sheet.cell(row=2, column=8).value = 'y'
-
-        self.sheet.cell(row=2, column=10).value = 'x'
-        self.sheet.cell(row=2, column=11).value = 'y'
-
-        self.sheet.cell(row=2, column=13).value = 'x'
-        self.sheet.cell(row=2, column=14).value = 'y'
-        
-        for i in range(0, len(xValue0), 1):
-            self.sheet.cell(row=i + 3, column=1).value = xValue0[i]
-            self.sheet.cell(row=i + 3, column=2).value = yValue0[i]
-
-            self.sheet.cell(row=i + 3, column=4).value = xValue1[i]
-            self.sheet.cell(row=i + 3, column=5).value = yValue1[i]
-
-            self.sheet.cell(row=i + 3, column=7).value = xValue2[i]
-            self.sheet.cell(row=i + 3, column=8).value = yValue2[i]
-
-            self.sheet.cell(row=i + 3, column=10).value = xValue3[i]
-            self.sheet.cell(row=i + 3, column=11).value = yValue3[i]
-
-            self.sheet.cell(row=i + 3, column=13).value = xValue4[i]
-            self.sheet.cell(row=i + 3, column=14).value = yValue4[i]
-            
-        self.display_info.config(text='TEST DONE')
-        self.save_file()
 
             
-    def create_widgets(self):
-        
+    def create_widgets(self):       
         # - - - - - - - - - - - - - - - - - - - - -
         # MenuBar
         myMenuBar = Menu (self.window)
