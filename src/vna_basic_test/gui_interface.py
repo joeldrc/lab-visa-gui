@@ -112,22 +112,22 @@ class My_thread(threading.Thread):
         self.wb.save(file_position)
 
         
-class User_gui():
+class User_gui(tk.Frame):
     
-    def __init__(self):
+    def __init__(self, parent,):
+        self.window = parent
+        #self.window.geometry('600x600')
+        
         # variables
         self.plot_reference = False
         self.plot_saveRef = False
-        
-        self.window = tk.Tk()
-        #self.window.geometry('600x600')
 
         self.myThreadOb1 = My_thread()
         #self.myThreadOb1.start()
         #myThreadOb1.join()
-       
+             
         self.window.title("TEST GUI - V.1.0")
-        self.create_widgets()        
+        self.create_widgets()
         
                
     def focus(self, event):
