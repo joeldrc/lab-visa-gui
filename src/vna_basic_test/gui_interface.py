@@ -1,4 +1,5 @@
-from threading import Thread
+import threading
+
 from multi_thread import *
 
 from visa_scpi import Vna_measure
@@ -12,6 +13,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
 
+from openpyxl import *
 
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.backend_bases import key_press_handler
@@ -20,21 +22,12 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
-from openpyxl import *
 
+class My_thread(threading.Thread):
 
-# variables
-reference = False
-saveRef = False 
+    def __init__(self):
+        threading.Thread.__init__(self)
 
-
-class New_thread(Thread):
-    
-    def __init__(self, val):
-        #Thread.__init__(self)
-        Thread.__init__(self)
-
-        self.val = val
         self.file_name = "_null_"
         self.data_ready = False
         self.save_data = True
@@ -49,24 +42,19 @@ class New_thread(Thread):
 
     # run all the time
     def run(self):
-        if self.val:
+        self.data_ready = False
+        
+        # masure vna
+        self.measure0 = self.vna.read_measure(0)
+        self.measure1 = self.vna.read_measure(1)
+        self.measure2 = self.vna.read_measure(2)
+        self.measure3 = self.vna.read_measure(3)
+        self.measure4 = self.vna.read_measure(4)
 
-            self.data_ready = False
-            
-            # masure vna
-            self.measure0 = self.vna.read_measure(0)
-            self.measure1 = self.vna.read_measure(1)
-            self.measure2 = self.vna.read_measure(2)
-            self.measure3 = self.vna.read_measure(3)
-            self.measure4 = self.vna.read_measure(4)
+        self.data_ready = True                
 
-            self.data_ready = True                
-            self.val = not self.val
-
-            if self.save_data:
-                self.create_sheet()
-
-        #time.sleep(1)
+        if self.save_data:
+            self.create_sheet()
 
 
     def create_sheet(self):
@@ -123,22 +111,23 @@ class New_thread(Thread):
         file_position = filedialog.asksaveasfilename(initialdir = "/",initialfile=self.file_name, title = "Select file",filetypes = (("Microsoft Excel Worksheet","*.xlsx"),("all files","*.*")), defaultextension = ' ')
         self.wb.save(file_position)
 
-       
+        
 class User_gui():
     
     def __init__(self):
+        # variables
+        self.plot_reference = False
+        self.plot_saveRef = False
+        
         self.window = tk.Tk()
         #self.window.geometry('600x600')
 
-        # Declare objects of MyThread class
-        self.myThreadOb1 = New_thread(False)
-        # Start running the threads!
-        self.myThreadOb1.start()
-        # Wait for the threads to finish...
+        self.myThreadOb1 = My_thread()
+        #self.myThreadOb1.start()
         #myThreadOb1.join()
-     
+       
         self.window.title("TEST GUI - V.1.0")
-        self.create_widgets()
+        self.create_widgets()        
         
                
     def focus(self, event):
@@ -171,12 +160,8 @@ class User_gui():
     # autoupdate
     def update_screen(self):
         if self.myThreadOb1.data_ready:
-            #self.panel_led('lime')
             self.prog_bar.pb_complete()
             self.create_plot()
-        #else:
-            #self.panel_led('red')
-            #self.prog_bar.pb_start()
         
         self.clock.config(text=strftime("%d %b %Y %H:%M:%S", gmtime()))        
         self.clock.after(1000, self.update_screen)
@@ -188,27 +173,23 @@ class User_gui():
         self.circle_canvas.create_oval(10, 10, 40, 40, width=0, fill=color)
 
 
-    def save_ref(self):                
-        global saveRef
-        global reference       
+    def save_ref(self):                      
         # invert the value
-        reference = not reference
-        if reference == True:
+        self.plot_reference = not self.plot_reference
+        if self.plot_reference == True:
             self.save_ref.config(text='Remove Ref.')
-            saveRef = True
+            self.plot_saveRef = True
         else:
             self.save_ref.config(text='Set Ref.')
 
 
     def start_test(self):
         self.prog_bar.pb_start()
-                
-        if not self.myThreadOb1.isAlive():
-            self.myThreadOb1 = New_thread(True)
-            self.myThreadOb1.start()
-        else:
-            self.myThreadOb1.val = True
-
+        
+        self.myThreadOb1 = My_thread()
+        self.myThreadOb1.start()
+        
+        self.myThreadOb1.val = True     
         self.myThreadOb1.save_data = self.var.get()
         self.myThreadOb1.file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
         #print(self.myThreadOb1.isAlive())
@@ -245,8 +226,7 @@ class User_gui():
         xValue3, yValue3 = self.myThreadOb1.measure3
         xValue4, yValue4 = self.myThreadOb1.measure4
 
-        global saveRef
-        if saveRef == True:
+        if self.plot_saveRef == True:
             # set reference data on plot
             self.xRef0, self.yRef0 = xValue0, yValue0
             self.xRef1, self.yRef1 = xValue1, yValue1
@@ -272,8 +252,7 @@ class User_gui():
         self.plot3.plot(xValue3, yValue3)
         self.plot4.plot(xValue4, yValue4)
 
-        global reference
-        if reference == True:     
+        if self.plot_reference == True:     
             self.plot0.plot(self.xRef0, self.yRef0)        
             self.plot1.plot(self.xRef1, self.yRef1)
             self.plot2.plot(self.xRef2, self.yRef2)
@@ -351,12 +330,6 @@ class User_gui():
         submit = Button(frame, text='START MEASURE', fg='Black', command= self.start_test)
         submit.grid(row=11, column=1, columnspan=2, sticky = E, padx=20, pady = 5)
 
-        """
-        # display led
-        self.circle_canvas = Canvas(frame, width=40, height=40)
-        self.circle_canvas.grid(row=20, column=1, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=5)
-        """
-
         # create loading bar
         self.prog_bar = Progress(frame, row=30, columnspan=2, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=10)
 
@@ -398,11 +371,4 @@ class User_gui():
         # whenever the enter key is pressed then call the focus1 function
         self.window.bind('<Return>', self.focus)
 
-        """
-        # screen resize
-        self.window.bind("<Configure>", self.configure)
         
-    def configure(self, event):
-        # read screen width & height
-        w, h = event.width, event.height
-        """
