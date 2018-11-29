@@ -37,6 +37,7 @@ class New_thread(Thread):
         self.val = val
         self.file_name = "_null_"
         self.data_ready = False
+        self.save_data = True
 
         self.vna = Vna_measure('TCPIP::CFO-MD-BQPVNA1::INSTR')
         self.instrument_info = self.vna.instrument_info()
@@ -62,7 +63,8 @@ class New_thread(Thread):
             self.data_ready = True                
             self.val = not self.val
 
-            self.create_sheet()
+            if self.save_data:
+                self.create_sheet()
 
         #time.sleep(1)
 
@@ -207,6 +209,7 @@ class User_gui():
         else:
             self.myThreadOb1.val = True
 
+        self.myThreadOb1.save_data = self.var.get()
         self.myThreadOb1.file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
         #print(self.myThreadOb1.isAlive())
 
@@ -280,7 +283,7 @@ class User_gui():
         # update plot    
         self.canvas.draw()
 
-            
+           
     def create_widgets(self):       
         # - - - - - - - - - - - - - - - - - - - - -
         # menuBar
@@ -336,12 +339,17 @@ class User_gui():
         self.details_field = Entry(frame)
         self.details_field.grid(row=5, column=0, sticky = E + W, columnspan=2, padx=5, pady = 5)
 
+        # display check button
+        self.var = IntVar(value=1)
+        self.check_save_file = Checkbutton(frame, text = "Save data after measure", variable=self.var)
+        self.check_save_file.grid(row=10, column=0, padx=0, pady=5)
+        
         # display button
         self.save_ref = Button(frame, text='Save ref.', fg='Black', command= self.save_ref)
-        self.save_ref.grid(row=10, column=0, columnspan=2, sticky = W, padx=20, pady = 5)
+        self.save_ref.grid(row=11, column=0, columnspan=2, sticky = W, padx=20, pady = 5)
         
         submit = Button(frame, text='START MEASURE', fg='Black', command= self.start_test)
-        submit.grid(row=10, column=1, columnspan=2, sticky = E, padx=20, pady = 5)
+        submit.grid(row=11, column=1, columnspan=2, sticky = E, padx=20, pady = 5)
 
         """
         # display led
@@ -350,11 +358,11 @@ class User_gui():
         """
 
         # create loading bar
-        self.prog_bar = Progress(frame, row=20, columnspan=2, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=5)
+        self.prog_bar = Progress(frame, row=30, columnspan=2, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=10)
 
         # display time
         self.clock = Label(frame)
-        self.clock.grid(row=30, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=0, pady=5)
+        self.clock.grid(row=31, column=0, sticky = tk.W + tk.N + tk.S, padx=5, pady=5)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # plot setup
