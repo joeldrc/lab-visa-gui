@@ -14,11 +14,8 @@ from tkinter import filedialog
 from openpyxl import *
 
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
-from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
-
-import numpy as np
 
 
 class Progress():
@@ -157,6 +154,7 @@ class User_gui(tk.Frame):
     def __init__(self, parent,):
         self.window = parent
         #self.window.geometry('600x600')
+        #self.window.configure(background='gray')
         
         # variables
         self.plot_reference = False
@@ -229,11 +227,15 @@ class User_gui(tk.Frame):
         self.myThreadOb1 = My_thread()
         self.myThreadOb1.start()
         
+        self.save_data()
         self.myThreadOb1.val = True     
-        self.myThreadOb1.save_data = self.var.get()
         self.myThreadOb1.file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
         #print(self.myThreadOb1.isAlive())
 
+
+    def save_data(self):
+        self.myThreadOb1.save_data = self.var.get()
+        
         
     def set_axis_name(self):
         # set axis names
@@ -360,7 +362,7 @@ class User_gui(tk.Frame):
 
         # display check button
         self.var = IntVar(value=1)
-        self.check_save_file = Checkbutton(frame, text = "Save data after measure", variable=self.var)
+        self.check_save_file = Checkbutton(frame, text = "Save data after measure", variable=self.var, command= self.save_data)
         self.check_save_file.grid(row=10, column=0, padx=0, pady=5)
         
         # display button
