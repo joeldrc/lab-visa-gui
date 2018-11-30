@@ -63,9 +63,13 @@ class User_gui(tk.Frame):
     # autoupdate
     def update_screen(self):
         try:
+            if self.myThreadOb1.measure_started:
+                self.prog_bar.pb_start()
+                
             if self.myThreadOb1.data_ready:             
                 self.prog_bar.pb_complete()
                 self.create_plot()
+                
         except:
             print("No class declared")
             
@@ -91,15 +95,12 @@ class User_gui(tk.Frame):
 
     def start_test(self):
         self.instrument_connection(start_test = True)
-        self.prog_bar.pb_start()
-        self.save_data()
-          
+        self.save_data()       
         self.myThreadOb1.file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
 
 
     def instrument_connection(self, start_test = False):
-        self.myThreadOb1 = My_thread(self.hostname_field.get())
-        self.myThreadOb1.start_test = start_test
+        self.myThreadOb1 = My_thread(self.hostname_field.get(), start_test)
         self.myThreadOb1.start()
         
         instrument_name, instrument_address = self.myThreadOb1.instrument_info

@@ -16,17 +16,22 @@ from openpyxl import *
 
 class My_thread(threading.Thread):
 
-    def __init__(self, address):
+    def __init__(self, address, start_test= False):
         threading.Thread.__init__(self)
 
         self.file_name = "_null_"
-        self.start_test = False
+        self.start_test = start_test      
+        self.measure_started = False
         self.data_ready = False    
         self.save_data = False
 
-        self.vna = Vna_measure(address)
-        self.instrument_info = self.vna.instrument_info()
-
+        try:
+            self.vna = Vna_measure(address)
+            self.instrument_info = self.vna.instrument_info()
+        except:
+            self.instrument_info = "Wrong address", "\n Retry"
+            self.start_test = False
+            
         # opening the existing excel file & create the sheet object
         self.wb = Workbook()
         self.sheet = self.wb.active
@@ -34,22 +39,29 @@ class My_thread(threading.Thread):
 
     # run all the time
     def run(self):
-        if self.start_test:
-            self.data_ready = False
+        try:
+            if self.start_test:
+                
+                self.measure_started = True
+                self.data_ready = False
+                
+                # masure vna
+                self.measure0 = self.vna.read_measure(0)
+                self.measure1 = self.vna.read_measure(1)
+                self.measure2 = self.vna.read_measure(2)
+                self.measure3 = self.vna.read_measure(3)
+                self.measure4 = self.vna.read_measure(4)
+
+                if self.save_data:
+                    self.create_sheet()
+
+                self.data_ready = True 
+                self.measure_started = False
+               
+        except:
+            print("no vna")
+
             
-            # masure vna
-            self.measure0 = self.vna.read_measure(0)
-            self.measure1 = self.vna.read_measure(1)
-            self.measure2 = self.vna.read_measure(2)
-            self.measure3 = self.vna.read_measure(3)
-            self.measure4 = self.vna.read_measure(4)
-
-            self.data_ready = True                
-
-            if self.save_data:
-                self.create_sheet()
-
-
     def create_sheet(self):
         # masure vna
         xValue0, yValue0 = self.measure0
