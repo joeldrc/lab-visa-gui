@@ -20,8 +20,8 @@ class My_thread(threading.Thread):
         threading.Thread.__init__(self)
 
         self.file_name = "_null_"
-        self.data_ready = False
         self.start_test = False
+        self.data_ready = False    
         self.save_data = False
 
         self.vna = Vna_measure(address)
