@@ -25,13 +25,9 @@ class User_gui(tk.Frame):
         #self.window.geometry('600x600')
         #self.window.configure(background='gray')
         
-        # variables
         self.plot_reference = False
-        self.plot_saveRef = False
-
-        self.myThreadOb1 = My_thread()
-        #self.myThreadOb1.start()
-        #myThreadOb1.join()
+        self.plot_saveRef = False      
+        self.hostname_value = "TCPIP::CFO-MD-BQPVNA1::INSTR"
              
         self.window.title("TEST GUI - V.1.0")
         self.create_widgets()
@@ -66,10 +62,13 @@ class User_gui(tk.Frame):
     # - - - - - - - - - - - - - - - - - - - - -
     # autoupdate
     def update_screen(self):
-        if self.myThreadOb1.data_ready:
-            self.prog_bar.pb_complete()
-            self.create_plot()
-        
+        try:
+            if self.myThreadOb1.data_ready:             
+                self.prog_bar.pb_complete()
+                self.create_plot()
+        except:
+            print("No class declared")
+            
         self.clock.config(text=strftime("%d %b %Y %H:%M:%S", gmtime()))        
         self.clock.after(1000, self.update_screen)
 
@@ -91,21 +90,31 @@ class User_gui(tk.Frame):
 
 
     def start_test(self):
+        self.instrument_connection(start_test = True)
         self.prog_bar.pb_start()
-        
-        self.myThreadOb1 = My_thread()
+        self.save_data()
+          
+        self.myThreadOb1.file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
+
+
+    def instrument_connection(self, start_test = False):
+        self.myThreadOb1 = My_thread(self.hostname_field.get())
+        self.myThreadOb1.start_test = start_test
         self.myThreadOb1.start()
         
-        self.save_data()
-        self.myThreadOb1.val = True     
-        self.myThreadOb1.file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
-        #print(self.myThreadOb1.isAlive())
+        instrument_name, instrument_address = self.myThreadOb1.instrument_info
+        self.str_instrument_info = instrument_name + "\n" + instrument_address
 
+        self.labeled_frame_label.config(text=self.str_instrument_info)
 
+        
     def save_data(self):
-        self.myThreadOb1.save_data = self.var.get()
-        
-        
+        try:
+            self.myThreadOb1.save_data = self.var.get()
+        except:
+            print("No class declared")
+
+              
     def set_axis_name(self):
         # set axis names
         self.plot0.set_title('S21 - delay')
@@ -173,7 +182,7 @@ class User_gui(tk.Frame):
         # update plot    
         self.canvas.draw()
 
-           
+          
     def create_widgets(self):       
         # - - - - - - - - - - - - - - - - - - - - -
         # menuBar
@@ -196,12 +205,17 @@ class User_gui(tk.Frame):
         self.window['pady'] = 10      
 
         # - - - - - - - - - - - - - - - - - - - - -
-        # title
-        instrument_name, instrument_address = self.myThreadOb1.instrument_info
-        str_instrument_info = instrument_name + "\n" + instrument_address
+        # title      
+        self.labeled_frame_label = ttk.Label(self.window, text=" \n ")
+        self.labeled_frame_label.grid(row=0, column=0, sticky=W, padx=10, pady=5)
+
+        # display button
+        self.hostname_field = Entry(self.window, width=35)
+        self.hostname_field.insert(30, self.hostname_value)
+        self.hostname_field.grid(row=0, column=1, sticky = tk.W, padx=10, pady = 5)
         
-        labeled_frame_label = ttk.Label(self.window, text=str_instrument_info)
-        labeled_frame_label.grid(row=0, column=0, sticky=W, padx=10, pady=5)
+        self.connect_device = Button(self.window, text='CONNECT', fg='Black', command= self.instrument_connection)
+        self.connect_device.grid(row=0, column=1, sticky = tk.E, padx=10, pady = 5)
 
         # - - - - - - - - - - - - - - - - - - - - -    
         # user data frame

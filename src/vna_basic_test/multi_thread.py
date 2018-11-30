@@ -16,14 +16,15 @@ from openpyxl import *
 
 class My_thread(threading.Thread):
 
-    def __init__(self):
+    def __init__(self, address):
         threading.Thread.__init__(self)
 
         self.file_name = "_null_"
-        self.data_ready = False
-        self.save_data = True
+        self.start_test = False
+        self.data_ready = False    
+        self.save_data = False
 
-        self.vna = Vna_measure('TCPIP::CFO-MD-BQPVNA1::INSTR')
+        self.vna = Vna_measure(address)
         self.instrument_info = self.vna.instrument_info()
 
         # opening the existing excel file & create the sheet object
@@ -33,19 +34,20 @@ class My_thread(threading.Thread):
 
     # run all the time
     def run(self):
-        self.data_ready = False
-        
-        # masure vna
-        self.measure0 = self.vna.read_measure(0)
-        self.measure1 = self.vna.read_measure(1)
-        self.measure2 = self.vna.read_measure(2)
-        self.measure3 = self.vna.read_measure(3)
-        self.measure4 = self.vna.read_measure(4)
+        if self.start_test:
+            self.data_ready = False
+            
+            # masure vna
+            self.measure0 = self.vna.read_measure(0)
+            self.measure1 = self.vna.read_measure(1)
+            self.measure2 = self.vna.read_measure(2)
+            self.measure3 = self.vna.read_measure(3)
+            self.measure4 = self.vna.read_measure(4)
 
-        self.data_ready = True                
+            self.data_ready = True                
 
-        if self.save_data:
-            self.create_sheet()
+            if self.save_data:
+                self.create_sheet()
 
 
     def create_sheet(self):
@@ -100,7 +102,10 @@ class My_thread(threading.Thread):
             self.sheet.cell(row=i + 3, column=14).value = yValue4[i]
                     
         file_position = filedialog.asksaveasfilename(initialdir = "/",initialfile=self.file_name, title = "Select file",filetypes = (("Microsoft Excel Worksheet","*.xlsx"),("all files","*.*")), defaultextension = ' ')
-        self.wb.save(file_position)
+        try:
+            self.wb.save(file_position)
+        except:
+            print("operation fault")
 
 
 class Progress():
