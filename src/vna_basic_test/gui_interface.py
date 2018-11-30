@@ -94,7 +94,7 @@ class User_gui(tk.Frame):
 
         self.prog_bar.pb_start()
         self.save_data()
-        self.myThreadOb1.val = True     
+        self.myThreadOb1.start_test = True     
         self.myThreadOb1.file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
 
 
@@ -212,10 +212,10 @@ class User_gui(tk.Frame):
         # display button
         self.hostname_field = Entry(self.window, width=35)
         self.hostname_field.insert(30, self.hostname_value)
-        self.hostname_field.grid(row=0, column=1, sticky = tk.W, padx=5, pady = 5)
+        self.hostname_field.grid(row=0, column=1, sticky = tk.W, padx=10, pady = 5)
         
         self.connect_device = Button(self.window, text='CONNECT', fg='Black', command= self.instrument_connection)
-        self.connect_device.grid(row=0, column=1, sticky = tk.E, padx=20, pady = 5)
+        self.connect_device.grid(row=0, column=1, sticky = tk.E, padx=10, pady = 5)
 
         # - - - - - - - - - - - - - - - - - - - - -    
         # user data frame
