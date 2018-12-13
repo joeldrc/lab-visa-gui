@@ -1,3 +1,16 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+#*******************************************************************************
+# title          : gui_interface.py
+# author         : Joel Daricou <joel.daricou@cern.ch>
+# date           : 12/2018
+# version        : 1.0
+# usage          : 
+# notes          :
+# python_version : 3.7  
+#*******************************************************************************
+
 from multi_thread import *
 
 import time
