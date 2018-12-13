@@ -2,24 +2,21 @@ from visa_scpi import *
 
 import threading
 
-import time
-from time import gmtime, strftime
-
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk
-from tkinter import messagebox
 from tkinter import filedialog
 
 from openpyxl import *
 
 
-class My_thread(threading.Thread):
+class Measure_thread(threading.Thread):
 
     def __init__(self, address, start_test= False):
         threading.Thread.__init__(self)
 
-        self.file_name = "_null_"
+        self.file_name = ""
+        self.time_value = ""
         self.start_test = start_test      
         self.measure_started = False
         self.data_ready = False    
@@ -29,7 +26,8 @@ class My_thread(threading.Thread):
             self.vna = Vna_measure(address)
             self.instrument_info = self.vna.instrument_info()
         except:
-            self.instrument_info = "Wrong address", "\n Retry"
+            print("Visa error or wrong address")
+            self.instrument_info = "No connection", "\n "
             self.start_test = False
             
         # opening the existing excel file & create the sheet object
@@ -59,7 +57,7 @@ class My_thread(threading.Thread):
                 self.measure_started = False
                
         except:
-            print("no vna")
+            print("No vna declared")
 
             
     def create_sheet(self):
@@ -80,7 +78,7 @@ class My_thread(threading.Thread):
         
         self.sheet.cell(row=1, column=1).value = self.file_name
 
-        self.sheet.cell(row=1, column=2).value =strftime("%d %b %Y %H:%M:%S", gmtime())
+        self.sheet.cell(row=1, column=2).value = self.time_value
 
         self.sheet.cell(row=2, column=1).value = 'x'
         self.sheet.cell(row=2, column=2).value = 'y'
@@ -117,10 +115,10 @@ class My_thread(threading.Thread):
         try:
             self.wb.save(file_position)
         except:
-            print("operation fault")
+            print("Save operation error")
 
 
-class Progress():
+class Progress_bar():
     
     # threaded progress bar for tkinter gui
     def __init__(self, parent, row, columnspan, sticky, padx, pady):
