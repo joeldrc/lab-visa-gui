@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 #*******************************************************************************
 # title          : gui_interface.py
 # author         : Joel Daricou <joel.daricou@cern.ch>
@@ -33,6 +32,8 @@ class User_gui(tk.Frame):
         self.window = parent
         #self.window.geometry('600x600')
         #self.window.configure(background='gray')
+
+        self.window.protocol("WM_DELETE_WINDOW", self.close_program)
         
         self.plot_reference = False
         self.plot_saveRef = False
@@ -43,6 +44,11 @@ class User_gui(tk.Frame):
         self.window.title("TEST GUI - V.1.0")
         self.create_widgets()
 
+
+    # when you close the program kill all the windows
+    def close_program(self):
+        exit()
+        
         
     # when you press return           
     def focus(self, event):
