@@ -80,7 +80,7 @@ class User_gui(tk.Frame):
     def close_file(self):
         exit = messagebox.askyesno(title = 'Quit?', message = 'Are you sure?')
         if exit > 0:
-            self.window.destroy()
+            self.close_program()
 
 
     # - - - - - - - - - - - - - - - - - - - - -
