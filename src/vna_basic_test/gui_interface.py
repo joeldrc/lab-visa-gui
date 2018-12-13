@@ -47,6 +47,7 @@ class User_gui(tk.Frame):
 
     # when you close the program kill all the windows
     def close_program(self):
+        self.window.destroy()
         exit()
         
         
