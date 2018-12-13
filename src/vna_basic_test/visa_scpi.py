@@ -117,17 +117,21 @@ if __name__ == '__main__':
 
     import matplotlib.pyplot as plt
 
-    address = "TCPIP::CFO-MD-BQPVNA1::INSTR"
-    test = Vna_measure(address)
-    print(test.instrument_info())
-    
-    for i in range(0, 5, 1):
-        x, y = test.read_measure(i)
-        print(x)
-        print(y)
+    try:
+        address = "TCPIP::CFO-MD-BQPVNA1::INSTR"
+        test = Vna_measure(address)
+        print(test.instrument_info())
+        
+        for i in range(0, 5, 1):
+            x, y = test.read_measure(i)
+            print(x)
+            print(y)
 
-        plt.title ("Trace Data via Python - PyVisa - SCPI")
-        plt.xlabel("Frequency")
-        plt.ylabel("Amplitude (dBm)")
-        plt.plot(x, y)
-        plt.show()
+            plt.title ("Trace Data via Python - PyVisa - SCPI")
+            plt.xlabel("Frequency")
+            plt.ylabel("Amplitude (dBm)")
+            plt.plot(x, y)
+            plt.show()
+
+    except:
+        print("Visa error or wrong address")
