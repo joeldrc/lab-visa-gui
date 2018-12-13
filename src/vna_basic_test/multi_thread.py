@@ -121,6 +121,7 @@ class My_thread(threading.Thread):
 
 
 class Progress():
+    
     # threaded progress bar for tkinter gui
     def __init__(self, parent, row, columnspan, sticky, padx, pady):
         self.maximum = 100
@@ -133,7 +134,6 @@ class Progress():
 
 
     def pb_stop(self):
-        """ stops the progress bar """
         if not self.thread.isAlive():
             VALUE = self.progressbar["value"]
             self.progressbar.stop()
@@ -141,7 +141,6 @@ class Progress():
 
 
     def pb_start(self):
-        """ starts the progress bar """
         if not self.thread.isAlive():
             VALUE = self.progressbar["value"]
             self.progressbar.configure(mode="indeterminate", maximum=self.maximum, value=VALUE)
@@ -149,14 +148,12 @@ class Progress():
 
 
     def pb_clear(self):
-        """ stops the progress bar """
         if not self.thread.isAlive():
             self.progressbar.stop()
             self.progressbar.configure(mode="determinate", value=0)
 
 
     def pb_complete(self):
-        """ stops the progress bar and fills it """
         if not self.thread.isAlive():
             self.progressbar.stop()
             self.progressbar.configure(mode="determinate", maximum=self.maximum, value=self.maximum)
