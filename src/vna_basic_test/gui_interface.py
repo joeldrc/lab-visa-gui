@@ -1,7 +1,5 @@
 from multi_thread import *
 
-import threading
-
 import time
 from time import gmtime, strftime
 
@@ -11,8 +9,6 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
 
-from openpyxl import *
-
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -20,19 +16,22 @@ import matplotlib.pyplot as plt
     
 class User_gui(tk.Frame):
     
-    def __init__(self, parent,):
+    def __init__(self, parent):
         self.window = parent
         #self.window.geometry('600x600')
         #self.window.configure(background='gray')
         
         self.plot_reference = False
-        self.plot_saveRef = False      
+        self.plot_saveRef = False
+        self.save_data = False
+        
         self.hostname_value = "TCPIP::CFO-MD-BQPVNA1::INSTR"
              
         self.window.title("TEST GUI - V.1.0")
         self.create_widgets()
+
         
-               
+    # when you press return           
     def focus(self, event):
         self.start_test()
 
@@ -45,6 +44,11 @@ class User_gui(tk.Frame):
 
     def save_file(self):    
         #file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
+        try:
+            self.measure_thread.create_sheet()
+        except:
+            print("No data ready")
+            
         return
 
 
@@ -62,17 +66,20 @@ class User_gui(tk.Frame):
     # - - - - - - - - - - - - - - - - - - - - -
     # autoupdate
     def update_screen(self):
-        try:
-            if self.myThreadOb1.measure_started:
+        try:            
+            if self.measure_thread.measure_started:
                 self.prog_bar.pb_start()
-                
-            if self.myThreadOb1.data_ready:             
-                self.prog_bar.pb_complete()
+            else:
                 self.create_plot()
-                
+               
+            if self.measure_thread.data_ready:
+                self.measure_thread.data_ready = False
+                self.prog_bar.pb_complete()               
+                if self.save_data:
+                    self.measure_thread.create_sheet()                             
         except:
-            print("No class declared")
-            
+            print(".")
+
         self.clock.config(text=strftime("%d %b %Y %H:%M:%S", gmtime()))        
         self.clock.after(1000, self.update_screen)
 
@@ -94,24 +101,23 @@ class User_gui(tk.Frame):
 
 
     def start_test(self):
-        self.instrument_connection(start_test = True)
-        self.save_data()       
-        self.myThreadOb1.file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
+        self.instrument_connection(start_test = True)      
+        self.measure_thread.file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
+        self.measure_thread.time_value = strftime("%d %b %Y %H:%M:%S", gmtime())
 
 
     def instrument_connection(self, start_test = False):
-        self.myThreadOb1 = My_thread(self.hostname_field.get(), start_test)
-        self.myThreadOb1.start()
+        self.measure_thread = Measure_thread(self.hostname_field.get(), start_test)
+        self.measure_thread.start()
         
-        instrument_name, instrument_address = self.myThreadOb1.instrument_info
+        instrument_name, instrument_address = self.measure_thread.instrument_info
         self.str_instrument_info = instrument_name + "\n" + instrument_address
-
         self.labeled_frame_label.config(text=self.str_instrument_info)
 
         
-    def save_data(self):
+    def save_sheet(self):
         try:
-            self.myThreadOb1.save_data = self.var.get()
+            self.save_data = self.var.get()
         except:
             print("No class declared")
 
@@ -141,11 +147,11 @@ class User_gui(tk.Frame):
 
     def create_plot(self):
         # masure vna
-        xValue0, yValue0 = self.myThreadOb1.measure0
-        xValue1, yValue1 = self.myThreadOb1.measure1
-        xValue2, yValue2 = self.myThreadOb1.measure2
-        xValue3, yValue3 = self.myThreadOb1.measure3
-        xValue4, yValue4 = self.myThreadOb1.measure4
+        xValue0, yValue0 = self.measure_thread.measure0
+        xValue1, yValue1 = self.measure_thread.measure1
+        xValue2, yValue2 = self.measure_thread.measure2
+        xValue3, yValue3 = self.measure_thread.measure3
+        xValue4, yValue4 = self.measure_thread.measure4
 
         if self.plot_saveRef == True:
             # set reference data on plot
@@ -246,7 +252,7 @@ class User_gui(tk.Frame):
 
         # display check button
         self.var = IntVar(value=1)
-        self.check_save_file = Checkbutton(frame, text = "Save data after measure", variable=self.var, command= self.save_data)
+        self.check_save_file = Checkbutton(frame, text = "Save data after measure", variable=self.var, command= self.save_sheet)
         self.check_save_file.grid(row=10, column=0, padx=0, pady=5)
         
         # display button
@@ -257,7 +263,7 @@ class User_gui(tk.Frame):
         submit.grid(row=11, column=1, columnspan=2, sticky = E, padx=20, pady = 5)
 
         # create loading bar
-        self.prog_bar = Progress(frame, row=30, columnspan=2, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=10)
+        self.prog_bar = Progress_bar(frame, row=30, columnspan=2, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=10)
 
         # display time
         self.clock = Label(frame)
