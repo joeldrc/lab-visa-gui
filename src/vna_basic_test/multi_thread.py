@@ -19,8 +19,7 @@ class Measure_thread(threading.Thread):
         self.time_value = ""
         self.start_test = start_test      
         self.measure_started = False
-        self.data_ready = False    
-        self.save_data = False
+        self.data_ready = False
 
         try:
             self.vna = Vna_measure(address)
@@ -50,9 +49,6 @@ class Measure_thread(threading.Thread):
                 self.measure3 = self.vna.read_measure(3)
                 self.measure4 = self.vna.read_measure(4)
 
-                if self.save_data:
-                    self.create_sheet()
-
                 self.data_ready = True 
                 self.measure_started = False
                
@@ -60,7 +56,7 @@ class Measure_thread(threading.Thread):
             print("No vna declared")
 
             
-    def create_sheet(self):
+    def create_sheet(self):      
         # masure vna
         xValue0, yValue0 = self.measure0
         xValue1, yValue1 = self.measure1

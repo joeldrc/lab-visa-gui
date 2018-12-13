@@ -23,6 +23,7 @@ class User_gui(tk.Frame):
         
         self.plot_reference = False
         self.plot_saveRef = False
+        self.save_data = False
         
         self.hostname_value = "TCPIP::CFO-MD-BQPVNA1::INSTR"
              
@@ -43,6 +44,11 @@ class User_gui(tk.Frame):
 
     def save_file(self):    
         #file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
+        try:
+            self.measure_thread.create_sheet()
+        except:
+            print("No data ready")
+            
         return
 
 
@@ -60,16 +66,19 @@ class User_gui(tk.Frame):
     # - - - - - - - - - - - - - - - - - - - - -
     # autoupdate
     def update_screen(self):
-        try:
+        try:            
             if self.measure_thread.measure_started:
                 self.prog_bar.pb_start()
-                
-            if self.measure_thread.data_ready:             
-                self.prog_bar.pb_complete()
+            else:
                 self.create_plot()
-                
+               
+            if self.measure_thread.data_ready:
+                self.measure_thread.data_ready = False
+                self.prog_bar.pb_complete()               
+                if self.save_data:
+                    self.measure_thread.create_sheet()                             
         except:
-            self.labeled_frame_label.config(text= " \n ")
+            print(".")
 
         self.clock.config(text=strftime("%d %b %Y %H:%M:%S", gmtime()))        
         self.clock.after(1000, self.update_screen)
@@ -92,8 +101,7 @@ class User_gui(tk.Frame):
 
 
     def start_test(self):
-        self.instrument_connection(start_test = True)
-        self.save_data()       
+        self.instrument_connection(start_test = True)      
         self.measure_thread.file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
         self.measure_thread.time_value = strftime("%d %b %Y %H:%M:%S", gmtime())
 
@@ -107,9 +115,9 @@ class User_gui(tk.Frame):
         self.labeled_frame_label.config(text=self.str_instrument_info)
 
         
-    def save_data(self):
+    def save_sheet(self):
         try:
-            self.measure_thread.save_data = self.var.get()
+            self.save_data = self.var.get()
         except:
             print("No class declared")
 
@@ -244,7 +252,7 @@ class User_gui(tk.Frame):
 
         # display check button
         self.var = IntVar(value=1)
-        self.check_save_file = Checkbutton(frame, text = "Save data after measure", variable=self.var, command= self.save_data)
+        self.check_save_file = Checkbutton(frame, text = "Save data after measure", variable=self.var, command= self.save_sheet)
         self.check_save_file.grid(row=10, column=0, padx=0, pady=5)
         
         # display button
