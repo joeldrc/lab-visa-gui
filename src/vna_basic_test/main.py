@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 #*******************************************************************************
 # title          : main.py
 # author         : Joel Daricou <joel.daricou@cern.ch>
@@ -21,6 +20,6 @@ root = tk.Tk()
 try:
     root.iconbitmap('icon.ico')
 except:
-    print("No icon file")   
+    print("No icon file")
 program = User_gui(root)
 root.mainloop()

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 #*******************************************************************************
 # title          : visa_scpi.py
 # author         : Joel Daricou <joel.daricou@cern.ch>
