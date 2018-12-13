@@ -6,6 +6,7 @@ import numpy as np
 class Vna_measure():
     
     def __init__(self, address):
+        print("Init. visa setup")
         self.instrument_address = address
         rm = visa.ResourceManager()
         self.vna = rm.open_resource(self.instrument_address)
