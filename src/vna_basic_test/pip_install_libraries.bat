@@ -5,4 +5,4 @@ pip install PyVISA-py --user
 pip install matplotlib --user
 pip install openpyxl --user
 
-pause
+"%~dp0RUN_script.lnk"
