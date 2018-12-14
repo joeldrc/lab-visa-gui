@@ -21,7 +21,9 @@ To run the program...
 python main.pyw
 ```
 
-The software
+## Example
+
+![Alt text](window-example.jpg?raw=true "Screen")
 
 ### Author(s)
 
