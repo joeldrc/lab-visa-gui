@@ -2,7 +2,7 @@
 
 ![Alt text](window-example.jpg?raw=true "Screen")
 
-A basic program for connecting to an VNA and and interfacing with a HP4195A Network/Spectrum Analyser to view and save the data.
+It's a basic program to remotely control an VNA, read and store the values.
 
 ## Requirements
 
