@@ -1,14 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#*******************************************************************************
-# title          : multi_thread.py
-# author         : Joel Daricou <joel.daricou@cern.ch>
-# date           : 12/2018
-# version        : 1.0
-# usage          : 
-# notes          :
-# python_version : 3.7  
-#*******************************************************************************
 
 from visa_scpi import *
 
@@ -29,7 +20,7 @@ class Measure_thread(threading.Thread):
 
         self.file_name = ""
         self.time_value = ""
-        self.start_test = start_test      
+        self.start_test = start_test
         self.measure_started = False
         self.data_ready = False
 
@@ -40,7 +31,7 @@ class Measure_thread(threading.Thread):
             print("Visa error or wrong address")
             self.instrument_info = "No connection", "\n "
             self.start_test = False
-            
+
         # opening the existing excel file & create the sheet object
         self.wb = Workbook()
         self.sheet = self.wb.active
@@ -50,10 +41,10 @@ class Measure_thread(threading.Thread):
     def run(self):
         try:
             if self.start_test:
-                
+
                 self.measure_started = True
                 self.data_ready = False
-                
+
                 # masure vna
                 self.measure0 = self.vna.read_measure(0)
                 self.measure1 = self.vna.read_measure(1)
@@ -61,14 +52,14 @@ class Measure_thread(threading.Thread):
                 self.measure3 = self.vna.read_measure(3)
                 self.measure4 = self.vna.read_measure(4)
 
-                self.data_ready = True 
+                self.data_ready = True
                 self.measure_started = False
-               
+
         except:
             print("No vna declared")
 
-            
-    def create_sheet(self):      
+
+    def create_sheet(self):
         # masure vna
         xValue0, yValue0 = self.measure0
         xValue1, yValue1 = self.measure1
@@ -83,7 +74,7 @@ class Measure_thread(threading.Thread):
         self.sheet.column_dimensions['A'].width = 30
         self.sheet.column_dimensions['B'].width = 30
         """
-        
+
         self.sheet.cell(row=1, column=1).value = self.file_name
 
         self.sheet.cell(row=1, column=2).value = self.time_value
@@ -118,7 +109,7 @@ class Measure_thread(threading.Thread):
 
             self.sheet.cell(row=i + 3, column=13).value = xValue4[i]
             self.sheet.cell(row=i + 3, column=14).value = yValue4[i]
-                    
+
         file_position = filedialog.asksaveasfilename(initialdir = "/",initialfile=self.file_name, title = "Select file",filetypes = (("Microsoft Excel Worksheet","*.xlsx"),("all files","*.*")), defaultextension = ' ')
         try:
             self.wb.save(file_position)
@@ -127,7 +118,7 @@ class Measure_thread(threading.Thread):
 
 
 class Progress_bar():
-    
+
     # threaded progress bar for tkinter gui
     def __init__(self, parent, row, columnspan, sticky, padx, pady):
         self.maximum = 100
@@ -163,5 +154,3 @@ class Progress_bar():
         if not self.thread.isAlive():
             self.progressbar.stop()
             self.progressbar.configure(mode="determinate", maximum=self.maximum, value=self.maximum)
-
-

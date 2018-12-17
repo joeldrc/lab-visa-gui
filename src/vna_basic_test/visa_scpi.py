@@ -1,14 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#*******************************************************************************
-# title          : visa_scpi.py
-# author         : Joel Daricou <joel.daricou@cern.ch>
-# date           : 12/2018
-# version        : 1.0
-# usage          : 
-# notes          :
-# python_version : 3.7  
-#*******************************************************************************
 
 import time
 import visa
@@ -16,7 +7,7 @@ import numpy as np
 
 
 class Vna_measure():
-    
+
     def __init__(self, address):
         print("Init. visa setup")
         self.instrument_address = address
@@ -27,14 +18,14 @@ class Vna_measure():
 
     def instrument_info(self):
         name = self.vna.query('*IDN?')  # Query the Identification string
-        time.sleep(1)      
-        print(name)     
+        time.sleep(1)
+        print(name)
         return (name, self.instrument_address)
 
 
     def read_measure(self, index):
         #self.vna.write('*RST') # Reset the instrument
-        #self.vna.write('*CLS') # Clear the Error queue      
+        #self.vna.write('*CLS') # Clear the Error queue
         self.vna.write('SYST:DISP:UPD ON') # Display update ON - switch OFF after debugging
 
         # -----------------------------------------------------------
@@ -45,10 +36,10 @@ class Vna_measure():
 
             # marker
             self.vna.write('CALC1:MARK ON')
-            self.vna.write('CALCulate1:MARKer1:X 2Ghz')            
-            self.vna.write('CALC1:FORM GDELay')           
+            self.vna.write('CALCulate1:MARKer1:X 2Ghz')
+            self.vna.write('CALC1:FORM GDELay')
             time.sleep(1)
-            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
+            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
             time.sleep(1)
 
         # -----------------------------------------------------------
@@ -58,10 +49,10 @@ class Vna_measure():
             self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
             # marker
             self.vna.write('CALC1:MARK ON')
-            self.vna.write('CALCulate1:MARKer1:X 2Ghz')            
-            self.vna.write('CALC1:FORM MLOG')          
+            self.vna.write('CALCulate1:MARKer1:X 2Ghz')
+            self.vna.write('CALC1:FORM MLOG')
             time.sleep(1)
-            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
+            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
             time.sleep(1)
 
         # -----------------------------------------------------------
@@ -72,9 +63,9 @@ class Vna_measure():
             # marker
             self.vna.write('CALC1:MARK ON')
             self.vna.write('CALCulate1:MARKer1:X 2Ghz')
-            self.vna.write('CALC1:FORM SWR')              
+            self.vna.write('CALC1:FORM SWR')
             time.sleep(1)
-            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
+            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
             time.sleep(1)
 
         # -----------------------------------------------------------
@@ -85,9 +76,9 @@ class Vna_measure():
             # marker
             self.vna.write('CALC1:MARK ON')
             self.vna.write('CALCulate1:MARKer1:X 2Ghz')
-            self.vna.write('CALC1:FORM SWR')              
+            self.vna.write('CALC1:FORM SWR')
             time.sleep(1)
-            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
+            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
             time.sleep(1)
 
         # -----------------------------------------------------------
@@ -97,10 +88,10 @@ class Vna_measure():
             self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
             self.vna.write('CALC1:FORM REAL')
             # time domain
-            self.vna.write('CALC1:TRAN:TIME:STAT ON')   
-            self.vna.write('CALC1:TRAN:TIME LPAS; TIME:STIM STEP')           
-            time.sleep(1)    
-            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')    
+            self.vna.write('CALC1:TRAN:TIME:STAT ON')
+            self.vna.write('CALC1:TRAN:TIME LPAS; TIME:STIM STEP')
+            time.sleep(1)
+            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
             time.sleep(1)
 
         # -----------------------------------------------------------
@@ -115,16 +106,16 @@ class Vna_measure():
         self.vna.write('CALC1:DATA:STIM?')
         xData = self.vna.read()
         #print(xData)
-        
+
         yDataArray = yData.split(",")
         xDataArray = xData.split(",")
 
         yDataArray = list(np.float_(yDataArray))
         xDataArray = list(np.float_(xDataArray))
-       
+
         return(xDataArray, yDataArray)
 
-   
+
 # if is used like a main
 if __name__ == '__main__':
 
@@ -134,7 +125,7 @@ if __name__ == '__main__':
         address = "TCPIP::CFO-MD-BQPVNA1::INSTR"
         test = Vna_measure(address)
         print(test.instrument_info())
-        
+
         for i in range(0, 5, 1):
             x, y = test.read_measure(i)
             print(x)
