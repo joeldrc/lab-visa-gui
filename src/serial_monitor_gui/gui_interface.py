@@ -31,13 +31,10 @@ class User_gui(tk.Frame):
 
         #Variables
         self.f_saved = True       #Sampled data saved
-
         self.data_to_read = 16384     # Amount of samples to read.
-        #self.data_to_read = 128
+
         self.sample_rate = 5000       # Sampling frequency (SPS).
-        #self.g_scale = 3.0/512        # +- 3g. 10 bit ADC. Wrong value.
-        self.g_scale = (3.3 / 1024) * (1000/300)  #Right value. Thanks Steve.
-        #self.g_scale = (Vref / ADC resolution) * 1/(300 mv/g)
+        self.g_scale = (3.3 / 1024) * (1000/300)  #(Vref / ADC resolution) * 1/(300 mv/g)
         self.max_freq = 1500          # Maximum signal frequency, X and Y axis (accelerometer).
         self.max_freq_z = 500         # Maximum signal frequency, Z axis (accelerometer).
 
@@ -93,13 +90,11 @@ class User_gui(tk.Frame):
         note.add(self.tab2, text = "Time")
 
         # Positioning
-        #frame1.pack(side='left', fill='both', padx=5, pady=5)
-        #frame2.pack(side='right', fill='both', expand='true')
         frame1.grid(row=0, column=2, padx=10, pady=10, sticky = tk.E + tk.W + tk.N + tk.S)
         frame2.grid(row=0, column=1, padx=5, pady=5, sticky = tk.E + tk.W + tk.N + tk.S)
 
-        boton_scan = tk.Button(frame1, text="Scan serial ports", command=self.scan_ports)
-        boton_read = tk.Button(frame1, text="Read serial data", command=self.read_serial)
+        button_scan = tk.Button(frame1, text="Scan serial ports", command=self.scan_ports)
+        button_read = tk.Button(frame1, text="Read serial data", command=self.read_serial)
 
         label1 = tk.Label(frame1, text="Select Serial Port:")
         self.sel_port = ttk.Combobox(frame1, textvariable='', state="readonly")
@@ -113,8 +108,8 @@ class User_gui(tk.Frame):
         # Grid
         label1.grid(row=0, column=0, padx=5, pady=5)
         self.sel_port.grid(row=1, column=0, padx=5, pady=5)
-        boton_scan.grid(row=2, column=0, padx=5, pady=5)
-        boton_read.grid(row=3, column=0, padx=5, pady=5)
+        button_scan.grid(row=2, column=0, padx=5, pady=5)
+        button_read.grid(row=3, column=0, padx=5, pady=5)
         self.text_message.grid(row=4, column=0, padx=5, pady=5)
 
         #note.grid(row = 0, column=0)
