@@ -65,8 +65,8 @@ class User_gui(tk.Frame):
 
 
     def frames(self):
-        frame1 = tk.LabelFrame(self.window, text="USER DATA", relief=tk.RIDGE)
-        frame2 = tk.Frame(self.window)
+        frame1 = ttk.LabelFrame(self.window, text="USER DATA", relief=tk.RIDGE)
+        frame2 = ttk.Frame(self.window)
 
         # menuBar
         myMenuBar = Menu (self.window)
