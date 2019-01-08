@@ -2,16 +2,22 @@
 # -*- coding: utf-8 -*-
 
 import string
-import serial
-import serial.tools.list_ports
 
 
 def scan_serial():
-    """ Scans for serial ports"""
     ports_names = []
-    ports = (list(serial.tools.list_ports.comports()))
-    for index in range(len(ports)):
-        ports_names.append(ports[index][0])
+    
+    try:
+        import serial
+        import serial.tools.list_ports
+        
+        """ Scans for serial ports"""        
+        ports = (list(serial.tools.list_ports.comports()))
+        for index in range(len(ports)):
+            ports_names.append(ports[index][0])
+    except:
+        print('no serial ports connected')
+
     return ports_names
 
 
