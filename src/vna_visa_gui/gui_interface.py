@@ -78,10 +78,10 @@ class User_gui(tk.Frame):
         try:
             if self.measure_thread.measure_started:
                 self.prog_bar.pb_start()
-            else:
-                self.create_plot()
 
             if self.measure_thread.data_ready:
+                self.create_plot()
+
                 self.measure_thread.data_ready = False
                 self.prog_bar.pb_complete()
 
@@ -105,6 +105,10 @@ class User_gui(tk.Frame):
             self.plot_saveRef = True
         else:
             self.save_ref.config(text='Set Ref.')
+        try:
+            self.create_plot()
+        except:
+            pass
 
 
     def start_test(self):
@@ -247,22 +251,22 @@ class User_gui(tk.Frame):
         name = Label(frame_user, text='Name (User):')
         name.grid(row=1, column=0, sticky = W)
         self.name_field = Entry(frame_user)
-        self.name_field.grid(row=1, column=1, sticky = E, padx=5, pady = 5)
+        self.name_field.grid(row=1, column=1, sticky = E, pady=5)
 
         serial_name = Label(frame_user, text='Serial name:')
         serial_name.grid(row=2, column=0, sticky = W)
         self.serial_name_field = Entry(frame_user)
-        self.serial_name_field.grid(row=2, column=1, sticky = E, padx=5, pady = 5)
+        self.serial_name_field.grid(row=2, column=1, sticky = E, pady=5)
 
         serial_number = Label(frame_user, text='Serial num.:')
         serial_number.grid(row=3, column=0, sticky = W)
         self.serial_number_field = Entry(frame_user)
-        self.serial_number_field.grid(row=3, column=1, sticky = E, padx=5, pady = 5)
+        self.serial_number_field.grid(row=3, column=1, sticky = E, pady=5)
 
         details = Label(frame_user, text='Add details:')
         details.grid(row=4, column=0, sticky = W)
         self.details_field = Entry(frame_user)
-        self.details_field.grid(row=5, column=1, sticky = E + W, padx=5, pady = 5)
+        self.details_field.grid(row=4, column=1, sticky = E, pady=5)
 
         # display check button
         self.var = IntVar(value= self.save_data)
@@ -277,7 +281,7 @@ class User_gui(tk.Frame):
         submit.grid(row=11, column=1, sticky = E, padx=20, pady = 5)
 
         # create loading bar
-        self.prog_bar = Progress_bar(frame_user, row=30, columnspan=2, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=10)
+        self.prog_bar = Progress_bar(frame_user, row=30, columnspan=2, sticky = E + W + N + S, padx=5, pady=10)
 
         # display time
         self.clock = Label(frame_user)
