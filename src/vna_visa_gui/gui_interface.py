@@ -120,8 +120,8 @@ class User_gui(tk.Frame):
         self.measure_thread = Measure_thread(self.hostname_field.get(), start_test)
         self.measure_thread.start()
 
-        instrument_name, instrument_address = self.measure_thread.instrument_info
-        self.str_instrument_info = instrument_name + "\n" + instrument_address
+        instrument_name = self.measure_thread.instrument_info
+        self.str_instrument_info = instrument_name
         self.labeled_frame_label.config(text=self.str_instrument_info)
 
 

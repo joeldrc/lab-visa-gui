@@ -20,7 +20,7 @@ class Vna_measure():
         name = self.vna.query('*IDN?')  # Query the Identification string
         time.sleep(1)
         print(name)
-        return (name, self.instrument_address)
+        return (name)
 
 
     def read_measure(self, index):
