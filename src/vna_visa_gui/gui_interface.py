@@ -98,13 +98,10 @@ class User_gui(tk.Frame):
     # user pannel
 
     def save_ref(self):
-        # invert the value
-        self.plot_reference = not self.plot_reference
+        self.plot_reference = self.var1.get()
         if self.plot_reference == True:
-            self.save_ref.config(text='Remove Ref.')
             self.plot_saveRef = True
-        else:
-            self.save_ref.config(text='Set Ref.')
+
         try:
             self.create_plot()
         except:
@@ -271,12 +268,13 @@ class User_gui(tk.Frame):
         # display check button
         self.var = IntVar(value= self.save_data)
         self.check_save_file = Checkbutton(frame_user, text = "Save data after measure", variable=self.var, command= self.save_sheet)
-        self.check_save_file.grid(row=10, column=0, padx=0, pady=5)
+        self.check_save_file.grid(row=10, column=0, sticky=W, padx=0, pady=5)
+
+        self.var1 = IntVar(value= self.plot_reference)
+        self.check_save_ref = Checkbutton(frame_user, text = "Save reference", variable=self.var1, command= self.save_ref)
+        self.check_save_ref.grid(row=11, column=0, sticky=W, padx=0, pady=5)
 
         # display button
-        self.save_ref = Button(frame_user, text='Save ref.', fg='Black', command= self.save_ref)
-        self.save_ref.grid(row=11, column=0, sticky = W, padx=20, pady = 5)
-
         submit = Button(frame_user, text='START MEASURE', fg='Black', command= self.start_test)
         submit.grid(row=11, column=1, sticky = E, padx=20, pady = 5)
 
