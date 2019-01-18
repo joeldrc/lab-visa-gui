@@ -6,7 +6,6 @@ from multi_thread import *
 import time
 from time import gmtime, strftime
 
-from tkinter import *
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
@@ -54,7 +53,6 @@ class User_gui(tk.Frame):
 
 
     def save_file(self):
-        #file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
         try:
             self.measure_thread.create_sheet()
         except:
@@ -75,7 +73,7 @@ class User_gui(tk.Frame):
 
 
     # - - - - - - - - - - - - - - - - - - - - -
-    # autoupdate
+    # auto-update
     def update_screen(self):
         try:
             if self.measure_thread.measure_started:
@@ -89,7 +87,7 @@ class User_gui(tk.Frame):
                 if self.save_data:
                     self.measure_thread.create_sheet()
         except:
-            print(".")
+            pass
 
         self.clock.config(text=strftime("%d %b %Y %H:%M:%S", gmtime()))
         self.clock.after(1000, self.update_screen)
@@ -280,6 +278,16 @@ class User_gui(tk.Frame):
         self.clock = Label(frame)
         self.clock.grid(row=31, column=0, sticky = tk.W + tk.N + tk.S, padx=5, pady=5)
 
+        # Notebook
+        note = ttk.Notebook(self.window)
+        note.grid(row=1, column=0, sticky=tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
+
+        self.tab1 = ttk.Frame(note)
+        self.tab2 = ttk.Frame(note)
+
+        note.add(self.tab1, text = "Flanges")
+        note.add(self.tab2, text = "Pick-Up")
+
         # - - - - - - - - - - - - - - - - - - - - -
         # plot setup
         plt.style.use('bmh')
@@ -303,9 +311,19 @@ class User_gui(tk.Frame):
         plt.tight_layout()
 
         # draw
+        """
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.window)
         self.canvas.draw()
         self.canvas.get_tk_widget().grid(row=1, column=0, sticky=tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
+        """
+
+        # Canvas
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.tab1)
+        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+        self.toolbar1 = NavigationToolbar2Tk(self.canvas, self.tab1)
+        self.toolbar1.update()
+        self.canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # event
