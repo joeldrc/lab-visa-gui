@@ -199,85 +199,94 @@ class User_gui(tk.Frame):
     def create_widgets(self):
         # - - - - - - - - - - - - - - - - - - - - -
         # menuBar
-        myMenuBar = Menu (self.window)
+        menuBar = Menu (self.window)
 
-        myFileMenu = Menu (myMenuBar , tearoff = 0)
-        myFileMenu.add_command(label = "Exit", command = self.close_file)
-        myFileMenu.add_command(label = "Open", command = self.open_file)
-        myFileMenu.add_command(label = "Save as", command = self.save_file)
-        myMenuBar.add_cascade(label = "File", menu = myFileMenu)
+        fileMenu = Menu (menuBar , tearoff = 0)
+        fileMenu.add_command(label = "Exit", command = self.close_file)
+        fileMenu.add_command(label = "Open", command = self.open_file)
+        fileMenu.add_command(label = "Save as", command = self.save_file)
+        menuBar.add_cascade(label = "File", menu = fileMenu)
 
-        myFileMenu = Menu (myMenuBar , tearoff = 0)
-        myFileMenu.add_command(label = "Info", command = self.show_info)
-        myMenuBar.add_cascade(label = "Help", menu = myFileMenu)
+        fileMenu = Menu (menuBar , tearoff = 0)
+        fileMenu.add_command(label = "Info", command = self.show_info)
+        menuBar.add_cascade(label = "Help", menu = fileMenu)
 
-        self.window.config(menu = myMenuBar)
+        self.window.config(menu = menuBar)
 
         # create some room around all the internal frames
         self.window['padx'] = 10
         self.window['pady'] = 10
 
         # - - - - - - - - - - - - - - - - - - - - -
-        # title
-        self.labeled_frame_label = ttk.Label(self.window, text=" \n ")
-        self.labeled_frame_label.grid(row=0, column=0, sticky=W, padx=10, pady=5)
+        frame1 = ttk.Frame(self.window)
+        frame1.grid(row=0, column=0, sticky = tk.E + tk.W + tk.N)
+
+        frame2 = ttk.Frame(self.window)
+        frame2.grid(row=0, column=1, sticky = tk.E + tk.W + tk.N)
 
         # display button
-        self.hostname_field = Entry(self.window, width=35)
-        self.hostname_field.insert(30, self.hostname_value)
-        self.hostname_field.grid(row=0, column=1, sticky = tk.W, padx=10, pady = 5)
+        frame_button = ttk.LabelFrame(frame2, text="REMOTE CONNECTION")
+        frame_button.grid(row=0, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
 
-        self.connect_device = Button(self.window, text='CONNECT', fg='Black', command= self.instrument_connection)
-        self.connect_device.grid(row=0, column=1, sticky = tk.E, padx=10, pady = 5)
+        self.hostname_field = Entry(frame_button, width=35)
+        self.hostname_field.insert(30, self.hostname_value)
+        self.hostname_field.grid(row=0, column=0, sticky=W, padx=5, pady=5)
+
+        self.connect_device = Button(frame_button, text='CONNECT', fg='Black', command= self.instrument_connection)
+        self.connect_device.grid(row=0, column=1, sticky=E, padx=5, pady=5)
+
+        self.labeled_frame_label = ttk.Label(frame_button, text=" \n ")
+        self.labeled_frame_label.grid(row=1, column=0, columnspan=2, sticky=W, padx=5, pady=5)
 
         # - - - - - - - - - - - - - - - - - - - - -
-        # user data frame
-        frame = ttk.LabelFrame(self.window, text="USER DATA", relief=tk.RIDGE)
-        frame.grid(row=1, column=1, sticky = tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
+        # user data frame_user
+        frame_user = ttk.LabelFrame(frame2, text="USER DATA", relief=tk.RIDGE)
+        frame_user.grid(row=2, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
 
         # display label
-        name = Label(frame, text='Name (User):')
+        name = Label(frame_user, text='Name (User):')
         name.grid(row=1, column=0, sticky = W)
-        self.name_field = Entry(frame)
-        self.name_field.grid(row=1, column=1, padx=5, pady = 5)
+        self.name_field = Entry(frame_user)
+        self.name_field.grid(row=1, column=1, sticky = E, padx=5, pady = 5)
 
-        serial_name = Label(frame, text='Serial name:')
+        serial_name = Label(frame_user, text='Serial name:')
         serial_name.grid(row=2, column=0, sticky = W)
-        self.serial_name_field = Entry(frame)
-        self.serial_name_field.grid(row=2, column=1, padx=5, pady = 5)
+        self.serial_name_field = Entry(frame_user)
+        self.serial_name_field.grid(row=2, column=1, sticky = E, padx=5, pady = 5)
 
-        serial_number = Label(frame, text='Serial num.:')
+        serial_number = Label(frame_user, text='Serial num.:')
         serial_number.grid(row=3, column=0, sticky = W)
-        self.serial_number_field = Entry(frame)
-        self.serial_number_field.grid(row=3, column=1, padx=5, pady = 5)
+        self.serial_number_field = Entry(frame_user)
+        self.serial_number_field.grid(row=3, column=1, sticky = E, padx=5, pady = 5)
 
-        details = Label(frame, text='Add details:')
+        details = Label(frame_user, text='Add details:')
         details.grid(row=4, column=0, sticky = W)
-        self.details_field = Entry(frame)
-        self.details_field.grid(row=5, column=0, sticky = E + W, columnspan=2, padx=5, pady = 5)
+        self.details_field = Entry(frame_user)
+        self.details_field.grid(row=5, column=1, sticky = E + W, padx=5, pady = 5)
 
         # display check button
         self.var = IntVar(value= self.save_data)
-        self.check_save_file = Checkbutton(frame, text = "Save data after measure", variable=self.var, command= self.save_sheet)
+        self.check_save_file = Checkbutton(frame_user, text = "Save data after measure", variable=self.var, command= self.save_sheet)
         self.check_save_file.grid(row=10, column=0, padx=0, pady=5)
 
         # display button
-        self.save_ref = Button(frame, text='Save ref.', fg='Black', command= self.save_ref)
-        self.save_ref.grid(row=11, column=0, columnspan=2, sticky = W, padx=20, pady = 5)
+        self.save_ref = Button(frame_user, text='Save ref.', fg='Black', command= self.save_ref)
+        self.save_ref.grid(row=11, column=0, sticky = W, padx=20, pady = 5)
 
-        submit = Button(frame, text='START MEASURE', fg='Black', command= self.start_test)
-        submit.grid(row=11, column=1, columnspan=2, sticky = E, padx=20, pady = 5)
+        submit = Button(frame_user, text='START MEASURE', fg='Black', command= self.start_test)
+        submit.grid(row=11, column=1, sticky = E, padx=20, pady = 5)
 
         # create loading bar
-        self.prog_bar = Progress_bar(frame, row=30, columnspan=2, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=10)
+        self.prog_bar = Progress_bar(frame_user, row=30, columnspan=2, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=10)
 
         # display time
-        self.clock = Label(frame)
+        self.clock = Label(frame_user)
         self.clock.grid(row=31, column=0, sticky = tk.W + tk.N + tk.S, padx=5, pady=5)
 
+        # - - - - - - - - - - - - - - - - - - - - -
         # Notebook
-        note = ttk.Notebook(self.window)
-        note.grid(row=1, column=0, sticky=tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
+        note = ttk.Notebook(frame1)
+        note.pack()
 
         self.tab1 = ttk.Frame(note)
         self.tab2 = ttk.Frame(note)
@@ -307,13 +316,7 @@ class User_gui(tk.Frame):
         # autoadapt
         plt.tight_layout()
 
-        # draw
-        """
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.window)
-        self.canvas.draw()
-        self.canvas.get_tk_widget().grid(row=1, column=0, sticky=tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
-        """
-
+        # - - - - - - - - - - - - - - - - - - - - -
         # Canvas
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.tab1)
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
