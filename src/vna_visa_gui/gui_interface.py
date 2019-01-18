@@ -288,6 +288,14 @@ class User_gui(tk.Frame):
         self.clock.grid(row=31, column=0, sticky = tk.W + tk.N + tk.S, padx=5, pady=5)
 
         # - - - - - - - - - - - - - - - - - - - - -
+        # details_frame
+        details_frame = ttk.LabelFrame(frame2, text="DETAILS")
+        details_frame.grid(row=3, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
+
+        details_label = ttk.Label(details_frame, text="Add functions...")
+        details_label.grid(row=1, column=0, columnspan=2, sticky=W, padx=5, pady=5)
+
+        # - - - - - - - - - - - - - - - - - - - - -
         # Notebook
         note = ttk.Notebook(frame1)
         note.pack()
