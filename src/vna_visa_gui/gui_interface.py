@@ -96,9 +96,6 @@ class User_gui(tk.Frame):
 
     # - - - - - - - - - - - - - - - - - - - - -
     # user pannel
-    def panel_led(self, color):
-        self.circle_canvas.create_oval(10, 10, 40, 40, width=0, fill=color)
-
 
     def save_ref(self):
         # invert the value
@@ -121,8 +118,7 @@ class User_gui(tk.Frame):
         self.measure_thread.start()
 
         instrument_name = self.measure_thread.instrument_info
-        self.str_instrument_info = instrument_name
-        self.labeled_frame_label.config(text=self.str_instrument_info)
+        self.labeled_frame_label.config(text=instrument_name)
 
 
     def save_sheet(self):
