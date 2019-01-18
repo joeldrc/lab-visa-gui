@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import pip_install
+import lib_installer
 import tkinter as tk
 from tkinter import ttk
 from gui_interface import User_gui
