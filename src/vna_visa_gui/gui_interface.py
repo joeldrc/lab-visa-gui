@@ -84,6 +84,7 @@ class User_gui(tk.Frame):
             if self.measure_thread.data_ready:
                 self.measure_thread.data_ready = False
                 self.prog_bar.pb_complete()
+
                 if self.save_data:
                     self.measure_thread.create_sheet()
         except:
@@ -260,7 +261,7 @@ class User_gui(tk.Frame):
         self.details_field.grid(row=5, column=0, sticky = E + W, columnspan=2, padx=5, pady = 5)
 
         # display check button
-        self.var = IntVar(value=1)
+        self.var = IntVar(value= self.save_data)
         self.check_save_file = Checkbutton(frame, text = "Save data after measure", variable=self.var, command= self.save_sheet)
         self.check_save_file.grid(row=10, column=0, padx=0, pady=5)
 
