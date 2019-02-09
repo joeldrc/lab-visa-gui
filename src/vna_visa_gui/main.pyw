@@ -44,10 +44,10 @@ class Install_and_run(threading.Thread):
         self.pip_install('pyvisa-py')
         self.pip_install('numpy')
 
-        self.destroy_loader()
-
         #Run Main App
         self.start_gui()
+        
+        self.destroy_loader()
 
 
 def main():
