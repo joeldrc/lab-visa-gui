@@ -34,6 +34,11 @@ class Loading_window():
         self.master.title("Installing librairies...")
         self.master.geometry('300x100')
 
+        try:
+            self.master.iconbitmap('./data/icon.ico')
+        except:
+            print("No icon file")
+
         self.frame = Frame(self.master)
 
         self.ani_img = AnimatedGif("data/loading_bar.gif")
