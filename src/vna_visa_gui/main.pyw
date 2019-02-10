@@ -1,17 +1,71 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import lib_installer
+from tkinter import *
 import tkinter as tk
-from tkinter import ttk
-from gui_interface import User_gui
+import threading
+import subprocess
+import sys
+print(sys.executable)
 
 
-root = tk.Tk()
-#root.attributes("-fullscreen", False)
-try:
-    root.iconbitmap('./data/icon.ico')
-except:
-    print("No icon file")
-program = User_gui(root)
-root.mainloop()
+class Install_and_run(threading.Thread):
+    def __init__(self, parent):
+        threading.Thread.__init__(self)
+        self.parent = parent
+
+    def pip_install(self, package):
+        try:
+            subprocess.call(["pip", "install", package, "--user"], shell=True)  #!Security! Better if shell=False
+            print('\n Installed: ' + package)
+        except:
+            print("Error")
+
+    def start_loader(self):
+        from loading_window import Loading_window
+        self.loader_app = Toplevel(self.parent)
+        Loading_window(self.loader_app)
+
+    def destroy_loader(self):
+        self.loader_app.destroy()
+
+    def start_gui(self):
+        from gui_interface import User_gui
+        self.main_app = User_gui(self.parent)
+
+    def run(self):
+        #Run loading app
+        self.start_loader()
+
+        #pip_install all the packages
+        self.pip_install('matplotlib')
+        self.pip_install('openpyxl')
+        self.pip_install('pyvisa')
+        self.pip_install('pyvisa-py')
+        self.pip_install('numpy')
+
+        #Run Main App
+        self.start_gui()
+
+        self.destroy_loader()
+
+
+def main():
+    root = tk.Tk()
+    #root.attributes("-fullscreen", False)
+    root.title("JD soft - TEST GUI - V.1.0")
+
+    try:
+        root.iconbitmap('./data/icon.ico')
+    except:
+        print("No icon file")
+
+    #Install all librairies and run program
+    lib_installer = Install_and_run(root)
+    lib_installer.start()
+
+    root.mainloop()
+
+
+if __name__ == '__main__':
+    main()
