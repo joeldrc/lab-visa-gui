@@ -31,6 +31,7 @@ class Install_and_run(threading.Thread):
 
     def start_gui(self):
         from gui_interface import User_gui
+        self.parent.deiconify()
         self.main_app = User_gui(self.parent)
 
     def run(self):
@@ -54,6 +55,8 @@ def main():
     root = tk.Tk()
     #root.attributes("-fullscreen", False)
     root.title("JD soft - TEST GUI - V.1.0")
+    #root.iconify()
+    root.withdraw()
 
     try:
         root.iconbitmap('./data/icon.ico')
