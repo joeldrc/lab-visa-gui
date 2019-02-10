@@ -2,27 +2,22 @@
 # -*- coding: utf-8 -*-
 
 from multi_thread import *
-
 import time
 from time import gmtime, strftime
-
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
-
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 
 
 class User_gui(tk.Frame):
-
     def __init__(self, parent):
         self.window = parent
         #self.window.geometry('600x600')
         #self.window.configure(background='gray')
-
         self.window.protocol("WM_DELETE_WINDOW", self.close_program)
 
         self.plot_reference = False
@@ -34,23 +29,19 @@ class User_gui(tk.Frame):
         self.window.title("TEST GUI - V.1.0")
         self.create_widgets()
 
-
     # when you close the program kill all the windows
     def close_program(self):
         self.window.destroy()
         exit()
 
-
     # when you press return
     def focus(self, event):
         self.start_test()
-
 
     # - - - - - - - - - - - - - - - - - - - - -
     # menuBar
     def show_info(self):
         messagebox.showinfo(title = 'About Me!', message = 'joel.daricou@cern.ch 2018')
-
 
     def save_file(self):
         try:
@@ -60,17 +51,14 @@ class User_gui(tk.Frame):
 
         return
 
-
     def open_file(self):
         #self.file_position = filedialog.askopenfile().name
         return
-
 
     def close_file(self):
         exit = messagebox.askyesno(title = 'Quit?', message = 'Are you sure?')
         if exit > 0:
             self.close_program()
-
 
     # - - - - - - - - - - - - - - - - - - - - -
     # auto-update
@@ -93,7 +81,6 @@ class User_gui(tk.Frame):
         self.clock.config(text=strftime("%d %b %Y %H:%M:%S", gmtime()))
         self.clock.after(1000, self.update_screen)
 
-
     # - - - - - - - - - - - - - - - - - - - - -
     # user pannel
 
@@ -107,12 +94,10 @@ class User_gui(tk.Frame):
         except:
             pass
 
-
     def start_test(self):
         self.instrument_connection(start_test = True)
         self.measure_thread.file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
         self.measure_thread.time_value = strftime("%d %b %Y %H:%M:%S", gmtime())
-
 
     def instrument_connection(self, start_test = False):
         self.measure_thread = Measure_thread(self.hostname_field.get(), start_test)
@@ -121,13 +106,11 @@ class User_gui(tk.Frame):
         instrument_name = self.measure_thread.instrument_info
         self.labeled_frame_label.config(text=instrument_name)
 
-
     def save_sheet(self):
         try:
             self.save_data = self.var.get()
         except:
             print("No class declared")
-
 
     def set_axis_name(self):
         # set axis names
@@ -150,7 +133,6 @@ class User_gui(tk.Frame):
         self.plot4.set_title('S11 - TDR')
         self.plot4.set_xlabel('delay')
         self.plot4.set_ylabel('dB')
-
 
     def create_plot(self):
         # masure vna
@@ -195,7 +177,6 @@ class User_gui(tk.Frame):
 
         # update plot
         self.canvas.draw()
-
 
     def create_widgets(self):
         # - - - - - - - - - - - - - - - - - - - - -

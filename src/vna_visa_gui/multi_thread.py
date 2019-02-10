@@ -2,19 +2,15 @@
 # -*- coding: utf-8 -*-
 
 from visa_scpi import *
-
 import threading
-
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
-
 from openpyxl import *
 
 
 class Measure_thread(threading.Thread):
-
     def __init__(self, address, start_test= False):
         threading.Thread.__init__(self)
 
@@ -36,7 +32,6 @@ class Measure_thread(threading.Thread):
         self.wb = Workbook()
         self.sheet = self.wb.active
 
-
     # run all the time
     def run(self):
         try:
@@ -54,10 +49,8 @@ class Measure_thread(threading.Thread):
 
                 self.data_ready = True
                 self.measure_started = False
-
         except:
             print("No vna declared")
-
 
     def create_sheet(self):
         # masure vna
@@ -118,7 +111,6 @@ class Measure_thread(threading.Thread):
 
 
 class Progress_bar():
-
     # threaded progress bar for tkinter gui
     def __init__(self, parent, row, columnspan, sticky, padx, pady):
         self.maximum = 100
@@ -129,13 +121,11 @@ class Progress_bar():
         self.thread.__init__(target=self.progressbar.start(self.interval), args=())
         self.pb_clear()
 
-
     def pb_stop(self):
         if not self.thread.isAlive():
             VALUE = self.progressbar["value"]
             self.progressbar.stop()
             self.progressbar["value"] = VALUE
-
 
     def pb_start(self):
         if not self.thread.isAlive():
@@ -143,12 +133,10 @@ class Progress_bar():
             self.progressbar.configure(mode="indeterminate", maximum=self.maximum, value=VALUE)
             self.progressbar.start(self.interval)
 
-
     def pb_clear(self):
         if not self.thread.isAlive():
             self.progressbar.stop()
             self.progressbar.configure(mode="determinate", value=0)
-
 
     def pb_complete(self):
         if not self.thread.isAlive():

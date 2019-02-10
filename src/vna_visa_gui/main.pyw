@@ -3,11 +3,11 @@
 
 from tkinter import *
 import tkinter as tk
-
 import threading
 import subprocess
 import sys
-#print(sys.executable)
+print(sys.executable)
+
 
 class Install_and_run(threading.Thread):
     def __init__(self, parent):
@@ -22,9 +22,9 @@ class Install_and_run(threading.Thread):
             print("Error")
 
     def start_loader(self):
-        from main_window import Main_window
+        from loading_window import Loading_window
         self.loader_app = Toplevel(self.parent)
-        Main_window(self.loader_app)
+        Loading_window(self.loader_app)
 
     def destroy_loader(self):
         self.loader_app.destroy()
@@ -46,7 +46,7 @@ class Install_and_run(threading.Thread):
 
         #Run Main App
         self.start_gui()
-        
+
         self.destroy_loader()
 
 

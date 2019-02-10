@@ -7,7 +7,6 @@ import numpy as np
 
 
 class Vna_measure():
-
     def __init__(self, address):
         print("Init. visa setup")
         self.instrument_address = address
@@ -15,13 +14,11 @@ class Vna_measure():
         self.vna = rm.open_resource(self.instrument_address)
         self.vna.write_termination = '\n'  # Some instruments require that at the end of each command.
 
-
     def instrument_info(self):
         name = self.vna.query('*IDN?')  # Query the Identification string
         time.sleep(1)
         print(name)
         return (name)
-
 
     def read_measure(self, index):
         #self.vna.write('*RST') # Reset the instrument
@@ -118,7 +115,6 @@ class Vna_measure():
 
 # if is used like a main
 if __name__ == '__main__':
-
     import matplotlib.pyplot as plt
 
     try:
