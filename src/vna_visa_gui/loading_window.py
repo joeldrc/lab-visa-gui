@@ -54,10 +54,13 @@ class Loading_window():
 
         self.frame = Frame(self.master)
 
-        self.ani_img = AnimatedGif("data/loading_bar.gif")
-        self.animation = Label(self.frame, image=self.ani_img[0])  # Display first frame initially.
-        self.animation.pack()
-        self.enable_animation()
+        try:
+            self.ani_img = AnimatedGif("data/loading_bar.gif")
+            self.animation = Label(self.frame, image=self.ani_img[0])  # Display first frame initially.
+            self.animation.pack()
+            self.enable_animation()
+        except:
+            print("No gif file")
 
         self.frame.pack()
 
