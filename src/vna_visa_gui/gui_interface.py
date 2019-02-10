@@ -23,10 +23,8 @@ class User_gui(tk.Frame):
         self.plot_reference = False
         self.plot_saveRef = False
         self.save_data = False
-
         self.hostname_value = "TCPIP::CFO-MD-BQPVNA1::INSTR"
 
-        self.window.title("TEST GUI - V.1.0")
         self.create_widgets()
 
     # when you close the program kill all the windows

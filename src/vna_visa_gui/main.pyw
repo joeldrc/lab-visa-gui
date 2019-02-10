@@ -53,6 +53,7 @@ class Install_and_run(threading.Thread):
 def main():
     root = tk.Tk()
     #root.attributes("-fullscreen", False)
+    root.title("JD soft - TEST GUI - V.1.0")
 
     try:
         root.iconbitmap('./data/icon.ico')

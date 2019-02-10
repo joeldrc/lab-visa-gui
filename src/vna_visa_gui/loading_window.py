@@ -31,8 +31,21 @@ class AnimatedGif(object):
 class Loading_window():
     def __init__(self, master):
         self.master = master
-        self.master.title("Installing librairies...")
-        self.master.geometry('300x100')
+        self.master.title("JD soft - Installing librairies...")
+        self.master.geometry('360x120')
+
+        # Window in center of screen
+        self.master.update_idletasks()
+        width = self.master.winfo_width()
+        frm_width = self.master.winfo_rootx() - self.master.winfo_x()
+        win_width = width + 2 * frm_width
+        height = self.master.winfo_height()
+        titlebar_height = self.master.winfo_rooty() - self.master.winfo_y()
+        win_height = height + titlebar_height + frm_width
+        x = self.master.winfo_screenwidth() // 2 - win_width // 2
+        y = self.master.winfo_screenheight() // 2 - win_height // 2
+        self.master.geometry('{}x{}+{}+{}'.format(width, height, x, y))
+        self.master.deiconify()
 
         try:
             self.master.iconbitmap('./data/icon.ico')
