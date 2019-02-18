@@ -15,11 +15,20 @@ class Install_and_run(threading.Thread):
         self.parent = parent
 
     def pip_install(self, package):
+        import importlib
+        try:
+            importlib.import_module(package)
+        except ImportError:
+            from pip._internal import main
+            main(['install', package])
+            print('Installed: ' + package)
+        """
         try:
             subprocess.call(["pip", "install", package, "--user"], shell=True)  #!Security! Better if shell=False
             print('\n Installed: ' + package)
         except:
             print("Error")
+        """
 
     def start_loader(self):
         from loading_window import Loading_window
