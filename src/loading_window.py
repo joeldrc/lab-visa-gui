@@ -31,7 +31,7 @@ class AnimatedGif(object):
 class Loading_window():
     def __init__(self, master):
         self.master = master
-        self.master.title("JD soft - Installing librairies...")
+        self.master.title("JD soft - Installing libraries...")
         self.master.geometry('360x120')
 
         # Window in center of screen
