@@ -194,8 +194,8 @@ class User_gui(tk.Frame):
         self.window.config(menu = menuBar)
 
         # create some room around all the internal frames
-        self.window['padx'] = 10
-        self.window['pady'] = 10
+        self.window['padx'] = 5
+        self.window['pady'] = 5
 
         # - - - - - - - - - - - - - - - - - - - - -
         frame1 = ttk.Frame(self.window)
@@ -206,7 +206,7 @@ class User_gui(tk.Frame):
 
         # display button
         frame_button = ttk.LabelFrame(frame2, text="REMOTE CONNECTION")
-        frame_button.grid(row=0, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
+        frame_button.grid(row=0, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=5)
 
         self.hostname_field = Entry(frame_button, width=35)
         self.hostname_field.insert(30, self.hostname_value)
@@ -221,7 +221,7 @@ class User_gui(tk.Frame):
         # - - - - - - - - - - - - - - - - - - - - -
         # user data frame_user
         frame_user = ttk.LabelFrame(frame2, text="USER DATA", relief=tk.RIDGE)
-        frame_user.grid(row=2, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
+        frame_user.grid(row=2, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=5)
 
         # display label
         name = Label(frame_user, text='Name (User):')
@@ -267,7 +267,7 @@ class User_gui(tk.Frame):
         # - - - - - - - - - - - - - - - - - - - - -
         # details_frame
         details_frame = ttk.LabelFrame(frame2, text="DETAILS")
-        details_frame.grid(row=3, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=10, pady=10)
+        details_frame.grid(row=3, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=5)
 
         details_label = ttk.Label(details_frame, text="Add functions...")
         details_label.grid(row=1, column=0, columnspan=2, sticky=W, padx=5, pady=5)
@@ -275,7 +275,7 @@ class User_gui(tk.Frame):
         # - - - - - - - - - - - - - - - - - - - - -
         # Notebook
         note = ttk.Notebook(frame1)
-        note.pack()
+        note.pack(padx=5, pady=5)
 
         self.tab1 = ttk.Frame(note)
         self.tab2 = ttk.Frame(note)
