@@ -285,34 +285,80 @@ class User_gui(tk.Frame):
 
         # - - - - - - - - - - - - - - - - - - - - -
         # plot setup
-        plt.style.use('bmh')
+        #plt.style.use('bmh')
 
-        self.fig = Figure()
-        self.fig = plt.gcf()
-        DPI = self.fig.get_dpi()
-        self.fig.set_size_inches(1280.0/float(DPI), 720.0/float(DPI))
+        #Figure 1
+        fig1 = Figure(figsize=(14,7))
 
-        # subplot
-        self.plot0 = self.fig.add_subplot(231)
-        self.plot1 = self.fig.add_subplot(232)
-        self.plot2 = self.fig.add_subplot(233)
-        self.plot3 = self.fig.add_subplot(234)
-        self.plot4 = self.fig.add_subplot(235)
+        #fig1.suptitle('Sampled signal')
 
-        # set axis names
+        self.plot0 = fig1.add_subplot(2,3,1)
+        self.plot0.set_title("Channel X")
+        self.plot0.set_xlabel('g')
+        self.plot0.set_ylabel('g')
+        self.plot0.grid()
+
+        self.plot1 = fig1.add_subplot(2,3,2)
+        self.plot1.set_title("Channel Y")
+        self.plot1.set_xlabel('ms')
+        self.plot1.set_ylabel('g')
+        self.plot1.grid()
+
+        self.plot2 = fig1.add_subplot(2,3,3)
+        self.plot2.set_title("Channel Y")
+        self.plot2.set_xlabel('ms')
+        self.plot2.set_ylabel('g')
+        self.plot2.grid()
+
+        self.plot3 = fig1.add_subplot(2,3,4)
+        self.plot3.set_title("Channel Y")
+        self.plot3.set_xlabel('ms')
+        self.plot3.set_ylabel('g')
+        self.plot3.grid()
+
+        self.plot4 = fig1.add_subplot(2,3,5)
+        self.plot4.set_title("Channel Y")
+        self.plot4.set_xlabel('ms')
+        self.plot4.set_ylabel('g')
+        self.plot4.grid()
+
+        #add comment
         self.set_axis_name()
 
+        #Figure 2
+        fig2 = Figure()
+
+        #fig2.suptitle('Data received')
+
+        ax_21 = fig2.add_subplot(1,2,1)
+        #ax_21.hold(False)
+        ax_21.set_title("Channel X")
+        ax_21.set_ylabel('g')
+        ax_21.grid()
+
+        ax_22 = fig2.add_subplot(1,2,2)
+        #ax_21.hold(False)
+        ax_22.set_title("Channel X")
+        ax_22.set_ylabel('g')
+        ax_22.grid()
+
         # autoadapt
-        plt.tight_layout()
+        fig1.tight_layout()
+        fig2.tight_layout()
 
-        # - - - - - - - - - - - - - - - - - - - - -
-        # Canvas
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.tab1)
-        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-
-        self.toolbar1 = NavigationToolbar2Tk(self.canvas, self.tab1)
+        # Canvas1
+        self.canvas1 = FigureCanvasTkAgg(fig1, master=self.tab1)
+        self.canvas1.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        self.toolbar1 = NavigationToolbar2Tk(self.canvas1, self.tab1)
         self.toolbar1.update()
-        self.canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        self.canvas1._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+        # Canvas2
+        self.canvas2 = FigureCanvasTkAgg(fig2, master=self.tab2)
+        self.canvas2.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        self.toolbar2 = NavigationToolbar2Tk(self.canvas2, self.tab2)
+        self.toolbar2.update()
+        self.canvas2._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # event
