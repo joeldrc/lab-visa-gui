@@ -119,6 +119,7 @@ class Vna_measure():
         #self.vna.write('*CLS') # Clear the Error queue
         self.vna.write('SYST:DISP:UPD ON') # Display update ON - switch OFF after debugging
 
+        """
         # -----------------------------------------------------------
         if index == 0:
             self.vna.write("CALC1:PAR:DEF 'Trc1', S21")
@@ -128,7 +129,7 @@ class Vna_measure():
             # marker
             self.vna.write('CALC1:MARK ON')
             self.vna.write('CALCulate1:MARKer1:X 2Ghz')
-            self.vna.write('CALC1:FORM GDELay')
+            self.vna.write('CALC1:FORM SWR')
             time.sleep(1)
             self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
             time.sleep(1)
@@ -158,21 +159,37 @@ class Vna_measure():
             time.sleep(1)
             self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
             time.sleep(1)
+        """
 
-        # Receive measure
-        self.vna.write("CALC1:PAR:SEL 'Trc1'")
-        self.vna.write('CALC1:DATA? FDAT')
-        yData = self.vna.read()
-        #print(yData)
-        # Receive the number of point measured
-        self.vna.write('CALC1:DATA:STIM?')
-        xData = self.vna.read()
-        #print(xData)
+        if index == 0:
+            # Receive measure
+            self.vna.write("CALC1:PAR:SEL 'Trc1'")
+            self.vna.write('CALC1:DATA? FDAT')
+            yData = self.vna.read()
+            #print(yData)
+
+            # Receive the number of point measured
+            self.vna.write('CALC1:DATA:STIM?')
+            xData = self.vna.read()
+            #print(xData)
+
+        elif index == 1:
+            # Receive measure
+            self.vna.write("CALC2:PAR:SEL 'Trc2'")
+            self.vna.write('CALC2:DATA? FDAT')
+            yData = self.vna.read()
+            #print(yData)
+            # Receive the number of point measured
+            self.vna.write('CALC2:DATA:STIM?')
+            xData = self.vna.read()
+            #print(xData)
+      
         yDataArray = yData.split(",")
         xDataArray = xData.split(",")
         yDataArray = list(np.float_(yDataArray))
         xDataArray = list(np.float_(xDataArray))
         return(xDataArray, yDataArray)
+
 
 # if is used like a main
 if __name__ == '__main__':
