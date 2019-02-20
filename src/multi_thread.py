@@ -40,12 +40,12 @@ class Measure_thread(threading.Thread):
                 self.measure_started = True
                 self.data_ready = False
 
-                # masure vna
-                self.measure0 = self.vna.read_measure(0)
-                self.measure1 = self.vna.read_measure(1)
-                self.measure2 = self.vna.read_measure(2)
-                self.measure3 = self.vna.read_measure(3)
-                self.measure4 = self.vna.read_measure(4)
+                #measure vna
+                self.measure0 = self.vna.read_measure_1(0)
+                self.measure1 = self.vna.read_measure_1(1)
+                self.measure2 = self.vna.read_measure_1(2)
+                self.measure3 = self.vna.read_measure_1(3)
+                self.measure4 = self.vna.read_measure_1(4)
 
                 self.data_ready = True
                 self.measure_started = False
