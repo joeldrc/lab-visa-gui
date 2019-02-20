@@ -288,7 +288,7 @@ class User_gui(tk.Frame):
         #plt.style.use('bmh')
 
         #Figure 1
-        fig1 = Figure(figsize=(14,7))
+        fig1 = Figure(figsize=(12,7))
 
         #fig1.suptitle('Sampled signal')
 
