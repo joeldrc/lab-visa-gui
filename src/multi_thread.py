@@ -11,12 +11,13 @@ from openpyxl import *
 
 
 class Measure_thread(threading.Thread):
-    def __init__(self, address, start_test= False):
+    def __init__(self, address, start_test= False, test_number = 0):
         threading.Thread.__init__(self)
 
         self.file_name = ""
         self.time_value = ""
         self.start_test = start_test
+        self.test_number = test_number
         self.measure_started = False
         self.data_ready = False
 
@@ -40,12 +41,20 @@ class Measure_thread(threading.Thread):
                 self.measure_started = True
                 self.data_ready = False
 
-                #measure vna
-                self.measure0 = self.vna.read_measure_1(0)
-                self.measure1 = self.vna.read_measure_1(1)
-                self.measure2 = self.vna.read_measure_1(2)
-                self.measure3 = self.vna.read_measure_1(3)
-                self.measure4 = self.vna.read_measure_1(4)
+                if self.test_number == 0:
+                    #measure vna
+                    self.measure0 = self.vna.read_measure_1(0)
+                    self.measure1 = self.vna.read_measure_1(1)
+                    self.measure2 = self.vna.read_measure_1(2)
+                    self.measure3 = self.vna.read_measure_1(3)
+                    self.measure4 = self.vna.read_measure_1(4)
+                    print(self.test_number)
+
+                elif self.test_number == 1:
+                    #measure vna
+                    self.measure0 = self.vna.read_measure_2(0)
+                    self.measure1 = self.vna.read_measure_2(1)
+                    print(self.test_number)
 
                 self.data_ready = True
                 self.measure_started = False

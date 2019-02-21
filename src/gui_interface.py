@@ -64,7 +64,10 @@ class User_gui(tk.Frame):
         try:
             if self.measure_thread.measure_started:
                 self.prog_bar.pb_start()
+        except Exception as e:
+            print(e)
 
+        try:
             if self.measure_thread.data_ready:
                 self.create_plot()
 
@@ -73,15 +76,14 @@ class User_gui(tk.Frame):
 
                 if self.save_data:
                     self.measure_thread.create_sheet()
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
         self.clock.config(text=strftime("%d %b %Y %H:%M:%S", gmtime()))
         self.clock.after(1000, self.update_screen)
 
     # - - - - - - - - - - - - - - - - - - - - -
     # user pannel
-
     def save_ref(self):
         self.plot_reference = self.var1.get()
         if self.plot_reference == True:
@@ -89,16 +91,19 @@ class User_gui(tk.Frame):
 
         try:
             self.create_plot()
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
     def start_test(self):
-        self.instrument_connection(start_test = True)
+        #check wich frame you have selected (return int)
+        selected_frame_number = self.note.index("current")
+        #print(selected_frame_number)
+        self.instrument_connection(start_test = True, frame_number = selected_frame_number)
         self.measure_thread.file_name = self.serial_name_field.get() + '_' + self.serial_number_field.get() + '_' + self.details_field.get()
         self.measure_thread.time_value = strftime("%d %b %Y %H:%M:%S", gmtime())
 
-    def instrument_connection(self, start_test = False):
-        self.measure_thread = Measure_thread(self.hostname_field.get(), start_test)
+    def instrument_connection(self, start_test = False, frame_number = 0):
+        self.measure_thread = Measure_thread(self.hostname_field.get(), start_test, frame_number)
         self.measure_thread.start()
 
         instrument_name = self.measure_thread.instrument_info
@@ -115,66 +120,116 @@ class User_gui(tk.Frame):
         self.plot0.set_title('S21 - delay')
         self.plot0.set_xlabel('freq')
         self.plot0.set_ylabel('dB')
+        self.plot0.grid()
 
         self.plot1.set_title('S21 - dB')
         self.plot1.set_xlabel('freq')
         self.plot1.set_ylabel('dB')
+        self.plot1.grid()
 
         self.plot2.set_title('S11 - SWR')
         self.plot2.set_xlabel('freq')
         self.plot2.set_ylabel('dB')
+        self.plot2.grid()
 
         self.plot3.set_title('S22 - SWR')
         self.plot3.set_xlabel('freq')
         self.plot3.set_ylabel('dB')
+        self.plot3.grid()
 
         self.plot4.set_title('S11 - TDR')
         self.plot4.set_xlabel('delay')
         self.plot4.set_ylabel('dB')
+        self.plot4.grid()
+
+        self.plot10.set_title('S11 - TDR')
+        self.plot10.set_xlabel('delay')
+        self.plot10.set_ylabel('dB')
+        self.plot10.grid()
+
+        self.plot11.set_title('S11 - TDR')
+        self.plot11.set_xlabel('delay')
+        self.plot11.set_ylabel('dB')
+        self.plot11.grid()
 
     def create_plot(self):
-        # masure vna
-        xValue0, yValue0 = self.measure_thread.measure0
-        xValue1, yValue1 = self.measure_thread.measure1
-        xValue2, yValue2 = self.measure_thread.measure2
-        xValue3, yValue3 = self.measure_thread.measure3
-        xValue4, yValue4 = self.measure_thread.measure4
+        selected_frame_number = self.note.index("current")
+        if selected_frame_number == 0:
+            # masure vna
+            xValue0, yValue0 = self.measure_thread.measure0
+            xValue1, yValue1 = self.measure_thread.measure1
+            xValue2, yValue2 = self.measure_thread.measure2
+            xValue3, yValue3 = self.measure_thread.measure3
+            xValue4, yValue4 = self.measure_thread.measure4
 
-        if self.plot_saveRef == True:
-            # set reference data on plot
-            self.xRef0, self.yRef0 = xValue0, yValue0
-            self.xRef1, self.yRef1 = xValue1, yValue1
-            self.xRef2, self.yRef2 = xValue2, yValue2
-            self.xRef3, self.yRef3 = xValue3, yValue3
-            self.xRef4, self.yRef4 = xValue4, yValue4
-            self.plot_saveRef = False
+            if self.plot_saveRef == True:
+                # set reference data on plot
+                self.xRef0, self.yRef0 = xValue0, yValue0
+                self.xRef1, self.yRef1 = xValue1, yValue1
+                self.xRef2, self.yRef2 = xValue2, yValue2
+                self.xRef3, self.yRef3 = xValue3, yValue3
+                self.xRef4, self.yRef4 = xValue4, yValue4
+                self.plot_saveRef = False
 
-        # clean plot line
-        self.plot0.cla()
-        self.plot1.cla()
-        self.plot2.cla()
-        self.plot3.cla()
-        self.plot4.cla()
+            # clean plot line
+            self.plot0.cla()
+            self.plot1.cla()
+            self.plot2.cla()
+            self.plot3.cla()
+            self.plot4.cla()
 
-        # set axis names
-        self.set_axis_name()
+            # set axis names
+            self.set_axis_name()
 
-        # set data on plot
-        self.plot0.plot(xValue0, yValue0)
-        self.plot1.plot(xValue1, yValue1)
-        self.plot2.plot(xValue2, yValue2)
-        self.plot3.plot(xValue3, yValue3)
-        self.plot4.plot(xValue4, yValue4)
+            # set data on plot
+            self.plot0.plot(xValue0, yValue0)
+            self.plot1.plot(xValue1, yValue1)
+            self.plot2.plot(xValue2, yValue2)
+            self.plot3.plot(xValue3, yValue3)
+            self.plot4.plot(xValue4, yValue4)
 
-        if self.plot_reference == True:
-            self.plot0.plot(self.xRef0, self.yRef0)
-            self.plot1.plot(self.xRef1, self.yRef1)
-            self.plot2.plot(self.xRef2, self.yRef2)
-            self.plot3.plot(self.xRef3, self.yRef3)
-            self.plot4.plot(self.xRef4, self.yRef4)
+            if self.plot_reference == True:
+                self.plot0.plot(self.xRef0, self.yRef0)
+                self.plot1.plot(self.xRef1, self.yRef1)
+                self.plot2.plot(self.xRef2, self.yRef2)
+                self.plot3.plot(self.xRef3, self.yRef3)
+                self.plot4.plot(self.xRef4, self.yRef4)
 
-        # update plot
-        self.canvas.draw()
+            # autoadapt
+            self.fig1.tight_layout()
+            # update plot
+            self.canvas1.draw()
+
+        elif selected_frame_number == 1:
+            # masure vna
+            xValue0, yValue0 = self.measure_thread.measure0
+            xValue1, yValue1 = self.measure_thread.measure1
+
+            if self.plot_saveRef == True:
+                # set reference data on plot
+                self.xRef0, self.yRef0 = xValue0, yValue0
+                self.xRef1, self.yRef1 = xValue1, yValue1
+                self.plot_saveRef = False
+
+            # clean plot line
+            self.plot10.cla()
+            self.plot11.cla()
+            # set axis names
+            self.set_axis_name()
+
+            # set data on plot
+            self.plot10.plot(xValue0, yValue0)
+            self.plot11.plot(xValue1, yValue1)
+
+
+            if self.plot_reference == True:
+                self.plot10.plot(self.xRef0, self.yRef0)
+                self.plot11.plot(self.xRef1, self.yRef1)
+
+            # autoadapt
+            self.fig2.tight_layout()
+            # update plot
+            self.canvas2.draw()
 
     def create_widgets(self):
         # - - - - - - - - - - - - - - - - - - - - -
@@ -274,87 +329,49 @@ class User_gui(tk.Frame):
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Notebook
-        note = ttk.Notebook(frame1)
-        note.pack(padx=5, pady=5)
+        self.note = ttk.Notebook(frame1)
+        self.note.pack(padx=5, pady=5)
 
-        self.tab1 = ttk.Frame(note)
-        self.tab2 = ttk.Frame(note)
+        self.tab1 = ttk.Frame(self.note)
+        self.tab2 = ttk.Frame(self.note)
 
-        note.add(self.tab1, text = "Flanges")
-        note.add(self.tab2, text = "Pick-Up")
+        self.note.add(self.tab1, text = "Flanges")
+        self.note.add(self.tab2, text = "Pick-Up")
 
         # - - - - - - - - - - - - - - - - - - - - -
         # plot setup
         #plt.style.use('bmh')
 
         #Figure 1
-        fig1 = Figure(figsize=(12,7))
-
-        #fig1.suptitle('Sampled signal')
-
-        self.plot0 = fig1.add_subplot(2,3,1)
-        self.plot0.set_title("Channel X")
-        self.plot0.set_xlabel('g')
-        self.plot0.set_ylabel('g')
-        self.plot0.grid()
-
-        self.plot1 = fig1.add_subplot(2,3,2)
-        self.plot1.set_title("Channel Y")
-        self.plot1.set_xlabel('ms')
-        self.plot1.set_ylabel('g')
-        self.plot1.grid()
-
-        self.plot2 = fig1.add_subplot(2,3,3)
-        self.plot2.set_title("Channel Y")
-        self.plot2.set_xlabel('ms')
-        self.plot2.set_ylabel('g')
-        self.plot2.grid()
-
-        self.plot3 = fig1.add_subplot(2,3,4)
-        self.plot3.set_title("Channel Y")
-        self.plot3.set_xlabel('ms')
-        self.plot3.set_ylabel('g')
-        self.plot3.grid()
-
-        self.plot4 = fig1.add_subplot(2,3,5)
-        self.plot4.set_title("Channel Y")
-        self.plot4.set_xlabel('ms')
-        self.plot4.set_ylabel('g')
-        self.plot4.grid()
-
-        #add comment
-        self.set_axis_name()
+        self.fig1 = Figure(figsize=(12,7))
+        #self.fig1.suptitle('Sampled signal')
+        self.plot0 = self.fig1.add_subplot(2,3,1)
+        self.plot1 = self.fig1.add_subplot(2,3,2)
+        self.plot2 = self.fig1.add_subplot(2,3,3)
+        self.plot3 = self.fig1.add_subplot(2,3,4)
+        self.plot4 = self.fig1.add_subplot(2,3,5)
 
         #Figure 2
-        fig2 = Figure()
+        self.fig2 = Figure()
+        #self.fig2.suptitle('Data received')
+        self.plot10 = self.fig2.add_subplot(1,2,1)
+        self.plot11 = self.fig2.add_subplot(1,2,2)
 
-        #fig2.suptitle('Data received')
-
-        ax_21 = fig2.add_subplot(1,2,1)
-        #ax_21.hold(False)
-        ax_21.set_title("Channel X")
-        ax_21.set_ylabel('g')
-        ax_21.grid()
-
-        ax_22 = fig2.add_subplot(1,2,2)
-        #ax_21.hold(False)
-        ax_22.set_title("Channel X")
-        ax_22.set_ylabel('g')
-        ax_22.grid()
-
+        #set all axis names
+        self.set_axis_name()
         # autoadapt
-        fig1.tight_layout()
-        fig2.tight_layout()
+        self.fig1.tight_layout()
+        self.fig2.tight_layout()
 
         # Canvas1
-        self.canvas1 = FigureCanvasTkAgg(fig1, master=self.tab1)
+        self.canvas1 = FigureCanvasTkAgg(self.fig1, master=self.tab1)
         self.canvas1.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         self.toolbar1 = NavigationToolbar2Tk(self.canvas1, self.tab1)
         self.toolbar1.update()
         self.canvas1._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
         # Canvas2
-        self.canvas2 = FigureCanvasTkAgg(fig2, master=self.tab2)
+        self.canvas2 = FigureCanvasTkAgg(self.fig2, master=self.tab2)
         self.canvas2.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         self.toolbar2 = NavigationToolbar2Tk(self.canvas2, self.tab2)
         self.toolbar2.update()
