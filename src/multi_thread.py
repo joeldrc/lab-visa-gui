@@ -37,7 +37,6 @@ class Measure_thread(threading.Thread):
     def run(self):
         try:
             if self.start_test:
-
                 self.measure_started = True
                 self.data_ready = False
 
@@ -72,39 +71,28 @@ class Measure_thread(threading.Thread):
         self.sheet.column_dimensions['A'].width = 30
         self.sheet.column_dimensions['B'].width = 30
         """
-
         self.sheet.cell(row=1, column=1).value = self.file_name
-
         self.sheet.cell(row=1, column=2).value = self.time_value
-
         self.sheet.cell(row=2, column=1).value = 'x'
         self.sheet.cell(row=2, column=2).value = 'y'
-
         self.sheet.cell(row=2, column=4).value = 'x'
         self.sheet.cell(row=2, column=5).value = 'y'
-
         self.sheet.cell(row=2, column=7).value = 'x'
         self.sheet.cell(row=2, column=8).value = 'y'
-
         self.sheet.cell(row=2, column=10).value = 'x'
         self.sheet.cell(row=2, column=11).value = 'y'
-
         self.sheet.cell(row=2, column=13).value = 'x'
         self.sheet.cell(row=2, column=14).value = 'y'
 
         for i in range(0, len(xValue[0]), 1):
             self.sheet.cell(row=i + 3, column=1).value = xValue[0][i]
             self.sheet.cell(row=i + 3, column=2).value = yValue[0][i]
-
             self.sheet.cell(row=i + 3, column=4).value = xValue[1][i]
             self.sheet.cell(row=i + 3, column=5).value = yValue[1][i]
-
             self.sheet.cell(row=i + 3, column=7).value = xValue[2][i]
             self.sheet.cell(row=i + 3, column=8).value = yValue[2][i]
-
             self.sheet.cell(row=i + 3, column=10).value = xValue[3][i]
             self.sheet.cell(row=i + 3, column=11).value = yValue[3][i]
-
             self.sheet.cell(row=i + 3, column=13).value = xValue[4][i]
             self.sheet.cell(row=i + 3, column=14).value = yValue[4][i]
 

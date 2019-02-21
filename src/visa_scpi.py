@@ -119,48 +119,6 @@ class Vna_measure():
         #self.vna.write('*CLS') # Clear the Error queue
         self.vna.write('SYST:DISP:UPD ON') # Display update ON - switch OFF after debugging
 
-        """
-        # -----------------------------------------------------------
-        if index == 0:
-            self.vna.write("CALC1:PAR:DEF 'Trc1', S21")
-            self.vna.write('DISP:WIND:STAT ON')
-            self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
-
-            # marker
-            self.vna.write('CALC1:MARK ON')
-            self.vna.write('CALCulate1:MARKer1:X 2Ghz')
-            self.vna.write('CALC1:FORM SWR')
-            time.sleep(1)
-            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
-            time.sleep(1)
-
-        # -----------------------------------------------------------
-        elif index == 1:
-            self.vna.write("CALC1:PAR:DEF 'Trc1', S21")
-            self.vna.write('DISP:WIND:STAT ON')
-            self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
-            # marker
-            self.vna.write('CALC1:MARK ON')
-            self.vna.write('CALCulate1:MARKer1:X 2Ghz')
-            self.vna.write('CALC1:FORM MLOG')
-            time.sleep(1)
-            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
-            time.sleep(1)
-
-        # -----------------------------------------------------------
-        elif index == 2:
-            self.vna.write("CALC1:PAR:DEF 'Trc1', S11")
-            self.vna.write('DISP:WIND:STAT ON')
-            self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
-            # marker
-            self.vna.write('CALC1:MARK ON')
-            self.vna.write('CALCulate1:MARKer1:X 2Ghz')
-            self.vna.write('CALC1:FORM SWR')
-            time.sleep(1)
-            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
-            time.sleep(1)
-        """
-
         if index == 0:
             # Receive measure
             self.vna.write("CALC1:PAR:SEL 'Trc1'")
