@@ -117,40 +117,40 @@ class User_gui(tk.Frame):
 
     def set_axis_name(self):
         # set axis names
-        self.plot0.set_title('S21 - delay')
-        self.plot0.set_xlabel('freq')
-        self.plot0.set_ylabel('dB')
-        self.plot0.grid()
+        self.plot[0].set_title('S21 - delay')
+        self.plot[0].set_xlabel('freq')
+        self.plot[0].set_ylabel('dB')
+        self.plot[0].grid()
 
-        self.plot1.set_title('S21 - dB')
-        self.plot1.set_xlabel('freq')
-        self.plot1.set_ylabel('dB')
-        self.plot1.grid()
+        self.plot[1].set_title('S21 - dB')
+        self.plot[1].set_xlabel('freq')
+        self.plot[1].set_ylabel('dB')
+        self.plot[1].grid()
 
-        self.plot2.set_title('S11 - SWR')
-        self.plot2.set_xlabel('freq')
-        self.plot2.set_ylabel('dB')
-        self.plot2.grid()
+        self.plot[2].set_title('S11 - SWR')
+        self.plot[2].set_xlabel('freq')
+        self.plot[2].set_ylabel('dB')
+        self.plot[2].grid()
 
-        self.plot3.set_title('S22 - SWR')
-        self.plot3.set_xlabel('freq')
-        self.plot3.set_ylabel('dB')
-        self.plot3.grid()
+        self.plot[3].set_title('S22 - SWR')
+        self.plot[3].set_xlabel('freq')
+        self.plot[3].set_ylabel('dB')
+        self.plot[3].grid()
 
-        self.plot4.set_title('S11 - TDR')
-        self.plot4.set_xlabel('delay')
-        self.plot4.set_ylabel('dB')
-        self.plot4.grid()
+        self.plot[4].set_title('S11 - TDR')
+        self.plot[4].set_xlabel('delay')
+        self.plot[4].set_ylabel('dB')
+        self.plot[4].grid()
 
-        self.plot10.set_title('S11 - TDR')
-        self.plot10.set_xlabel('delay')
-        self.plot10.set_ylabel('dB')
-        self.plot10.grid()
+        self.plot_2[0].set_title('S11 - TDR')
+        self.plot_2[0].set_xlabel('delay')
+        self.plot_2[0].set_ylabel('dB')
+        self.plot_2[0].grid()
 
-        self.plot11.set_title('S11 - TDR')
-        self.plot11.set_xlabel('delay')
-        self.plot11.set_ylabel('dB')
-        self.plot11.grid()
+        self.plot_2[1].set_title('S11 - TDR')
+        self.plot_2[1].set_xlabel('delay')
+        self.plot_2[1].set_ylabel('dB')
+        self.plot_2[1].grid()
 
     def create_plot(self):
         selected_frame_number = self.note.index("current")
@@ -167,30 +167,18 @@ class User_gui(tk.Frame):
                 self.yRef = yValue
                 self.plot_saveRef = False
 
-            # clean plot line
-            self.plot0.cla()
-            self.plot1.cla()
-            self.plot2.cla()
-            self.plot3.cla()
-            self.plot4.cla()
+            for i in range(0,5,1):
+                # clean plot line
+                self.plot[i].cla()
+                # set data on plot
+                self.plot[i].plot(xValue[i], yValue[i])
+
+            if self.plot_reference == True:
+                for i in range(0,5,1):
+                    self.plot[i].plot(self.xRef[i], self.yRef[i])
 
             # set axis names
             self.set_axis_name()
-
-            # set data on plot
-            self.plot0.plot(xValue[0], yValue[0])
-            self.plot1.plot(xValue[1], yValue[1])
-            self.plot2.plot(xValue[2], yValue[2])
-            self.plot3.plot(xValue[3], yValue[3])
-            self.plot4.plot(xValue[4], yValue[4])
-
-            if self.plot_reference == True:
-                self.plot0.plot(self.xRef[0], self.yRef[0])
-                self.plot1.plot(self.xRef[1], self.yRef[1])
-                self.plot2.plot(self.xRef[2], self.yRef[2])
-                self.plot3.plot(self.xRef[3], self.yRef[3])
-                self.plot4.plot(self.xRef[4], self.yRef[4])
-
             # autoadapt
             self.fig1.tight_layout()
             # update plot
@@ -209,21 +197,18 @@ class User_gui(tk.Frame):
                 self.yRef = yValue
                 self.plot_saveRef = False
 
-            # clean plot line
-            self.plot10.cla()
-            self.plot11.cla()
+            for i in range(0,2,1):
+                # clean plot line
+                self.plot_2[i].cla()
+                # set data on plot
+                self.plot_2[i].plot(xValue[i], yValue[i])
+
+            if self.plot_reference == True:
+                for i in range(0,2,1):
+                    self.plot_2[i].plot(self.xRef[i], self.yRef[i])
 
             # set axis names
             self.set_axis_name()
-
-            # set data on plot
-            self.plot10.plot(xValue[0], yValue[0])
-            self.plot11.plot(xValue[1], yValue[1])
-
-            if self.plot_reference == True:
-                self.plot10.plot(self.xRef[0], self.yRef[0])
-                self.plot11.plot(self.xRef[1], self.yRef[1])
-
             # autoadapt
             self.fig2.tight_layout()
             # update plot
@@ -343,17 +328,18 @@ class User_gui(tk.Frame):
         #Figure 1
         self.fig1 = Figure(figsize=(12,7))
         #self.fig1.suptitle('Sampled signal')
-        self.plot0 = self.fig1.add_subplot(2,3,1)
-        self.plot1 = self.fig1.add_subplot(2,3,2)
-        self.plot2 = self.fig1.add_subplot(2,3,3)
-        self.plot3 = self.fig1.add_subplot(2,3,4)
-        self.plot4 = self.fig1.add_subplot(2,3,5)
+        self.plot = []
+        for i in range(0,5,1):
+            subplot = self.fig1.add_subplot(2,3,i + 1)
+            self.plot.append(subplot)
 
         #Figure 2
         self.fig2 = Figure()
         #self.fig2.suptitle('Data received')
-        self.plot10 = self.fig2.add_subplot(1,2,1)
-        self.plot11 = self.fig2.add_subplot(1,2,2)
+        self.plot_2 = []
+        for i in range(0,2,1):
+            subplot = self.fig2.add_subplot(1,2,i + 1)
+            self.plot_2.append(subplot)
 
         #set all axis names
         self.set_axis_name()
