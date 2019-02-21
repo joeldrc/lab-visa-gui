@@ -24,8 +24,8 @@ class Measure_thread(threading.Thread):
         try:
             self.vna = Vna_measure(address)
             self.instrument_info = self.vna.instrument_info()
-        except:
-            print("Visa error or wrong address")
+        except Exception as e:
+            print(e)
             self.instrument_info = "No connection", "\n "
             self.start_test = False
 
@@ -41,33 +41,29 @@ class Measure_thread(threading.Thread):
                 self.measure_started = True
                 self.data_ready = False
 
+                #measure vna
                 if self.test_number == 0:
-                    #measure vna
-                    self.measure0 = self.vna.read_measure_1(0)
-                    self.measure1 = self.vna.read_measure_1(1)
-                    self.measure2 = self.vna.read_measure_1(2)
-                    self.measure3 = self.vna.read_measure_1(3)
-                    self.measure4 = self.vna.read_measure_1(4)
-                    print(self.test_number)
+                    self.measures_0 = []
+                    for i in range(0,5,1):
+                        self.measures_0.append(self.vna.read_measure_1(i))
 
                 elif self.test_number == 1:
-                    #measure vna
-                    self.measure0 = self.vna.read_measure_2(0)
-                    self.measure1 = self.vna.read_measure_2(1)
-                    print(self.test_number)
+                    self.measures_1 = []
+                    for i in range(0,2,1):
+                        self.measures_1.append(self.vna.read_measure_2(i))
 
                 self.data_ready = True
                 self.measure_started = False
-        except:
-            print("No vna declared")
+        except Exception as e:
+            print(e)
 
     def create_sheet(self):
-        # masure vna
-        xValue0, yValue0 = self.measure0
-        xValue1, yValue1 = self.measure1
-        xValue2, yValue2 = self.measure2
-        xValue3, yValue3 = self.measure3
-        xValue4, yValue4 = self.measure4
+        xValue = []
+        yValue = []
+        for i in range(0,5,1):
+            x, y = self.measures_0[i]
+            xValue.append(x)
+            yValue.append(y)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Create sheet
@@ -96,27 +92,27 @@ class Measure_thread(threading.Thread):
         self.sheet.cell(row=2, column=13).value = 'x'
         self.sheet.cell(row=2, column=14).value = 'y'
 
-        for i in range(0, len(xValue0), 1):
-            self.sheet.cell(row=i + 3, column=1).value = xValue0[i]
-            self.sheet.cell(row=i + 3, column=2).value = yValue0[i]
+        for i in range(0, len(xValue[0]), 1):
+            self.sheet.cell(row=i + 3, column=1).value = xValue[0][i]
+            self.sheet.cell(row=i + 3, column=2).value = yValue[0][i]
 
-            self.sheet.cell(row=i + 3, column=4).value = xValue1[i]
-            self.sheet.cell(row=i + 3, column=5).value = yValue1[i]
+            self.sheet.cell(row=i + 3, column=4).value = xValue[1][i]
+            self.sheet.cell(row=i + 3, column=5).value = yValue[1][i]
 
-            self.sheet.cell(row=i + 3, column=7).value = xValue2[i]
-            self.sheet.cell(row=i + 3, column=8).value = yValue2[i]
+            self.sheet.cell(row=i + 3, column=7).value = xValue[2][i]
+            self.sheet.cell(row=i + 3, column=8).value = yValue[2][i]
 
-            self.sheet.cell(row=i + 3, column=10).value = xValue3[i]
-            self.sheet.cell(row=i + 3, column=11).value = yValue3[i]
+            self.sheet.cell(row=i + 3, column=10).value = xValue[3][i]
+            self.sheet.cell(row=i + 3, column=11).value = yValue[3][i]
 
-            self.sheet.cell(row=i + 3, column=13).value = xValue4[i]
-            self.sheet.cell(row=i + 3, column=14).value = yValue4[i]
+            self.sheet.cell(row=i + 3, column=13).value = xValue[4][i]
+            self.sheet.cell(row=i + 3, column=14).value = yValue[4][i]
 
         file_position = filedialog.asksaveasfilename(initialdir = "/",initialfile=self.file_name, title = "Select file",filetypes = (("Microsoft Excel Worksheet","*.xlsx"),("all files","*.*")), defaultextension = ' ')
         try:
             self.wb.save(file_position)
-        except:
-            print("Save operation error")
+        except Exception as e:
+            print(e)
 
 
 class Progress_bar():

@@ -111,7 +111,7 @@ class Vna_measure():
         yDataArray = list(np.float_(yDataArray))
         xDataArray = list(np.float_(xDataArray))
 
-        return(xDataArray, yDataArray)
+        return xDataArray, yDataArray
 
     #for pick-up tests
     def read_measure_2(self, index):
@@ -183,12 +183,13 @@ class Vna_measure():
             self.vna.write('CALC2:DATA:STIM?')
             xData = self.vna.read()
             #print(xData)
-      
+
         yDataArray = yData.split(",")
         xDataArray = xData.split(",")
         yDataArray = list(np.float_(yDataArray))
         xDataArray = list(np.float_(xDataArray))
-        return(xDataArray, yDataArray)
+
+        return xDataArray, yDataArray
 
 
 # if is used like a main
@@ -199,8 +200,11 @@ if __name__ == '__main__':
         test = Vna_measure(address)
         print(test.instrument_info())
 
+        values = []
         for i in range(0, 5, 1):
-            x, y = test.read_measure_2(i)
+            #x, y = test.read_measure_2(i)
+            values.append(test.read_measure_2(i))
+            x, y = values[i]
             print(x)
             print(y)
 
@@ -209,5 +213,5 @@ if __name__ == '__main__':
             plt.ylabel("Amplitude (dBm)")
             plt.plot(x, y)
             plt.show()
-    except:
-        print("Visa error or wrong address")
+    except Exception as e:
+        print(e)

@@ -155,20 +155,16 @@ class User_gui(tk.Frame):
     def create_plot(self):
         selected_frame_number = self.note.index("current")
         if selected_frame_number == 0:
-            # masure vna
-            xValue0, yValue0 = self.measure_thread.measure0
-            xValue1, yValue1 = self.measure_thread.measure1
-            xValue2, yValue2 = self.measure_thread.measure2
-            xValue3, yValue3 = self.measure_thread.measure3
-            xValue4, yValue4 = self.measure_thread.measure4
+            xValue = []
+            yValue = []
+            for i in range(0,5,1):
+                x, y = self.measure_thread.measures_0[i]
+                xValue.append(x)
+                yValue.append(y)
 
             if self.plot_saveRef == True:
-                # set reference data on plot
-                self.xRef0, self.yRef0 = xValue0, yValue0
-                self.xRef1, self.yRef1 = xValue1, yValue1
-                self.xRef2, self.yRef2 = xValue2, yValue2
-                self.xRef3, self.yRef3 = xValue3, yValue3
-                self.xRef4, self.yRef4 = xValue4, yValue4
+                self.xRef = xValue
+                self.yRef = yValue
                 self.plot_saveRef = False
 
             # clean plot line
@@ -182,18 +178,18 @@ class User_gui(tk.Frame):
             self.set_axis_name()
 
             # set data on plot
-            self.plot0.plot(xValue0, yValue0)
-            self.plot1.plot(xValue1, yValue1)
-            self.plot2.plot(xValue2, yValue2)
-            self.plot3.plot(xValue3, yValue3)
-            self.plot4.plot(xValue4, yValue4)
+            self.plot0.plot(xValue[0], yValue[0])
+            self.plot1.plot(xValue[1], yValue[1])
+            self.plot2.plot(xValue[2], yValue[2])
+            self.plot3.plot(xValue[3], yValue[3])
+            self.plot4.plot(xValue[4], yValue[4])
 
             if self.plot_reference == True:
-                self.plot0.plot(self.xRef0, self.yRef0)
-                self.plot1.plot(self.xRef1, self.yRef1)
-                self.plot2.plot(self.xRef2, self.yRef2)
-                self.plot3.plot(self.xRef3, self.yRef3)
-                self.plot4.plot(self.xRef4, self.yRef4)
+                self.plot0.plot(self.xRef[0], self.yRef[0])
+                self.plot1.plot(self.xRef[1], self.yRef[1])
+                self.plot2.plot(self.xRef[2], self.yRef[2])
+                self.plot3.plot(self.xRef[3], self.yRef[3])
+                self.plot4.plot(self.xRef[4], self.yRef[4])
 
             # autoadapt
             self.fig1.tight_layout()
@@ -201,30 +197,32 @@ class User_gui(tk.Frame):
             self.canvas1.draw()
 
         elif selected_frame_number == 1:
-            # masure vna
-            xValue0, yValue0 = self.measure_thread.measure0
-            xValue1, yValue1 = self.measure_thread.measure1
+            xValue = []
+            yValue = []
+            for i in range(0,2,1):
+                x, y = self.measure_thread.measures_1[i]
+                xValue.append(x)
+                yValue.append(y)
 
             if self.plot_saveRef == True:
-                # set reference data on plot
-                self.xRef0, self.yRef0 = xValue0, yValue0
-                self.xRef1, self.yRef1 = xValue1, yValue1
+                self.xRef = xValue
+                self.yRef = yValue
                 self.plot_saveRef = False
 
             # clean plot line
             self.plot10.cla()
             self.plot11.cla()
+
             # set axis names
             self.set_axis_name()
 
             # set data on plot
-            self.plot10.plot(xValue0, yValue0)
-            self.plot11.plot(xValue1, yValue1)
-
+            self.plot10.plot(xValue[0], yValue[0])
+            self.plot11.plot(xValue[1], yValue[1])
 
             if self.plot_reference == True:
-                self.plot10.plot(self.xRef0, self.yRef0)
-                self.plot11.plot(self.xRef1, self.yRef1)
+                self.plot10.plot(self.xRef[0], self.yRef[0])
+                self.plot11.plot(self.xRef[1], self.yRef[1])
 
             # autoadapt
             self.fig2.tight_layout()
