@@ -358,8 +358,8 @@ class User_gui(tk.Frame):
         # - - - - - - - - - - - - - - - - - - - - -
         # plot setup
         #plt.style.use('seaborn-darkgrid')
-        #plt.style.use('seaborn-whitegrid')
-        plt.style.use('bmh')
+        plt.style.use('seaborn-whitegrid')
+        #plt.style.use('bmh')
 
         self.plot = []
 
