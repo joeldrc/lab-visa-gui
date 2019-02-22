@@ -109,8 +109,13 @@ class User_gui(tk.Frame):
                 self.measure_thread.data_ready = False
                 self.prog_bar.pb_complete()
 
-                if self.save_data:
-                    self.measure_thread.create_sheet()
+                try:
+                    if self.save_data:
+                        self.measure_thread.create_sheet()
+                except Exception as e:
+                    print(e)
+                    messagebox.showerror(title = 'Error', message = e)
+
         except Exception as e:
             print(e)
 

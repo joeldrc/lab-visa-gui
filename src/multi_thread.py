@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from tkinter import *
+from tkinter import filedialog
 from visa_scpi import *
 import threading
 from openpyxl import *
@@ -55,45 +57,33 @@ class Measure_thread(threading.Thread):
     def create_sheet(self):
         xValue = []
         yValue = []
-        for i in range(0,5,1):
-            x, y = self.measures_0[i]
-            xValue.append(x)
-            yValue.append(y)
+
+        if self.test_number == 0:
+            for i in range(0,5,1):
+                x, y = self.measures_0[i]
+                xValue.append(x)
+                yValue.append(y)
+
+        elif self.test_number == 1:
+            for i in range(0,2,1):
+                x, y = self.measures_1[i]
+                xValue.append(x)
+                yValue.append(y)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Create sheet
-        """
-        # resize the width of columns in excel spreadsheet
-        self.sheet.column_dimensions['A'].width = 30
-        self.sheet.column_dimensions['B'].width = 30
-        """
         self.sheet.cell(row=1, column=1).value = self.file_name
         self.sheet.cell(row=1, column=2).value = self.time_value
-        self.sheet.cell(row=2, column=1).value = 'x'
-        self.sheet.cell(row=2, column=2).value = 'y'
-        self.sheet.cell(row=2, column=4).value = 'x'
-        self.sheet.cell(row=2, column=5).value = 'y'
-        self.sheet.cell(row=2, column=7).value = 'x'
-        self.sheet.cell(row=2, column=8).value = 'y'
-        self.sheet.cell(row=2, column=10).value = 'x'
-        self.sheet.cell(row=2, column=11).value = 'y'
-        self.sheet.cell(row=2, column=13).value = 'x'
-        self.sheet.cell(row=2, column=14).value = 'y'
 
-        for i in range(0, len(xValue[0]), 1):
-            self.sheet.cell(row=i + 3, column=1).value = xValue[0][i]
-            self.sheet.cell(row=i + 3, column=2).value = yValue[0][i]
-            self.sheet.cell(row=i + 3, column=4).value = xValue[1][i]
-            self.sheet.cell(row=i + 3, column=5).value = yValue[1][i]
-            self.sheet.cell(row=i + 3, column=7).value = xValue[2][i]
-            self.sheet.cell(row=i + 3, column=8).value = yValue[2][i]
-            self.sheet.cell(row=i + 3, column=10).value = xValue[3][i]
-            self.sheet.cell(row=i + 3, column=11).value = yValue[3][i]
-            self.sheet.cell(row=i + 3, column=13).value = xValue[4][i]
-            self.sheet.cell(row=i + 3, column=14).value = yValue[4][i]
+        for i in range(0, len(xValue), 1):
+            self.sheet.cell(row=2, column= (i * 2) + 1).value = 'data: ' + str(i + 1)
+
+            self.sheet.cell(row=3, column= (i * 2) + 1).value = 'x'
+            self.sheet.cell(row=3, column= (i * 2) + 2).value = 'y'
+
+            for j in range(0, len(xValue[0]), 1):
+                self.sheet.cell(row=j + 4, column= (i * 2) + 1).value = xValue[i][j]
+                self.sheet.cell(row=j + 4, column= (i * 2) + 2).value = yValue[i][j]
 
         file_position = filedialog.asksaveasfilename(initialdir = "/",initialfile=self.file_name, title = "Select file",filetypes = (("Microsoft Excel Worksheet","*.xlsx"),("all files","*.*")), defaultextension = ' ')
-        try:
-            self.wb.save(file_position)
-        except Exception as e:
-            print(e)
+        self.wb.save(file_position)
