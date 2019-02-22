@@ -123,7 +123,6 @@ class User_gui(tk.Frame):
         self.plot_reference = self.var1.get()
         if self.plot_reference == True:
             self.plot_saveRef = True
-
         try:
             self.create_plot()
         except Exception as e:
@@ -152,46 +151,41 @@ class User_gui(tk.Frame):
 
     def set_axis_name(self):
         # set axis names
+        #Fig 1
         self.plot[0].set_title('S21 - delay')
         self.plot[0].set_xlabel('freq')
         self.plot[0].set_ylabel('dB')
-        self.plot[0].grid()
-
         self.plot[1].set_title('S21 - dB')
         self.plot[1].set_xlabel('freq')
         self.plot[1].set_ylabel('dB')
-        self.plot[1].grid()
-
         self.plot[2].set_title('S11 - SWR')
         self.plot[2].set_xlabel('freq')
         self.plot[2].set_ylabel('dB')
-        self.plot[2].grid()
-
         self.plot[3].set_title('S22 - SWR')
         self.plot[3].set_xlabel('freq')
         self.plot[3].set_ylabel('dB')
-        self.plot[3].grid()
-
         self.plot[4].set_title('S11 - TDR')
         self.plot[4].set_xlabel('delay')
         self.plot[4].set_ylabel('dB')
-        self.plot[4].grid()
 
-        self.plot_2[0].set_title('S11 - TDR')
-        self.plot_2[0].set_xlabel('delay')
-        self.plot_2[0].set_ylabel('dB')
-        self.plot_2[0].grid()
+        #Fig 2
+        self.plot[5].set_title('S11 - TDR')
+        self.plot[5].set_xlabel('delay')
+        self.plot[5].set_ylabel('dB')
+        self.plot[6].set_title('S11 - TDR')
+        self.plot[6].set_xlabel('delay')
+        self.plot[6].set_ylabel('dB')
 
-        self.plot_2[1].set_title('S11 - TDR')
-        self.plot_2[1].set_xlabel('delay')
-        self.plot_2[1].set_ylabel('dB')
-        self.plot_2[1].grid()
+        #set grid on
+        for i in range(0,7,1):
+            self.plot[i].grid()
 
     def create_plot(self):
         selected_frame_number = self.note.index("current")
+        xValue = []
+        yValue = []
+
         if selected_frame_number == 0:
-            xValue = []
-            yValue = []
             for i in range(0,5,1):
                 x, y = self.measure_thread.measures_0[i]
                 xValue.append(x)
@@ -220,8 +214,6 @@ class User_gui(tk.Frame):
             self.canvas1.draw()
 
         elif selected_frame_number == 1:
-            xValue = []
-            yValue = []
             for i in range(0,2,1):
                 x, y = self.measure_thread.measures_1[i]
                 xValue.append(x)
@@ -234,13 +226,13 @@ class User_gui(tk.Frame):
 
             for i in range(0,2,1):
                 # clean plot line
-                self.plot_2[i].cla()
+                self.plot[i + 5].cla()
                 # set data on plot
-                self.plot_2[i].plot(xValue[i], yValue[i])
+                self.plot[i + 5].plot(xValue[i], yValue[i])
 
             if self.plot_reference == True:
                 for i in range(0,2,1):
-                    self.plot_2[i].plot(self.xRef[i], self.yRef[i])
+                    self.plot[i + 5].plot(self.xRef[i], self.yRef[i])
 
             # set axis names
             self.set_axis_name()
@@ -359,11 +351,11 @@ class User_gui(tk.Frame):
         # - - - - - - - - - - - - - - - - - - - - -
         # plot setup
         #plt.style.use('bmh')
+        self.plot = []
 
         #Figure 1
         self.fig1 = Figure(figsize=(12,7))
         #self.fig1.suptitle('Sampled signal')
-        self.plot = []
         for i in range(0,5,1):
             subplot = self.fig1.add_subplot(2,3,i + 1)
             self.plot.append(subplot)
@@ -371,10 +363,9 @@ class User_gui(tk.Frame):
         #Figure 2
         self.fig2 = Figure()
         #self.fig2.suptitle('Data received')
-        self.plot_2 = []
         for i in range(0,2,1):
             subplot = self.fig2.add_subplot(1,2,i + 1)
-            self.plot_2.append(subplot)
+            self.plot.append(subplot)
 
         #set all axis names
         self.set_axis_name()
