@@ -181,9 +181,11 @@ class User_gui(tk.Frame):
         self.plot[6].set_xlabel('delay')
         self.plot[6].set_ylabel('dB')
 
+        """
         #set grid on
         for i in range(0,7,1):
             self.plot[i].grid()
+        """
 
     def create_plot(self):
         selected_frame_number = self.note.index("current")
@@ -355,7 +357,10 @@ class User_gui(tk.Frame):
 
         # - - - - - - - - - - - - - - - - - - - - -
         # plot setup
-        #plt.style.use('bmh')
+        #plt.style.use('seaborn-darkgrid')
+        #plt.style.use('seaborn-whitegrid')
+        plt.style.use('bmh')
+
         self.plot = []
 
         #Figure 1
