@@ -20,7 +20,8 @@ class Vna_measure():
         print(name)
         return (name)
 
-    def read_measure(self, index):
+    #for flange tests
+    def read_measure_1(self, index):
         #self.vna.write('*RST') # Reset the instrument
         #self.vna.write('*CLS') # Clear the Error queue
         self.vna.write('SYST:DISP:UPD ON') # Display update ON - switch OFF after debugging
@@ -110,20 +111,58 @@ class Vna_measure():
         yDataArray = list(np.float_(yDataArray))
         xDataArray = list(np.float_(xDataArray))
 
-        return(xDataArray, yDataArray)
+        return xDataArray, yDataArray
+
+    #for pick-up tests
+    def read_measure_2(self, index):
+        #self.vna.write('*RST') # Reset the instrument
+        #self.vna.write('*CLS') # Clear the Error queue
+        self.vna.write('SYST:DISP:UPD ON') # Display update ON - switch OFF after debugging
+
+        if index == 0:
+            # Receive measure
+            self.vna.write("CALC1:PAR:SEL 'Trc1'")
+            self.vna.write('CALC1:DATA? FDAT')
+            yData = self.vna.read()
+            #print(yData)
+
+            # Receive the number of point measured
+            self.vna.write('CALC1:DATA:STIM?')
+            xData = self.vna.read()
+            #print(xData)
+
+        elif index == 1:
+            # Receive measure
+            self.vna.write("CALC2:PAR:SEL 'Trc2'")
+            self.vna.write('CALC2:DATA? FDAT')
+            yData = self.vna.read()
+            #print(yData)
+            # Receive the number of point measured
+            self.vna.write('CALC2:DATA:STIM?')
+            xData = self.vna.read()
+            #print(xData)
+
+        yDataArray = yData.split(",")
+        xDataArray = xData.split(",")
+        yDataArray = list(np.float_(yDataArray))
+        xDataArray = list(np.float_(xDataArray))
+
+        return xDataArray, yDataArray
 
 
 # if is used like a main
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
-
     try:
         address = "TCPIP::CFO-MD-BQPVNA1::INSTR"
         test = Vna_measure(address)
         print(test.instrument_info())
 
+        values = []
         for i in range(0, 5, 1):
-            x, y = test.read_measure(i)
+            #x, y = test.read_measure_2(i)
+            values.append(test.read_measure_2(i))
+            x, y = values[i]
             print(x)
             print(y)
 
@@ -132,6 +171,5 @@ if __name__ == '__main__':
             plt.ylabel("Amplitude (dBm)")
             plt.plot(x, y)
             plt.show()
-
-    except:
-        print("Visa error or wrong address")
+    except Exception as e:
+        print(e)
