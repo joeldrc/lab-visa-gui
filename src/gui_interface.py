@@ -198,27 +198,20 @@ class User_gui(tk.Frame):
                 xValue.append(x)
                 yValue.append(y)
 
-            if self.plot_saveRef == True:
-                self.xRef = xValue
-                self.yRef = yValue
-                self.plot_saveRef = False
-
             for i in range(0,5,1):
                 # clean plot line
                 self.plot[i].cla()
                 # set data on plot
                 self.plot[i].plot(xValue[i], yValue[i])
 
+            if self.plot_saveRef == True:
+                self.xRef = xValue
+                self.yRef = yValue
+                self.plot_saveRef = False
+
             if self.plot_reference == True:
                 for i in range(0,5,1):
                     self.plot[i].plot(self.xRef[i], self.yRef[i])
-
-            # set axis names
-            self.set_axis_name()
-            # autoadapt
-            self.fig1.tight_layout()
-            # update plot
-            self.canvas1.draw()
 
         elif selected_frame_number == 1:
             for i in range(0,2,1):
@@ -226,27 +219,27 @@ class User_gui(tk.Frame):
                 xValue.append(x)
                 yValue.append(y)
 
-            if self.plot_saveRef == True:
-                self.xRef = xValue
-                self.yRef = yValue
-                self.plot_saveRef = False
-
             for i in range(0,2,1):
                 # clean plot line
                 self.plot[i + 5].cla()
                 # set data on plot
                 self.plot[i + 5].plot(xValue[i], yValue[i])
 
+            if self.plot_saveRef == True:
+                self.xRef = xValue
+                self.yRef = yValue
+                self.plot_saveRef = False
+
             if self.plot_reference == True:
                 for i in range(0,2,1):
                     self.plot[i + 5].plot(self.xRef[i], self.yRef[i])
 
-            # set axis names
-            self.set_axis_name()
-            # autoadapt
-            self.fig2.tight_layout()
-            # update plot
-            self.canvas2.draw()
+        # set axis names
+        self.set_axis_name()
+        # autoadapt
+        self.fig[selected_frame_number].tight_layout()
+        # update plot
+        self.canvas[selected_frame_number].draw()
 
     def create_widgets(self):
         # - - - - - - - - - - - - - - - - - - - - -
@@ -362,40 +355,51 @@ class User_gui(tk.Frame):
         #plt.style.use('bmh')
 
         self.plot = []
+        self.fig = []
+        self.canvas = []
+        self.toolbar = []
 
         #Figure 1
-        self.fig1 = Figure(figsize=(12,7))
-        #self.fig1.suptitle('Sampled signal')
+        figure = Figure(figsize=(12,7))
+        self.fig.append(figure)
+
         for i in range(0,5,1):
-            subplot = self.fig1.add_subplot(2,3,i + 1)
+            subplot = self.fig[0].add_subplot(2,3,i + 1)
             self.plot.append(subplot)
 
         #Figure 2
-        self.fig2 = Figure()
-        #self.fig2.suptitle('Data received')
+        figure = Figure(figsize=(12,7))
+        self.fig.append(figure)
+
         for i in range(0,2,1):
-            subplot = self.fig2.add_subplot(1,2,i + 1)
+            subplot = self.fig[1].add_subplot(1,2,i + 1)
             self.plot.append(subplot)
 
         #set all axis names
         self.set_axis_name()
         # autoadapt
-        self.fig1.tight_layout()
-        self.fig2.tight_layout()
+        self.fig[0].tight_layout()
+        self.fig[1].tight_layout()
 
         # Canvas1
-        self.canvas1 = FigureCanvasTkAgg(self.fig1, master=self.tab1)
-        self.canvas1.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-        self.toolbar1 = NavigationToolbar2Tk(self.canvas1, self.tab1)
-        self.toolbar1.update()
-        self.canvas1._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        figureCanvas = FigureCanvasTkAgg(self.fig[0], master=self.tab1)
+        self.canvas.append(figureCanvas)
+        self.canvas[0].get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+        navigationToolbar = NavigationToolbar2Tk(self.canvas[0], self.tab1)
+        self.toolbar.append(navigationToolbar)
+        self.toolbar[0].update()
+        self.canvas[0]._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
         # Canvas2
-        self.canvas2 = FigureCanvasTkAgg(self.fig2, master=self.tab2)
-        self.canvas2.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-        self.toolbar2 = NavigationToolbar2Tk(self.canvas2, self.tab2)
-        self.toolbar2.update()
-        self.canvas2._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        figureCanvas = FigureCanvasTkAgg(self.fig[1], master=self.tab2)
+        self.canvas.append(figureCanvas)
+        self.canvas[1].get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+        navigationToolbar = NavigationToolbar2Tk(self.canvas[1], self.tab2)
+        self.toolbar.append(navigationToolbar)
+        self.toolbar[1].update()
+        self.canvas[1]._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # event
