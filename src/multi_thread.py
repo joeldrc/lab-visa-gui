@@ -12,6 +12,7 @@ class Measure_thread(threading.Thread):
     def __init__(self, address, start_test= False, test_number = 0,  chart_numbers = 0):
         threading.Thread.__init__(self)
 
+        self.address = address
         self.file_name = ""
         self.time_value = ""
         self.start_test = start_test
@@ -21,11 +22,11 @@ class Measure_thread(threading.Thread):
         self.data_ready = False
 
         try:
-            self.vna = Vna_measure(address)
+            self.vna = Vna_measure(self.address)
             self.instrument_info = self.vna.instrument_info()
         except Exception as e:
             print(e)
-            self.instrument_info = "No connection", "\n "
+            self.instrument_info = 'NO CONNECTION \n'
             self.start_test = False
 
         # opening the existing excel file & create the sheet object
@@ -41,12 +42,8 @@ class Measure_thread(threading.Thread):
 
                 #measure vna
                 self.measures = []
-
                 for i in range(self.chart_numbers):
-                    if self.test_number == 0:
-                        self.measures.append(self.vna.read_measure_1(i))
-                    elif self.test_number == 1:
-                        self.measures.append(self.vna.read_measure_2(i))
+                    self.measures.append(self.vna.read_measure(self.test_number, i))
 
                 self.data_ready = True
                 self.measure_started = False
