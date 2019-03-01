@@ -23,6 +23,9 @@ plot_names = [[['S11 - TDR', 'x', 'y'],
               [['S11 - TDR', 'x', 'y'],
                ['S11 - TDR', 'x', 'y']]]
 
+figure_names = [['Flanges'],
+                ['Pick-Up']]
+
 
 class Progress_bar():
     # threaded progress bar for tkinter gui
@@ -314,9 +317,7 @@ class User_gui(tk.Frame):
         self.tab = [[] for i in range(number_of_plots)]
         for i in range(number_of_plots):
             self.tab[i] = ttk.Frame(self.note)
-
-        self.note.add(self.tab[0], text = "Flanges")
-        self.note.add(self.tab[1], text = "Pick-Up")
+            self.note.add(self.tab[i], text = figure_names[i])
 
         # - - - - - - - - - - - - - - - - - - - - -
         # plot setup
@@ -331,15 +332,15 @@ class User_gui(tk.Frame):
         for i in range(number_of_plots):
             self.fig[i] =Figure(figsize=(12,7))
 
-        #Figure 1
-        for i in range(len(plot_names[0])):
-            subplot = self.fig[0].add_subplot(2, 3, i + 1)
-            self.plot[0].append(subplot)
-
-        #Figure 2
-        for i in range(len(plot_names[1])):
-            subplot = self.fig[1].add_subplot(1, 2, i + 1)
-            self.plot[1].append(subplot)
+        # Figures
+        for index in range(number_of_plots):
+            subplot_number = len(plot_names[index])
+            for i in range(subplot_number):
+                # auto adapt plot number
+                subplot_columns = (subplot_number // 3) + (subplot_number % 3)
+                subplot_rows = subplot_number // 2
+                subplot = self.fig[index].add_subplot(subplot_rows, subplot_columns, i + 1)
+                self.plot[index].append(subplot)
 
         # auto adj
         for i in range(number_of_plots):
