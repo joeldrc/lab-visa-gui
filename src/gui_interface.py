@@ -14,6 +14,11 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 
 
+# global variables
+__author__ = 'joel.daricou@cern.ch 2018'
+__version__ = '1'
+
+# plot list
 plot_names = [[['S11 - TDR', 'x', 'y'],
                ['S11 - TDR', 'x', 'y'],
                ['S11 - TDR', 'x', 'y'],
@@ -87,19 +92,18 @@ class User_gui(tk.Frame):
     # - - - - - - - - - - - - - - - - - - - - -
     # menuBar
     def show_info(self):
-        messagebox.showinfo(title = 'About Me!', message = 'joel.daricou@cern.ch 2018')
+        info_txt = __author__ + '\n' + "Version: " + __version__
+        messagebox.showinfo(title = 'About Me!', message = info_txt)
 
     def save_file(self):
         try:
             self.measure_thread.create_sheet()
         except:
-            print("No data ready")
-
-        return
+            messagebox.showerror("Warning", "No data to save!")
 
     def open_file(self):
         #self.file_position = filedialog.askopenfile().name
-        return
+        return None
 
     def close_file(self):
         exit = messagebox.askyesno(title = 'Quit?', message = 'Are you sure?')
@@ -141,6 +145,7 @@ class User_gui(tk.Frame):
         self.plot_reference = self.var1.get()
         if self.plot_reference == True:
             self.plot_saveRef = True
+            
         try:
             self.update_plot()
         except Exception as e:
@@ -155,7 +160,7 @@ class User_gui(tk.Frame):
         self.measure_thread.time_value = strftime("%d %b %Y %H:%M:%S", gmtime())
 
     def instrument_connection(self, start_test = False, frame_number = 0):
-        self.measure_thread = Measure_thread(self.hostname_field.get(), start_test, frame_number)
+        self.measure_thread = Measure_thread(self.hostname_field.get(), start_test, frame_number, len(plot_names[frame_number]))
         self.measure_thread.start()
 
         instrument_name = self.measure_thread.instrument_info
@@ -167,12 +172,11 @@ class User_gui(tk.Frame):
         except:
             print("No class declared")
 
-
-
     def update_plot(self):
         # return wich test you have selected
         channel_number = len(self.measure_thread.measures)
-        selected_frame_number = self.note.index("current")
+        selected_frame_number = self.measure_thread.test_number
+
         xValue = []
         yValue = []
 
