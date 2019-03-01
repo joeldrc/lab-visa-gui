@@ -12,7 +12,8 @@ class Vna_measure():
         self.instrument_address = address
         rm = visa.ResourceManager()
         self.vna = rm.open_resource(self.instrument_address)
-        self.vna.write_termination = '\n'  # Some instruments require that at the end of each command.
+        # Some instruments require that at the end of each command.
+        self.vna.write_termination = '\n'
 
     def instrument_info(self):
         name = self.vna.query('*IDN?')  # Query the Identification string
@@ -24,7 +25,9 @@ class Vna_measure():
     def read_measure_1(self, index):
         #self.vna.write('*RST') # Reset the instrument
         #self.vna.write('*CLS') # Clear the Error queue
-        self.vna.write('SYST:DISP:UPD ON') # Display update ON - switch OFF after debugging
+
+        # Display update ON - switch OFF after debugging
+        self.vna.write('SYST:DISP:UPD ON')
 
         # -----------------------------------------------------------
         if index == 0:
@@ -117,7 +120,9 @@ class Vna_measure():
     def read_measure_2(self, index):
         #self.vna.write('*RST') # Reset the instrument
         #self.vna.write('*CLS') # Clear the Error queue
-        self.vna.write('SYST:DISP:UPD ON') # Display update ON - switch OFF after debugging
+
+        # Display update ON - switch OFF after debugging
+        self.vna.write('SYST:DISP:UPD ON')
 
         if index == 0:
             # Receive measure

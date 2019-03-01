@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import settings
 from tkinter import *
 import tkinter as tk
 
@@ -10,7 +11,6 @@ class AnimatedGif(object):
     def __init__(self, image_file_path):
         # Read in all the frames of a multi-frame gif image.
         self._frames = []
-
         frame_num = 0  # Number of next frame to read.
         while True:
             try:
@@ -31,7 +31,7 @@ class AnimatedGif(object):
 class Loading_window():
     def __init__(self, master):
         self.master = master
-        self.master.title("JD soft - Installing libraries...")
+        self.master.title(settings.__logo__ + " - Installing libraries...")
         self.master.geometry('360x120')
 
         # Window in center of screen
@@ -56,7 +56,8 @@ class Loading_window():
 
         try:
             self.ani_img = AnimatedGif("data/loading_bar.gif")
-            self.animation = Label(self.frame, image=self.ani_img[0])  # Display first frame initially.
+            # Display first frame initially.
+            self.animation = Label(self.frame, image=self.ani_img[0])
             self.animation.pack()
             self.enable_animation()
         except:
@@ -67,8 +68,10 @@ class Loading_window():
     def update_label_image(self, label, ani_img, ms_delay, frame_num):
         label.configure(image=self.ani_img[frame_num])
         frame_num = (frame_num+1) % len(self.ani_img)
-        self.frame.after(ms_delay, self.update_label_image, label, self.ani_img, ms_delay, frame_num)
+        self.frame.after(ms_delay, self.update_label_image, label,
+                         self.ani_img, ms_delay, frame_num)
 
     def enable_animation(self):
         ms_delay = 1000 // len(self.ani_img)    # Show all frames in 1000 ms.
-        self.frame.after(ms_delay, self.update_label_image, self.animation, self.ani_img, ms_delay, 0)
+        self.frame.after(ms_delay, self.update_label_image, self.animation,
+                         self.ani_img, ms_delay, 0)
