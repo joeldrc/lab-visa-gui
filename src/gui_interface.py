@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import settings
 from multi_thread import *
 import time
 from time import gmtime, strftime
@@ -13,10 +14,6 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationTool
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 
-
-# global variables
-__author__ = 'joel.daricou@cern.ch 2018'
-__version__ = '1'
 
 # plot list
 plot_names = [[['S11 - TDR', 'x', 'y'],
@@ -92,7 +89,7 @@ class User_gui(tk.Frame):
     # - - - - - - - - - - - - - - - - - - - - -
     # menuBar
     def show_info(self):
-        info_txt = __author__ + '\n' + "Version: " + __version__
+        info_txt = settings.__author__ + '\n' + "Version: " + settings.__version__
         messagebox.showinfo(title = 'About Me!', message = info_txt)
 
     def save_file(self):
@@ -145,7 +142,7 @@ class User_gui(tk.Frame):
         self.plot_reference = self.var1.get()
         if self.plot_reference == True:
             self.plot_saveRef = True
-            
+
         try:
             self.update_plot()
         except Exception as e:

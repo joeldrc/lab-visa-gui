@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import settings
 from tkinter import *
 import tkinter as tk
 
@@ -30,7 +31,7 @@ class AnimatedGif(object):
 class Loading_window():
     def __init__(self, master):
         self.master = master
-        self.master.title("JD soft - Installing libraries...")
+        self.master.title(settings.__logo__ + " - Installing libraries...")
         self.master.geometry('360x120')
 
         # Window in center of screen

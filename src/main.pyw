@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import settings
 from tkinter import *
 import tkinter as tk
 import threading
@@ -63,7 +64,7 @@ class Install_and_run(threading.Thread):
 def main():
     root = tk.Tk()
     #root.attributes("-fullscreen", False)
-    root.title("JD soft - TEST GUI - V.1.0")
+    root.title(settings.__logo__ + " - " + settings.__title__ + " - " + settings.__version__)
     #root.iconify()
     root.withdraw()
 
