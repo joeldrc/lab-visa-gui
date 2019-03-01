@@ -39,15 +39,14 @@ class Measure_thread(threading.Thread):
                 self.data_ready = False
 
                 #measure vna
+                self.measures = []
                 if self.test_number == 0:
-                    self.measures_0 = []
                     for i in range(0,5,1):
-                        self.measures_0.append(self.vna.read_measure_1(i))
+                        self.measures.append(self.vna.read_measure_1(i))
 
                 elif self.test_number == 1:
-                    self.measures_1 = []
                     for i in range(0,2,1):
-                        self.measures_1.append(self.vna.read_measure_2(i))
+                        self.measures.append(self.vna.read_measure_2(i))
 
                 self.data_ready = True
                 self.measure_started = False
@@ -60,13 +59,13 @@ class Measure_thread(threading.Thread):
 
         if self.test_number == 0:
             for i in range(0,5,1):
-                x, y = self.measures_0[i]
+                x, y = self.measures[i]
                 xValue.append(x)
                 yValue.append(y)
 
         elif self.test_number == 1:
             for i in range(0,2,1):
-                x, y = self.measures_1[i]
+                x, y = self.measures[i]
                 xValue.append(x)
                 yValue.append(y)
 

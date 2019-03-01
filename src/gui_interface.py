@@ -14,6 +14,15 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 
 
+plot_names = [['S11 - TDR', 'x', 'y'],
+              ['S11 - TDR', 'x', 'y'],
+              ['S11 - TDR', 'x', 'y'],
+              ['S11 - TDR', 'x', 'y'],
+              ['S11 - TDR', 'x', 'y'],
+              ['S11 - TDR', 'x', 'y'],
+              ['S11 - TDR', 'x', 'y']]
+
+
 class Progress_bar():
     # threaded progress bar for tkinter gui
     def __init__(self, parent, row, columnspan, sticky, padx, pady):
@@ -104,7 +113,7 @@ class User_gui(tk.Frame):
 
         try:
             if self.measure_thread.data_ready:
-                self.create_plot()
+                self.update_plot()
 
                 self.measure_thread.data_ready = False
                 self.prog_bar.pb_complete()
@@ -129,7 +138,7 @@ class User_gui(tk.Frame):
         if self.plot_reference == True:
             self.plot_saveRef = True
         try:
-            self.create_plot()
+            self.update_plot()
         except Exception as e:
             print(e)
 
@@ -154,76 +163,30 @@ class User_gui(tk.Frame):
         except:
             print("No class declared")
 
-    def set_axis_name(self):
-        # set axis names
-        #Fig 1
-        self.plot[0].set_title('S21 - delay')
-        self.plot[0].set_xlabel('freq')
-        self.plot[0].set_ylabel('dB')
-        self.plot[1].set_title('S21 - dB')
-        self.plot[1].set_xlabel('freq')
-        self.plot[1].set_ylabel('dB')
-        self.plot[2].set_title('S11 - SWR')
-        self.plot[2].set_xlabel('freq')
-        self.plot[2].set_ylabel('dB')
-        self.plot[3].set_title('S22 - SWR')
-        self.plot[3].set_xlabel('freq')
-        self.plot[3].set_ylabel('dB')
-        self.plot[4].set_title('S11 - TDR')
-        self.plot[4].set_xlabel('delay')
-        self.plot[4].set_ylabel('dB')
 
-        #Fig 2
-        self.plot[5].set_title('S11 - TDR')
-        self.plot[5].set_xlabel('delay')
-        self.plot[5].set_ylabel('dB')
-        self.plot[6].set_title('S11 - TDR')
-        self.plot[6].set_xlabel('delay')
-        self.plot[6].set_ylabel('dB')
 
-        """
-        #set grid on
-        for i in range(0,7,1):
-            self.plot[i].grid()
-        """
-
-    def create_plot(self):
+    def update_plot(self):
+        # return wich test you have selected
+        channel_number = len(self.measure_thread.measures)
         selected_frame_number = self.note.index("current")
         xValue = []
         yValue = []
 
         if selected_frame_number == 0:
-            for i in range(0,5,1):
-                x, y = self.measure_thread.measures_0[i]
-                xValue.append(x)
-                yValue.append(y)
-
-            for i in range(0,5,1):
-                # clean plot line
-                self.plot[i].cla()
-                # set data on plot
-                self.plot[i].plot(xValue[i], yValue[i])
-
-            if self.plot_saveRef == True:
-                self.xRef = xValue
-                self.yRef = yValue
-                self.plot_saveRef = False
-
-            if self.plot_reference == True:
-                for i in range(0,5,1):
-                    self.plot[i].plot(self.xRef[i], self.yRef[i])
-
+            offset = 0
         elif selected_frame_number == 1:
-            for i in range(0,2,1):
-                x, y = self.measure_thread.measures_1[i]
+            offset = 5
+
+        try:
+            for i in range(0, channel_number, 1):
+                x, y = self.measure_thread.measures[i]
                 xValue.append(x)
                 yValue.append(y)
 
-            for i in range(0,2,1):
                 # clean plot line
-                self.plot[i + 5].cla()
+                self.plot[i + offset].cla()
                 # set data on plot
-                self.plot[i + 5].plot(xValue[i], yValue[i])
+                self.plot[i + offset].plot(xValue[i], yValue[i])
 
             if self.plot_saveRef == True:
                 self.xRef = xValue
@@ -231,11 +194,18 @@ class User_gui(tk.Frame):
                 self.plot_saveRef = False
 
             if self.plot_reference == True:
-                for i in range(0,2,1):
-                    self.plot[i + 5].plot(self.xRef[i], self.yRef[i])
+                for i in range(0, channel_number, 1):
+                    self.plot[i + offset].plot(self.xRef[i], self.yRef[i])
+        except Exception as e:
+            print(e)
 
-        # set axis names
-        self.set_axis_name()
+        # Set names on plot
+        for i in range(0, channel_number + offset, 1):
+            self.plot[i].set_title(plot_names[i][0])
+            self.plot[i].set_xlabel(plot_names[i][1])
+            self.plot[i].set_ylabel(plot_names[i][2])
+            #self.plot[i].grid()
+
         # autoadapt
         self.fig[selected_frame_number].tight_layout()
         # update plot
@@ -362,7 +332,6 @@ class User_gui(tk.Frame):
         #Figure 1
         figure = Figure(figsize=(12,7))
         self.fig.append(figure)
-
         for i in range(0,5,1):
             subplot = self.fig[0].add_subplot(2,3,i + 1)
             self.plot.append(subplot)
@@ -370,14 +339,11 @@ class User_gui(tk.Frame):
         #Figure 2
         figure = Figure(figsize=(12,7))
         self.fig.append(figure)
-
         for i in range(0,2,1):
             subplot = self.fig[1].add_subplot(1,2,i + 1)
             self.plot.append(subplot)
 
-        #set all axis names
-        self.set_axis_name()
-        # autoadapt
+        # auto adj
         self.fig[0].tight_layout()
         self.fig[1].tight_layout()
 
@@ -385,17 +351,17 @@ class User_gui(tk.Frame):
         figureCanvas = FigureCanvasTkAgg(self.fig[0], master=self.tab1)
         self.canvas.append(figureCanvas)
         self.canvas[0].get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-
-        navigationToolbar = NavigationToolbar2Tk(self.canvas[0], self.tab1)
-        self.toolbar.append(navigationToolbar)
-        self.toolbar[0].update()
-        self.canvas[0]._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-
         # Canvas2
         figureCanvas = FigureCanvasTkAgg(self.fig[1], master=self.tab2)
         self.canvas.append(figureCanvas)
         self.canvas[1].get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
+        # toolbar1
+        navigationToolbar = NavigationToolbar2Tk(self.canvas[0], self.tab1)
+        self.toolbar.append(navigationToolbar)
+        self.toolbar[0].update()
+        self.canvas[0]._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        # toolbar2
         navigationToolbar = NavigationToolbar2Tk(self.canvas[1], self.tab2)
         self.toolbar.append(navigationToolbar)
         self.toolbar[1].update()
