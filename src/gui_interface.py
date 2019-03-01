@@ -14,13 +14,14 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 
 
-plot_names = [['S11 - TDR', 'x', 'y'],
-              ['S11 - TDR', 'x', 'y'],
-              ['S11 - TDR', 'x', 'y'],
-              ['S11 - TDR', 'x', 'y'],
-              ['S11 - TDR', 'x', 'y'],
-              ['S11 - TDR', 'x', 'y'],
-              ['S11 - TDR', 'x', 'y']]
+plot_names = [[['S11 - TDR', 'x', 'y'],
+               ['S11 - TDR', 'x', 'y'],
+               ['S11 - TDR', 'x', 'y'],
+               ['S11 - TDR', 'x', 'y'],
+               ['S11 - TDR', 'x', 'y']],
+
+              [['S11 - TDR', 'x', 'y'],
+               ['S11 - TDR', 'x', 'y']]]
 
 
 class Progress_bar():
@@ -172,11 +173,6 @@ class User_gui(tk.Frame):
         xValue = []
         yValue = []
 
-        if selected_frame_number == 0:
-            offset = 0
-        elif selected_frame_number == 1:
-            offset = 5
-
         try:
             for i in range(0, channel_number, 1):
                 x, y = self.measure_thread.measures[i]
@@ -184,9 +180,9 @@ class User_gui(tk.Frame):
                 yValue.append(y)
 
                 # clean plot line
-                self.plot[i + offset].cla()
+                self.plot[selected_frame_number][i].cla()
                 # set data on plot
-                self.plot[i + offset].plot(xValue[i], yValue[i])
+                self.plot[selected_frame_number][i].plot(xValue[i], yValue[i])
 
             if self.plot_saveRef == True:
                 self.xRef = xValue
@@ -195,16 +191,16 @@ class User_gui(tk.Frame):
 
             if self.plot_reference == True:
                 for i in range(0, channel_number, 1):
-                    self.plot[i + offset].plot(self.xRef[i], self.yRef[i])
+                    self.plot[selected_frame_number][i].plot(self.xRef[i], self.yRef[i])
         except Exception as e:
             print(e)
 
         # Set names on plot
-        for i in range(0, channel_number + offset, 1):
-            self.plot[i].set_title(plot_names[i][0])
-            self.plot[i].set_xlabel(plot_names[i][1])
-            self.plot[i].set_ylabel(plot_names[i][2])
-            #self.plot[i].grid()
+        for i in range(0, len(plot_names[selected_frame_number]), 1):
+            self.plot[selected_frame_number][i].set_title(plot_names[selected_frame_number][i][0])
+            self.plot[selected_frame_number][i].set_xlabel(plot_names[selected_frame_number][i][1])
+            self.plot[selected_frame_number][i].set_ylabel(plot_names[selected_frame_number][i][2])
+            #self.plot[selected_frame_number][i].grid()
 
         # autoadapt
         self.fig[selected_frame_number].tight_layout()
@@ -312,60 +308,51 @@ class User_gui(tk.Frame):
         self.note = ttk.Notebook(frame1)
         self.note.pack(padx=5, pady=5)
 
-        self.tab1 = ttk.Frame(self.note)
-        self.tab2 = ttk.Frame(self.note)
+        number_of_plots = len(plot_names)
 
-        self.note.add(self.tab1, text = "Flanges")
-        self.note.add(self.tab2, text = "Pick-Up")
+        # initialize tab
+        self.tab = [[] for i in range(number_of_plots)]
+        for i in range(number_of_plots):
+            self.tab[i] = ttk.Frame(self.note)
+
+        self.note.add(self.tab[0], text = "Flanges")
+        self.note.add(self.tab[1], text = "Pick-Up")
 
         # - - - - - - - - - - - - - - - - - - - - -
         # plot setup
-        #plt.style.use('seaborn-darkgrid')
         plt.style.use('seaborn-whitegrid')
-        #plt.style.use('bmh')
 
-        self.plot = []
-        self.fig = []
-        self.canvas = []
-        self.toolbar = []
+        self.plot = [[] for i in range(number_of_plots)]
+        self.fig = [[] for i in range(number_of_plots)]
+        self.canvas = [[] for i in range(number_of_plots)]
+        self.toolbar = [[] for i in range(number_of_plots)]
+
+        # initialize fig
+        for i in range(number_of_plots):
+            self.fig[i] =Figure(figsize=(12,7))
 
         #Figure 1
-        figure = Figure(figsize=(12,7))
-        self.fig.append(figure)
-        for i in range(0,5,1):
-            subplot = self.fig[0].add_subplot(2,3,i + 1)
-            self.plot.append(subplot)
+        for i in range(len(plot_names[0])):
+            subplot = self.fig[0].add_subplot(2, 3, i + 1)
+            self.plot[0].append(subplot)
 
         #Figure 2
-        figure = Figure(figsize=(12,7))
-        self.fig.append(figure)
-        for i in range(0,2,1):
-            subplot = self.fig[1].add_subplot(1,2,i + 1)
-            self.plot.append(subplot)
+        for i in range(len(plot_names[1])):
+            subplot = self.fig[1].add_subplot(1, 2, i + 1)
+            self.plot[1].append(subplot)
 
         # auto adj
-        self.fig[0].tight_layout()
-        self.fig[1].tight_layout()
+        for i in range(number_of_plots):
+            self.fig[i].tight_layout()
 
-        # Canvas1
-        figureCanvas = FigureCanvasTkAgg(self.fig[0], master=self.tab1)
-        self.canvas.append(figureCanvas)
-        self.canvas[0].get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-        # Canvas2
-        figureCanvas = FigureCanvasTkAgg(self.fig[1], master=self.tab2)
-        self.canvas.append(figureCanvas)
-        self.canvas[1].get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        # Canvas & # toolbar
+        for i in range(number_of_plots):
+            self.canvas[i] = FigureCanvasTkAgg(self.fig[i], master=self.tab[i])
+            self.canvas[i].get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-        # toolbar1
-        navigationToolbar = NavigationToolbar2Tk(self.canvas[0], self.tab1)
-        self.toolbar.append(navigationToolbar)
-        self.toolbar[0].update()
-        self.canvas[0]._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-        # toolbar2
-        navigationToolbar = NavigationToolbar2Tk(self.canvas[1], self.tab2)
-        self.toolbar.append(navigationToolbar)
-        self.toolbar[1].update()
-        self.canvas[1]._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+            self.toolbar[i] = NavigationToolbar2Tk(self.canvas[i], self.tab[i])
+            self.toolbar[i].update()
+            self.canvas[i]._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # event
