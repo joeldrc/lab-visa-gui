@@ -10,19 +10,42 @@ class Vna_measure():
     def __init__(self, address):
         print("Init. visa setup")
         self.instrument_address = address
-        rm = visa.ResourceManager()
-        self.vna = rm.open_resource(self.instrument_address)
-        # Some instruments require that at the end of each command.
-        self.vna.write_termination = '\n'
+
+        # TEST is used for debug
+        if self.instrument_address == "TEST":
+            self.test_mode = True
+        else:
+            self.test_mode = False
+
+            rm = visa.ResourceManager()
+            self.vna = rm.open_resource(self.instrument_address)
+            # Some instruments require that at the end of each command.
+            self.vna.write_termination = '\n'
+
 
     def instrument_info(self):
-        name = self.vna.query('*IDN?')  # Query the Identification string
+        if self.test_mode == True:
+            name = 'TEST MODE ON \n'
+        else:
+            name = self.vna.query('*IDN?')  # Query the Identification string
         time.sleep(1)
-        print(name)
-        return (name)
+        return name
 
-    #for flange tests
-    def read_measure_1(self, index):
+    # return random numbers
+    def read_measure(self, value, index):
+        if self.test_mode == True:
+            x = np.linspace(1, 301)
+            y = np.sin(x) + np.random.normal(scale=0.1, size = len(x))
+            return x, y
+
+        elif value == 0:
+            return self.flanges(index)
+
+        elif value == 1:
+            return self.pick_up(index)
+
+    # for flange tests
+    def flanges(self, index):
         #self.vna.write('*RST') # Reset the instrument
         #self.vna.write('*CLS') # Clear the Error queue
 
@@ -117,7 +140,7 @@ class Vna_measure():
         return xDataArray, yDataArray
 
     #for pick-up tests
-    def read_measure_2(self, index):
+    def pick_up(self, index):
         #self.vna.write('*RST') # Reset the instrument
         #self.vna.write('*CLS') # Clear the Error queue
 
@@ -159,14 +182,14 @@ class Vna_measure():
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
     try:
-        address = "TCPIP::CFO-MD-BQPVNA1::INSTR"
+        address = "TCPIP::CFO-MD-BQPVNA1::INSTR" #"TEST"
         test = Vna_measure(address)
         print(test.instrument_info())
 
         values = []
         for i in range(0, 5, 1):
             #x, y = test.read_measure_2(i)
-            values.append(test.read_measure_2(i))
+            values.append(test.read_measure(0, i))
             x, y = values[i]
             print(x)
             print(y)

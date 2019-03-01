@@ -161,7 +161,7 @@ class User_gui(tk.Frame):
         self.measure_thread.start()
 
         instrument_name = self.measure_thread.instrument_info
-        self.labeled_frame_label.config(text=instrument_name)
+        self.labeled_frame_label.config(text = instrument_name)
 
     def save_sheet(self):
         try:
