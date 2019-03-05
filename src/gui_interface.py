@@ -29,19 +29,10 @@ figure_names = [['Flanges'],
                 ['Pick-Up']]
 
 
-class Markers():
-    def __init__(self, parent_details, canvas, plot, x, y):
-        label = []
-        plot_numbers = len(plot)
-
-        for i in range(plot_numbers):
-            # test marker
-            plot[i].plot([x[i][20]], [y[i][20]], marker="o", ms=4)
-            plot[i].legend(('y = ' + str(y[i][20]), ), loc='upper right', ncol=2, mode="expand", borderaxespad=0.)
-
-            # label
-            #label.append(ttk.Label(parent_details, text= "x: " + str(i)))
-            #label[i].pack(padx=5, pady=5)
+class Single_marker():
+    def __init__(self, canvas, plot, x, y):
+        plot.plot([x[20]], [y[20]], marker="o", ms=4)
+        plot.legend(('y = ' + str(y[20]), ), loc='upper right', ncol=2, mode="expand", borderaxespad=0.)
 
         canvas.draw()
 
@@ -195,7 +186,7 @@ class User_gui(tk.Frame):
         yValue = []
 
         try:
-            for i in range(0, channel_number, 1):
+            for i in range(channel_number):
                 x, y = self.measure_thread.measures[i]
                 xValue.append(x)
                 yValue.append(y)
@@ -210,13 +201,13 @@ class User_gui(tk.Frame):
                 self.plot_saveRef = False
 
             if self.plot_reference == True:
-                for i in range(0, channel_number, 1):
+                for i in range(channel_number):
                     self.plot[selected_frame_number][i].plot(self.xRef[i], self.yRef[i])
         except Exception as e:
             print(e)
 
         # Set names on plot
-        for i in range(0, len(plot_names[selected_frame_number]), 1):
+        for i in range(len(plot_names[selected_frame_number])):
             self.plot[selected_frame_number][i].set_title(plot_names[selected_frame_number][i][0])
             self.plot[selected_frame_number][i].set_xlabel(plot_names[selected_frame_number][i][1])
             self.plot[selected_frame_number][i].set_ylabel(plot_names[selected_frame_number][i][2])
@@ -228,7 +219,8 @@ class User_gui(tk.Frame):
         self.canvas[selected_frame_number].draw()
 
         # markers
-        Markers(self.details_frame, self.canvas[selected_frame_number], self.plot[selected_frame_number], xValue, yValue)
+        for i in range(0, len(plot_names[selected_frame_number]), 1):
+            Single_marker(self.canvas[selected_frame_number], self.plot[selected_frame_number][i], xValue[i], yValue[i])
 
     def create_widgets(self):
         # - - - - - - - - - - - - - - - - - - - - -

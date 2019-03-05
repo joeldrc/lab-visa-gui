@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-global __title__
-global __logo__
-global __author__
-global __version__
-"""
 
 __title__ = 'VNA tester'
 __logo__ = 'JD soft'
