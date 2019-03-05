@@ -29,6 +29,22 @@ figure_names = [['Flanges'],
                 ['Pick-Up']]
 
 
+class Single_marker():
+    def __init__(self, canvas, plot, x, y):
+        measure_pointer = 20
+        x_label_sci = str("%.6g" % x[measure_pointer])
+        y_label_sci = str("%.6g" % y[measure_pointer])
+
+        plot_label = plot.get_xlabel() + ' = ' + x_label_sci + " / " + plot.get_ylabel() + ' = ' + y_label_sci
+
+        plot.plot(x[measure_pointer], y[measure_pointer], marker="o", ms=4, label = plot_label)
+        legend = plot.legend(loc='upper left', ncol=2, mode="expand", shadow=True, fancybox=True)
+        #legend = plot.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='lower left', ncol=2, mode="expand", borderaxespad=0.)
+        #legend.get_frame().set_facecolor('C0')
+
+        canvas.draw()
+
+
 class Progress_bar():
     # threaded progress bar for tkinter gui
     def __init__(self, parent, row, columnspan, sticky, padx, pady):
@@ -73,6 +89,7 @@ class User_gui(tk.Frame):
         self.plot_reference = False
         self.plot_saveRef = False
         self.save_data = False
+        self.plot_markers = False
         self.hostname_value = "TCPIP::CFO-MD-BQPVNA1::INSTR"
 
         self.create_widgets()
@@ -138,16 +155,6 @@ class User_gui(tk.Frame):
 
     # - - - - - - - - - - - - - - - - - - - - -
     # user pannel
-    def save_ref(self):
-        self.plot_reference = self.var1.get()
-        if self.plot_reference == True:
-            self.plot_saveRef = True
-
-        try:
-            self.update_plot()
-        except Exception as e:
-            print(e)
-
     def start_test(self):
         #check wich frame you have selected (return int)
         selected_frame_number = self.note.index("current")
@@ -163,11 +170,26 @@ class User_gui(tk.Frame):
         instrument_name = self.measure_thread.instrument_info
         self.labeled_frame_label.config(text = instrument_name)
 
-    def save_sheet(self):
-        try:
-            self.save_data = self.var.get()
-        except:
-            print("No class declared")
+    def checkbox(self, type):
+        if type == 1:
+            try:
+                self.save_data = self.var.get()
+            except:
+                print("No class declared")
+        elif type == 2:
+            self.plot_reference = self.var1.get()
+            if self.plot_reference == True:
+                self.plot_saveRef = True
+            try:
+                self.update_plot()
+            except Exception as e:
+                print(e)
+        elif type == 3:
+            try:
+                self.plot_markers = self.var2.get()
+                self.update_plot()
+            except Exception as e:
+                print(e)
 
     def update_plot(self):
         # return wich test you have selected
@@ -178,11 +200,10 @@ class User_gui(tk.Frame):
         yValue = []
 
         try:
-            for i in range(0, channel_number, 1):
+            for i in range(channel_number):
                 x, y = self.measure_thread.measures[i]
                 xValue.append(x)
                 yValue.append(y)
-
                 # clean plot line
                 self.plot[selected_frame_number][i].cla()
                 # set data on plot
@@ -194,13 +215,13 @@ class User_gui(tk.Frame):
                 self.plot_saveRef = False
 
             if self.plot_reference == True:
-                for i in range(0, channel_number, 1):
+                for i in range(channel_number):
                     self.plot[selected_frame_number][i].plot(self.xRef[i], self.yRef[i])
         except Exception as e:
             print(e)
 
         # Set names on plot
-        for i in range(0, len(plot_names[selected_frame_number]), 1):
+        for i in range(len(plot_names[selected_frame_number])):
             self.plot[selected_frame_number][i].set_title(plot_names[selected_frame_number][i][0])
             self.plot[selected_frame_number][i].set_xlabel(plot_names[selected_frame_number][i][1])
             self.plot[selected_frame_number][i].set_ylabel(plot_names[selected_frame_number][i][2])
@@ -210,6 +231,11 @@ class User_gui(tk.Frame):
         self.fig[selected_frame_number].tight_layout()
         # update plot
         self.canvas[selected_frame_number].draw()
+
+        # markers
+        if self.plot_markers == True:
+            for i in range(0, len(plot_names[selected_frame_number]), 1):
+                Single_marker(self.canvas[selected_frame_number], self.plot[selected_frame_number][i], xValue[i], yValue[i])
 
     def create_widgets(self):
         # - - - - - - - - - - - - - - - - - - - - -
@@ -281,11 +307,11 @@ class User_gui(tk.Frame):
 
         # display check button
         self.var = IntVar(value= self.save_data)
-        self.check_save_file = Checkbutton(frame_user, text = "Save data after measure", variable=self.var, command= self.save_sheet)
+        self.check_save_file = Checkbutton(frame_user, text = "Save data after measure", variable=self.var, command= lambda: self.checkbox(1))
         self.check_save_file.grid(row=10, column=0, sticky=W, padx=0, pady=5)
 
         self.var1 = IntVar(value= self.plot_reference)
-        self.check_save_ref = Checkbutton(frame_user, text = "Save reference", variable=self.var1, command= self.save_ref)
+        self.check_save_ref = Checkbutton(frame_user, text = "Save reference", variable=self.var1, command= lambda: self.checkbox(2))
         self.check_save_ref.grid(row=11, column=0, sticky=W, padx=0, pady=5)
 
         # display button
@@ -304,8 +330,9 @@ class User_gui(tk.Frame):
         details_frame = ttk.LabelFrame(frame2, text="DETAILS")
         details_frame.grid(row=3, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=5)
 
-        details_label = ttk.Label(details_frame, text="Add functions...")
-        details_label.grid(row=1, column=0, columnspan=2, sticky=W, padx=5, pady=5)
+        self.var2 = IntVar(value= self.plot_markers)
+        self.markers_status = Checkbutton(details_frame, text = "Markers", variable=self.var2, command= lambda: self.checkbox(3))
+        self.markers_status.pack()
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Notebook
