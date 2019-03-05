@@ -30,15 +30,20 @@ figure_names = [['Flanges'],
 
 
 class Markers():
-    def __init__(self, parent_details, parent_plot, selected_frame_number, x, y, plot_numbers):
+    def __init__(self, parent_details, canvas, plot, x, y):
         label = []
+        plot_numbers = len(plot)
+
         for i in range(plot_numbers):
             # test marker
-            parent_plot[selected_frame_number][i].plot([x[i][20]], [y[i][20]], marker="o", ms=4)
-            #self.plot[selected_frame_number][i].legend(('x=' + str(x[i][20]), ), loc='upper right', ncol=2, mode="expand", borderaxespad=0.)
+            plot[i].plot([x[i][20]], [y[i][20]], marker="o", ms=4)
+            plot[i].legend(('y = ' + str(y[i][20]), ), loc='upper right', ncol=2, mode="expand", borderaxespad=0.)
 
-            label.append(ttk.Label(parent_details, text= "x: " + str(i)))
-            label[i].pack(padx=5, pady=5)
+            # label
+            #label.append(ttk.Label(parent_details, text= "x: " + str(i)))
+            #label[i].pack(padx=5, pady=5)
+
+        canvas.draw()
 
 
 class Progress_bar():
@@ -217,12 +222,13 @@ class User_gui(tk.Frame):
             self.plot[selected_frame_number][i].set_ylabel(plot_names[selected_frame_number][i][2])
             #self.plot[selected_frame_number][i].grid()
 
-        # markers
-        #Markers(self.details_frame, self.plot, selected_frame_number, xValue, yValue, channel_number)
         # autoadapt
         self.fig[selected_frame_number].tight_layout()
         # update plot
         self.canvas[selected_frame_number].draw()
+
+        # markers
+        Markers(self.details_frame, self.canvas[selected_frame_number], self.plot[selected_frame_number], xValue, yValue)
 
     def create_widgets(self):
         # - - - - - - - - - - - - - - - - - - - - -
