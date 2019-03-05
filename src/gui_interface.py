@@ -29,6 +29,18 @@ figure_names = [['Flanges'],
                 ['Pick-Up']]
 
 
+class Markers():
+    def __init__(self, parent_details, parent_plot, selected_frame_number, x, y, plot_numbers):
+        label = []
+        for i in range(plot_numbers):
+            # test marker
+            parent_plot[selected_frame_number][i].plot([x[i][20]], [y[i][20]], marker="o", ms=4)
+            #self.plot[selected_frame_number][i].legend(('x=' + str(x[i][20]), ), loc='upper right', ncol=2, mode="expand", borderaxespad=0.)
+
+            label.append(ttk.Label(parent_details, text= "x: " + str(i)))
+            label[i].pack(padx=5, pady=5)
+
+
 class Progress_bar():
     # threaded progress bar for tkinter gui
     def __init__(self, parent, row, columnspan, sticky, padx, pady):
@@ -182,7 +194,6 @@ class User_gui(tk.Frame):
                 x, y = self.measure_thread.measures[i]
                 xValue.append(x)
                 yValue.append(y)
-
                 # clean plot line
                 self.plot[selected_frame_number][i].cla()
                 # set data on plot
@@ -206,6 +217,8 @@ class User_gui(tk.Frame):
             self.plot[selected_frame_number][i].set_ylabel(plot_names[selected_frame_number][i][2])
             #self.plot[selected_frame_number][i].grid()
 
+        # markers
+        #Markers(self.details_frame, self.plot, selected_frame_number, xValue, yValue, channel_number)
         # autoadapt
         self.fig[selected_frame_number].tight_layout()
         # update plot
@@ -301,11 +314,8 @@ class User_gui(tk.Frame):
 
         # - - - - - - - - - - - - - - - - - - - - -
         # details_frame
-        details_frame = ttk.LabelFrame(frame2, text="DETAILS")
-        details_frame.grid(row=3, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=5)
-
-        details_label = ttk.Label(details_frame, text="Add functions...")
-        details_label.grid(row=1, column=0, columnspan=2, sticky=W, padx=5, pady=5)
+        self.details_frame = ttk.LabelFrame(frame2, text="DETAILS")
+        self.details_frame.grid(row=3, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=5)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Notebook
