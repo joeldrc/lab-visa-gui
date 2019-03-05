@@ -305,34 +305,34 @@ class User_gui(tk.Frame):
         self.details_field = Entry(frame_user)
         self.details_field.grid(row=4, column=1, sticky = E, pady=5)
 
+        # create loading bar
+        self.prog_bar = Progress_bar(frame_user, row=10, columnspan=2, sticky = E + W + N + S, padx=5, pady=10)
+
         # display check button
         self.var = IntVar(value= self.save_data)
         self.check_save_file = Checkbutton(frame_user, text = "Save data after measure", variable=self.var, command= lambda: self.checkbox(1))
-        self.check_save_file.grid(row=10, column=0, sticky=W, padx=0, pady=5)
-
-        self.var1 = IntVar(value= self.plot_reference)
-        self.check_save_ref = Checkbutton(frame_user, text = "Save reference", variable=self.var1, command= lambda: self.checkbox(2))
-        self.check_save_ref.grid(row=11, column=0, sticky=W, padx=0, pady=5)
+        self.check_save_file.grid(row=20, column=0, sticky=W, padx=0, pady=5)
 
         # display button
         submit = Button(frame_user, text='START MEASURE', fg='Black', command= self.start_test)
-        submit.grid(row=11, column=1, sticky = E, padx=20, pady = 5)
-
-        # create loading bar
-        self.prog_bar = Progress_bar(frame_user, row=30, columnspan=2, sticky = E + W + N + S, padx=5, pady=10)
+        submit.grid(row=20, column=1, sticky = E, padx=20, pady = 5)
 
         # display time
         self.clock = Label(frame_user)
-        self.clock.grid(row=31, column=0, sticky = tk.W + tk.N + tk.S, padx=5, pady=5)
+        self.clock.grid(row=30, column=0, sticky = tk.W + tk.N + tk.S, padx=5, pady=5)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # details_frame
-        details_frame = ttk.LabelFrame(frame2, text="DETAILS")
+        details_frame = ttk.LabelFrame(frame2, text="PLOT OPTIONS")
         details_frame.grid(row=3, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=5)
+
+        self.var1 = IntVar(value= self.plot_reference)
+        self.check_save_ref = Checkbutton(details_frame, text = "Save reference", variable=self.var1, command= lambda: self.checkbox(2))
+        self.check_save_ref.grid(row=1, column=0, sticky=W, padx=0, pady=5)
 
         self.var2 = IntVar(value= self.plot_markers)
         self.markers_status = Checkbutton(details_frame, text = "Markers", variable=self.var2, command= lambda: self.checkbox(3))
-        self.markers_status.pack()
+        self.markers_status.grid(row=2, column=0, sticky=W, padx=0, pady=5)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Notebook
