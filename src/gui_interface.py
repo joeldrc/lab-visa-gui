@@ -243,9 +243,11 @@ class User_gui(tk.Frame):
         menuBar = Menu (self.window)
 
         fileMenu = Menu (menuBar , tearoff = 0)
-        fileMenu.add_command(label = "Exit", command = self.close_file)
+        fileMenu.add_command(label = "New")
         fileMenu.add_command(label = "Open", command = self.open_file)
         fileMenu.add_command(label = "Save as", command = self.save_file)
+        fileMenu.add_separator()
+        fileMenu.add_command(label = "Exit", command = self.close_file)
         menuBar.add_cascade(label = "File", menu = fileMenu)
 
         fileMenu = Menu (menuBar , tearoff = 0)
