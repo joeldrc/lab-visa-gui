@@ -30,28 +30,32 @@ figure_names = [['Flanges'],
 
 
 class Single_marker():
-    def __init__(self, parent, canvas, plot, x, y, loop):
+    def __init__(self, parent, canvas, plot, x, y, loop, marker_status = True):
         measure_pointer = 20
 
         # clean all the previous labels
         for widget in parent.winfo_children():
             widget.destroy()
 
+
+
         # create new label
-        for i in range(loop):
-            x_label_sci = str("%.6g" % x[i][measure_pointer])
-            y_label_sci = str("%.6g" % y[i][measure_pointer])
-            marker_txt = plot[i].get_xlabel() + ' = ' + x_label_sci + " - " + plot[i].get_ylabel() + ' = ' + y_label_sci
+        if marker_status == True:
+            for i in range(loop):
+                x_label_sci = str("%.6g" % x[i][measure_pointer])
+                y_label_sci = str("%.6g" % y[i][measure_pointer])
+                marker_txt = plot[i].get_xlabel() + ' = ' + x_label_sci + " - " + plot[i].get_ylabel() + ' = ' + y_label_sci
 
-            plot_label = marker_txt
-            plot[i].plot(x[i][measure_pointer], y[i][measure_pointer], label = plot_label)
-            legend = plot[i].legend(loc='upper left', ncol=2, mode="expand", shadow=True, fancybox=True)
+                plot_label = marker_txt
+                plot[i].plot(x[i][measure_pointer], y[i][measure_pointer], marker="o", ms=4, label = plot_label)
+                legend = plot[i].legend(loc='upper left', ncol=2, mode="expand", shadow=True, fancybox=True)
+                canvas.draw()
 
-            plot[i].plot(x[i][measure_pointer], y[i][measure_pointer], marker="o", ms=4)
-            canvas.draw()
-
-            label = Label(parent, text= str(i)+ " " + marker_txt)
-            label.grid(column = 0, row = i + 1)
+                label = Label(parent, text= str(i)+ " " + marker_txt)
+                label.grid(column = 0, row = i + 1)
+        else:
+            label = Label(parent, text= "")
+            label.grid(column = 0, row = 1, sticky=W)
 
 
 class Progress_bar():
@@ -242,8 +246,7 @@ class User_gui(tk.Frame):
         self.canvas[selected_frame_number].draw()
 
         # markers
-        if self.plot_markers == True:
-            Single_marker(self.others_frame, self.canvas[selected_frame_number], self.plot[selected_frame_number], xValue, yValue, len(plot_names[selected_frame_number]))
+        Single_marker(self.others_frame, self.canvas[selected_frame_number], self.plot[selected_frame_number], xValue, yValue, len(plot_names[selected_frame_number]), self.plot_markers)
 
     def create_widgets(self):
         # - - - - - - - - - - - - - - - - - - - - -
