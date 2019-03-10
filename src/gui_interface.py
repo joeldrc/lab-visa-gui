@@ -30,19 +30,30 @@ figure_names = [['Flanges'],
 
 
 class Single_marker():
-    def __init__(self, canvas, plot, x, y):
+    def __init__(self, parent, canvas, plot, x, y, loop, marker_status = True):
         measure_pointer = 20
-        x_label_sci = str("%.6g" % x[measure_pointer])
-        y_label_sci = str("%.6g" % y[measure_pointer])
 
-        plot_label = plot.get_xlabel() + ' = ' + x_label_sci + " / " + plot.get_ylabel() + ' = ' + y_label_sci
+        # clean all the previous labels
+        for widget in parent.winfo_children():
+            widget.destroy()
 
-        plot.plot(x[measure_pointer], y[measure_pointer], marker="o", ms=4, label = plot_label)
-        legend = plot.legend(loc='upper left', ncol=2, mode="expand", shadow=True, fancybox=True)
-        #legend = plot.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='lower left', ncol=2, mode="expand", borderaxespad=0.)
-        #legend.get_frame().set_facecolor('C0')
+        # create new label
+        if marker_status == True:
+            for i in range(loop):
+                x_label_sci = str("%.6g" % x[i][measure_pointer])
+                y_label_sci = str("%.6g" % y[i][measure_pointer])
+                marker_txt = plot[i].get_xlabel() + ' = ' + x_label_sci + " - " + plot[i].get_ylabel() + ' = ' + y_label_sci
 
-        canvas.draw()
+                plot_label = marker_txt
+                plot[i].plot(x[i][measure_pointer], y[i][measure_pointer], marker="o", ms=4, label = plot_label)
+                legend = plot[i].legend(loc='upper left', ncol=2, mode="expand", shadow=True, fancybox=True)
+                canvas.draw()
+
+                label = Label(parent, text= str(i)+ " " + marker_txt)
+                label.grid(column = 0, row = i + 1)
+        else:
+            label = Label(parent, text= "")
+            label.grid(column = 0, row = 1, sticky=W)
 
 
 class Progress_bar():
@@ -233,9 +244,7 @@ class User_gui(tk.Frame):
         self.canvas[selected_frame_number].draw()
 
         # markers
-        if self.plot_markers == True:
-            for i in range(0, len(plot_names[selected_frame_number]), 1):
-                Single_marker(self.canvas[selected_frame_number], self.plot[selected_frame_number][i], xValue[i], yValue[i])
+        Single_marker(self.others_frame, self.canvas[selected_frame_number], self.plot[selected_frame_number], xValue, yValue, len(plot_names[selected_frame_number]), self.plot_markers)
 
     def create_widgets(self):
         # - - - - - - - - - - - - - - - - - - - - -
@@ -243,9 +252,11 @@ class User_gui(tk.Frame):
         menuBar = Menu (self.window)
 
         fileMenu = Menu (menuBar , tearoff = 0)
-        fileMenu.add_command(label = "Exit", command = self.close_file)
+        fileMenu.add_command(label = "New")
         fileMenu.add_command(label = "Open", command = self.open_file)
         fileMenu.add_command(label = "Save as", command = self.save_file)
+        fileMenu.add_separator()
+        fileMenu.add_command(label = "Exit", command = self.close_file)
         menuBar.add_cascade(label = "File", menu = fileMenu)
 
         fileMenu = Menu (menuBar , tearoff = 0)
@@ -305,34 +316,38 @@ class User_gui(tk.Frame):
         self.details_field = Entry(frame_user)
         self.details_field.grid(row=4, column=1, sticky = E, pady=5)
 
+        # create loading bar
+        self.prog_bar = Progress_bar(frame_user, row=10, columnspan=2, sticky = E + W + N + S, padx=5, pady=10)
+
         # display check button
         self.var = IntVar(value= self.save_data)
         self.check_save_file = Checkbutton(frame_user, text = "Save data after measure", variable=self.var, command= lambda: self.checkbox(1))
-        self.check_save_file.grid(row=10, column=0, sticky=W, padx=0, pady=5)
-
-        self.var1 = IntVar(value= self.plot_reference)
-        self.check_save_ref = Checkbutton(frame_user, text = "Save reference", variable=self.var1, command= lambda: self.checkbox(2))
-        self.check_save_ref.grid(row=11, column=0, sticky=W, padx=0, pady=5)
+        self.check_save_file.grid(row=20, column=0, sticky=W, padx=0, pady=5)
 
         # display button
         submit = Button(frame_user, text='START MEASURE', fg='Black', command= self.start_test)
-        submit.grid(row=11, column=1, sticky = E, padx=20, pady = 5)
-
-        # create loading bar
-        self.prog_bar = Progress_bar(frame_user, row=30, columnspan=2, sticky = E + W + N + S, padx=5, pady=10)
+        submit.grid(row=20, column=1, sticky = E, padx=20, pady = 5)
 
         # display time
         self.clock = Label(frame_user)
-        self.clock.grid(row=31, column=0, sticky = tk.W + tk.N + tk.S, padx=5, pady=5)
+        self.clock.grid(row=30, column=0, sticky = tk.W + tk.N + tk.S, padx=5, pady=5)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # details_frame
-        details_frame = ttk.LabelFrame(frame2, text="DETAILS")
+        details_frame = ttk.LabelFrame(frame2, text="PLOT OPTIONS")
         details_frame.grid(row=3, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=5)
+
+        self.var1 = IntVar(value= self.plot_reference)
+        self.check_save_ref = Checkbutton(details_frame, text = "Save reference", variable=self.var1, command= lambda: self.checkbox(2))
+        self.check_save_ref.grid(row=1, column=0, sticky=W, padx=0, pady=5)
 
         self.var2 = IntVar(value= self.plot_markers)
         self.markers_status = Checkbutton(details_frame, text = "Markers", variable=self.var2, command= lambda: self.checkbox(3))
-        self.markers_status.pack()
+        self.markers_status.grid(row=2, column=0, sticky=W, padx=0, pady=5)
+
+        # others_frame
+        self.others_frame = ttk.LabelFrame(frame2, text="OTHERS")
+        self.others_frame.grid(row=4, column=0, sticky = tk.E + tk.W + tk.N + tk.S, padx=5, pady=5)
 
         # - - - - - - - - - - - - - - - - - - - - -
         # Notebook

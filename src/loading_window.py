@@ -32,7 +32,7 @@ class Loading_window():
     def __init__(self, master):
         self.master = master
         self.master.title(settings.__logo__ + " - Installing libraries...")
-        self.master.geometry('360x120')
+        self.master.geometry('360x125')
 
         # Window in center of screen
         self.master.update_idletasks()
@@ -57,13 +57,17 @@ class Loading_window():
         try:
             self.ani_img = AnimatedGif("data/loading_bar.gif")
             # Display first frame initially.
-            self.animation = Label(self.frame, image=self.ani_img[0])
+            self.animation = Label(self.frame, height = 100, image=self.ani_img[0])
             self.animation.pack()
             self.enable_animation()
         except:
             print("No gif file")
-
+            
         self.frame.pack()
+
+        # display text
+        self.startLog = Text(self.frame, takefocus=0)
+        self.startLog.pack()
 
     def update_label_image(self, label, ani_img, ms_delay, frame_num):
         label.configure(image=self.ani_img[frame_num])

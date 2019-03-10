@@ -17,12 +17,18 @@ class Install_and_run(threading.Thread):
 
     def pip_install(self, package):
         import importlib
+
         try:
             importlib.import_module(package)
+            txt = str('Loading pakages: ' + package)
         except ImportError:
             from pip._internal import main
             main(['install', package])
             print('Installed: ' + package)
+            txt = str('Installing pakages: ' + package)
+
+        self.loadingWindow.startLog.insert(0.0, txt + "\n")
+
         """
         try:
             subprocess.call(["pip", "install", package, "--user"], shell=True)  #!Security! Better if shell=False
@@ -34,7 +40,7 @@ class Install_and_run(threading.Thread):
     def start_loader(self):
         from loading_window import Loading_window
         self.loader_app = Toplevel(self.parent)
-        Loading_window(self.loader_app)
+        self.loadingWindow = Loading_window(self.loader_app)
 
     def destroy_loader(self):
         self.loader_app.destroy()
@@ -47,17 +53,14 @@ class Install_and_run(threading.Thread):
     def run(self):
         #Run loading app
         self.start_loader()
-
         #pip_install all the packages
         self.pip_install('matplotlib')
         self.pip_install('openpyxl')
         self.pip_install('pyvisa')
         self.pip_install('pyvisa-py')
         self.pip_install('numpy')
-
         #Run Main App
         self.start_gui()
-
         self.destroy_loader()
 
 
