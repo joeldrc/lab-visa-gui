@@ -37,8 +37,6 @@ class Single_marker():
         for widget in parent.winfo_children():
             widget.destroy()
 
-
-
         # create new label
         if marker_status == True:
             for i in range(loop):
