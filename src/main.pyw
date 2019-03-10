@@ -34,7 +34,8 @@ class Install_and_run(threading.Thread):
     def start_loader(self):
         from loading_window import Loading_window
         self.loader_app = Toplevel(self.parent)
-        Loading_window(self.loader_app)
+        self.loadingWindow = Loading_window(self.loader_app)
+        self.loadingWindow.startLog.insert(0.0, str('Installing pakages') + "\n")
 
     def destroy_loader(self):
         self.loader_app.destroy()
