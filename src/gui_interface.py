@@ -42,15 +42,22 @@ class Single_marker():
             for i in range(loop):
                 x_label_sci = str("%.6g" % x[i][measure_pointer])
                 y_label_sci = str("%.6g" % y[i][measure_pointer])
-                marker_txt = plot[i].get_xlabel() + ' = ' + x_label_sci + " - " + plot[i].get_ylabel() + ' = ' + y_label_sci
+                marker_x = plot[i].get_xlabel() + ' = ' + x_label_sci
+                marker_y = plot[i].get_ylabel() + ' = ' + y_label_sci
 
-                plot_label = marker_txt
+                plot_label = marker_x + " / " + marker_y
                 plot[i].plot(x[i][measure_pointer], y[i][measure_pointer], marker="o", ms=4, label = plot_label)
                 legend = plot[i].legend(loc='upper left', ncol=2, mode="expand", shadow=True, fancybox=True)
                 canvas.draw()
 
-                label = Label(parent, text= str(i)+ " " + marker_txt)
-                label.grid(column = 0, row = i + 1)
+                plot_number = label_x = Label(parent, text=str(i))
+                plot_number.grid(column = 0, row = i + 1, sticky=W)
+
+                label_x = Label(parent, text=marker_x)
+                label_x.grid(column = 1, row = i + 1, sticky=W)
+
+                label_y = Label(parent, text=marker_y)
+                label_y.grid(column = 2, row = i + 1, sticky=W)
         else:
             label = Label(parent, text= "")
             label.grid(column = 0, row = 1, sticky=W)
