@@ -72,20 +72,20 @@ class Auto_install(threading.Thread):
                          self.ani_img, ms_delay, 0)
 
     def pip_install(self, package):
-        from pip._internal import main
-
-        main(['install', package])
-        txt = str('Installed: ' + package)
-        print(txt)
-        self.startLog.insert(0.0, txt + "\n")
-
-        """
+        import subprocess
+        
         try:
             subprocess.call(["pip", "install", package, "--user"], shell=True)  #!Security! Better if shell=False
             print('\n Installed: ' + package)
         except:
             print("Error")
-        """
+
+        txt = str('Installed: ' + package)
+        print(txt)
+        self.startLog.insert(0.0, txt + "\n")
+
+        import time
+        time.sleep(2)
 
     def check_modules(self):
         start = False
@@ -107,7 +107,7 @@ class Auto_install(threading.Thread):
                 missed_module = str(moduleError).split("'")[1]
 
                 # run autoinstaller
-                pip_install(missed_module)
+                self.pip_install(missed_module)
 
             except Exception as e:
                 print(e)
