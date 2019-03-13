@@ -28,19 +28,18 @@ class Main(threading.Thread):
         self.start()
 
         self.root.mainloop()
-              
+
     def start_gui(self, parent):
         from gui_interface import User_gui
         parent.deiconify()
         User_gui(parent)
 
     def run(self):
-        Auto_install(Toplevel(self.root))       
-        self.start_gui(self.root)   
+        Auto_install(Toplevel(self.root))
+        self.start_gui(self.root)
 
 
 
 if __name__ == '__main__':
     # multi thread main
     Main()
-

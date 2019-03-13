@@ -16,11 +16,12 @@ class Auto_install(threading.Thread):
         self.master = master
 
         self.edit_loader()
-    
-        # start to check modules    
+        self.startLog.insert(0.0, "Start running..." + "\n")
+
+        # start to check modules
         self.check_modules()
 
-    def edit_loader(self):     
+    def edit_loader(self):
         self.master.title(settings.__logo__ + " - Installing libraries...")
         self.master.geometry('360x125')
 
@@ -52,7 +53,7 @@ class Auto_install(threading.Thread):
             self.enable_animation()
         except:
             print("No gif file")
-            
+
         self.frame.pack()
 
         # display text
@@ -69,13 +70,15 @@ class Auto_install(threading.Thread):
         ms_delay = 1000 // len(self.ani_img)    # Show all frames in 1000 ms.
         self.frame.after(ms_delay, self.update_label_image, self.animation,
                          self.ani_img, ms_delay, 0)
-        
+
     def pip_install(self, package):
         from pip._internal import main
-        
+
         main(['install', package])
-        print('Installed: ' + package)
-        
+        txt = str('Installed: ' + package)
+        print(txt)
+        self.startLog.insert(0.0, txt + "\n")
+
         """
         try:
             subprocess.call(["pip", "install", package, "--user"], shell=True)  #!Security! Better if shell=False
@@ -96,19 +99,19 @@ class Auto_install(threading.Thread):
 
                 for i in modules:
                     print(modules[i])
-                    
+
                 start = True
-                
+
             except ImportError as moduleError:
                 # cut "No module named" and print the module name
                 missed_module = str(moduleError).split("'")[1]
 
-                # run autoinstaller           
+                # run autoinstaller
                 pip_install(missed_module)
-                
+
             except Exception as e:
                 print(e)
-                
+
                 # continue to modify
                 start = True
 
@@ -136,5 +139,3 @@ class AnimatedGif(object):
 
     def __getitem__(self, frame_num):
         return self._frames[frame_num]
-
-    
