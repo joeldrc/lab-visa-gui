@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import settings
+
 from multi_thread import *
+
 import time
 from time import gmtime, strftime
 from tkinter import *
@@ -97,20 +99,30 @@ class Progress_bar():
             self.progressbar.configure(mode="determinate", maximum=self.maximum, value=self.maximum)
 
 
-class User_gui(tk.Frame):
-    def __init__(self, parent):
-        self.window = parent
-        #self.window.geometry('600x600')
-        #self.window.configure(background='gray')
-        self.window.protocol("WM_DELETE_WINDOW", self.close_program)
-
+class User_gui():
+    def __init__(self):
         self.plot_reference = False
         self.plot_saveRef = False
         self.save_data = False
         self.plot_markers = False
         self.hostname_value = "TCPIP::CFO-MD-BQPVNA1::INSTR"
 
+        self.window = tk.Tk()
+        #self.window.attributes("-fullscreen", False)
+        self.window.title(settings.__logo__ + " - " + settings.__title__ + " - " + settings.__version__)
+        #self.window.iconify()
+        #self.window.withdraw()
+        try:
+            self.window.iconbitmap('./data/icon.ico')
+        except:
+            print("No icon file")
+
+        #self.window.deiconify()
+        self.window.protocol("WM_DELETE_WINDOW", self.close_program)
+
         self.create_widgets()
+
+        self.window.mainloop()
 
     # when you close the program kill all the windows
     def close_program(self):
@@ -411,3 +423,7 @@ class User_gui(tk.Frame):
 
         # whenever the enter key is pressed then call the focus1 function
         self.window.bind('<Return>', self.focus)
+
+
+if __name__ == '__main__':
+    User_gui()

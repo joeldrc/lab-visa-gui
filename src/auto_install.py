@@ -11,17 +11,10 @@ import tkinter as tk
 
 
 class Auto_install(threading.Thread):
-    def __init__(self, master):
+    def __init__(self):
         threading.Thread.__init__(self)
-        self.master = master
 
-        self.edit_loader()
-        self.startLog.insert(0.0, "Start running..." + "\n")
-
-        # start to check modules
-        self.check_modules()
-
-    def edit_loader(self):
+        self.master = tk.Tk()
         self.master.title(settings.__logo__ + " - Installing libraries...")
         self.master.geometry('360x125')
 
@@ -44,36 +37,35 @@ class Auto_install(threading.Thread):
             print("No icon file")
 
         self.frame = Frame(self.master)
-
         try:
-            self.ani_img = AnimatedGif("data/loading_bar.gif")
+            self.ani_img = AnimatedGif("./data/loading_bar.gif")
             # Display first frame initially.
             self.animation = Label(self.frame, height = 100, image=self.ani_img[0])
             self.animation.pack()
-            self.enable_animation()
         except:
             print("No gif file")
-
         self.frame.pack()
 
         # display text
         self.startLog = Text(self.frame, takefocus=0)
         self.startLog.pack()
 
+        # start to check modules
+        self.start()
+
+        self.master.mainloop()
+
     def update_label_image(self, label, ani_img, ms_delay, frame_num):
         label.configure(image=self.ani_img[frame_num])
         frame_num = (frame_num+1) % len(self.ani_img)
-        self.frame.after(ms_delay, self.update_label_image, label,
-                         self.ani_img, ms_delay, frame_num)
+        self.frame.after(ms_delay, self.update_label_image, label, self.ani_img, ms_delay, frame_num)
 
     def enable_animation(self):
         ms_delay = 1000 // len(self.ani_img)    # Show all frames in 1000 ms.
-        self.frame.after(ms_delay, self.update_label_image, self.animation,
-                         self.ani_img, ms_delay, 0)
+        self.frame.after(ms_delay, self.update_label_image, self.animation, self.ani_img, ms_delay, 0)
 
     def pip_install(self, package):
         import subprocess
-        
         try:
             subprocess.call(["pip", "install", package, "--user"], shell=True)  #!Security! Better if shell=False
             print('\n Installed: ' + package)
@@ -83,9 +75,6 @@ class Auto_install(threading.Thread):
         txt = str('Installed: ' + package)
         print(txt)
         self.startLog.insert(0.0, txt + "\n")
-
-        import time
-        time.sleep(2)
 
     def check_modules(self):
         start = False
@@ -99,7 +88,6 @@ class Auto_install(threading.Thread):
 
                 for i in modules:
                     print(modules[i])
-
                 start = True
 
             except ImportError as moduleError:
@@ -111,12 +99,23 @@ class Auto_install(threading.Thread):
 
             except Exception as e:
                 print(e)
-
                 # continue to modify
                 start = True
 
+    def run(self):
+        try:
+            self.enable_animation()
+        except:
+            pass
+        # update label
+        self.startLog.insert(0.0, "Start running..." + "\n")
+        # start to check modules
+        self.check_modules()
+
         # destroy loading window
         self.master.destroy()
+        # destroy class
+        del self
 
 
 class AnimatedGif(object):
@@ -139,3 +138,8 @@ class AnimatedGif(object):
 
     def __getitem__(self, frame_num):
         return self._frames[frame_num]
+
+
+if __name__ == '__main__':
+    Auto_install()
+    print("end")
