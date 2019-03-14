@@ -99,7 +99,7 @@ class Progress_bar():
             self.progressbar.configure(mode="determinate", maximum=self.maximum, value=self.maximum)
 
 
-class User_gui():
+class User_gui(tk.Frame):
     def __init__(self):
         self.plot_reference = False
         self.plot_saveRef = False
