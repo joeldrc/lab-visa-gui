@@ -7,11 +7,13 @@ from auto_install import*
 
 def main():
     #run auto installer
-    Auto_install()
+    installer = Auto_install()
+    #installer.mainloop()
 
     # start gui
     from gui_interface import User_gui
-    User_gui()
+    gui = User_gui()
+    #gui.mainloop()
 
 
 if __name__ == '__main__':
