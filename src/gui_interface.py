@@ -18,11 +18,11 @@ import matplotlib.pyplot as plt
 
 
 # plot list
-plot_names = [[['S11 - TDR', 'x', 'y'],
-               ['S11 - TDR', 'x', 'y'],
-               ['S11 - TDR', 'x', 'y'],
-               ['S11 - TDR', 'x', 'y'],
-               ['S11 - TDR', 'x', 'y']],
+plot_names = [[['S21 - delay', 'GHz', 'dB'],
+               ['S21 - dB', 'GHz', 'dB'],
+               ['S11 - SWR', 'GHz', 'mU'],
+               ['S11 - SWR', 'GHz', 'mU'],
+               ['S11 - TDR', 'ns', 'mU']],
 
               [['S11 - TDR', 'x', 'y'],
                ['S11 - TDR', 'x', 'y']]]
