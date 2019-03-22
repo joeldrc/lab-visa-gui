@@ -480,10 +480,6 @@ class User_gui(tk.Frame):
         self.check_save_ref = Checkbutton(details_frame, text = "Save reference", variable=self.var1, command= lambda: self.checkbox(2))
         self.check_save_ref.grid(row=1, column=0, sticky=W, padx=0, pady=5)
 
-        self.var3 = IntVar(value= self.plot_markers)
-        self.markers_status = Checkbutton(details_frame, text = "Markers", variable=self.var2, command= lambda: self.checkbox(3))
-        self.markers_status.grid(row=2, column=0, sticky=W, padx=0, pady=5)
-
         self.var2 = IntVar(value= self.plot_markers)
         self.markers_status = Checkbutton(details_frame, text = "Markers", variable=self.var2, command= lambda: self.checkbox(3))
         self.markers_status.grid(row=2, column=0, sticky=W, padx=0, pady=5)
