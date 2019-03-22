@@ -21,8 +21,8 @@ import matplotlib.pyplot as plt
 
 
 # plot list
-plot_names = [[['S21 - delay', 'GHz', 'dB'],
-               ['S21 - dB', 'GHz', 'dB'],
+plot_names = [[['S21 - delay', 'GHz', 'nS'],
+               ['S21 - dB Mag', 'GHz', 'dB'],
                ['S11 - SWR', 'GHz', 'mU'],
                ['S11 - SWR', 'GHz', 'mU'],
                ['S11 - TDR', 'ns', 'mU']],
@@ -124,13 +124,13 @@ class Main(tk.Tk, threading.Thread):
             self.frames[LoadingPage].loading.config(text=str(i))
             time.sleep(1)
 
-        #test     
+        #test
         user_gui = User_gui(self.test_container, self)
         user_gui.grid(row=0, column=0, sticky="nsew")
 
         zoomPage(self)
         screenTransp(self, False)
-    
+
         #self.show_frame(PageOne)
 
 
@@ -163,7 +163,6 @@ class PageOne(tk.Frame):
         button.pack()
 
 
-########################################################################
 class Single_marker():
     def __init__(self, parent, canvas, plot, x, y, loop, marker_status = True):
         measure_pointer = 20
@@ -480,6 +479,10 @@ class User_gui(tk.Frame):
         self.var1 = IntVar(value= self.plot_reference)
         self.check_save_ref = Checkbutton(details_frame, text = "Save reference", variable=self.var1, command= lambda: self.checkbox(2))
         self.check_save_ref.grid(row=1, column=0, sticky=W, padx=0, pady=5)
+
+        self.var3 = IntVar(value= self.plot_markers)
+        self.markers_status = Checkbutton(details_frame, text = "Markers", variable=self.var2, command= lambda: self.checkbox(3))
+        self.markers_status.grid(row=2, column=0, sticky=W, padx=0, pady=5)
 
         self.var2 = IntVar(value= self.plot_markers)
         self.markers_status = Checkbutton(details_frame, text = "Markers", variable=self.var2, command= lambda: self.checkbox(3))
