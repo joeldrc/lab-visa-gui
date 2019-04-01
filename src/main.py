@@ -71,7 +71,10 @@ def check_input(self):
 
 def update_time(self):
     self.timeLabel.setText(strftime("%d %b %Y %H:%M:%S", gmtime()))
-    """ add auto update """
+
+    self.timer = QtCore.QTimer()
+    self.timer.timeout.connect(self.update_time)
+    self.timer.start(1000)
 
 def update_progressBar(self):
     self.progressBar.setValue(100)
