@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'main_gui.ui'
+# Form implementation generated from reading ui file 'user_gui.ui'
 #
 # Created by: PyQt5 UI code generator 5.11.3
 #
@@ -49,6 +49,12 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
+        self.verticalLayoutWidget_2 = QtWidgets.QWidget(self.tab_2)
+        self.verticalLayoutWidget_2.setGeometry(QtCore.QRect(0, 0, 791, 571))
+        self.verticalLayoutWidget_2.setObjectName("verticalLayoutWidget_2")
+        self.plotTest_2 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_2)
+        self.plotTest_2.setContentsMargins(0, 0, 0, 0)
+        self.plotTest_2.setObjectName("plotTest_2")
         self.tabWidget.addTab(self.tab_2, "")
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
@@ -151,6 +157,20 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        MainWindow.setTabOrder(self.tabWidget, self.instrumentAddress)
+        MainWindow.setTabOrder(self.instrumentAddress, self.connectButton)
+        MainWindow.setTabOrder(self.connectButton, self.userName)
+        MainWindow.setTabOrder(self.userName, self.serialName)
+        MainWindow.setTabOrder(self.serialName, self.serialNumber)
+        MainWindow.setTabOrder(self.serialNumber, self.addDetails)
+        MainWindow.setTabOrder(self.addDetails, self.autoSave)
+        MainWindow.setTabOrder(self.autoSave, self.startMeasure)
+        MainWindow.setTabOrder(self.startMeasure, self.saveReference)
+        MainWindow.setTabOrder(self.saveReference, self.markersOn)
+        MainWindow.setTabOrder(self.markersOn, self.addTrace)
+        MainWindow.setTabOrder(self.addTrace, self.removeTrace)
+        MainWindow.setTabOrder(self.removeTrace, self.checkBox)
+        MainWindow.setTabOrder(self.checkBox, self.textEdit)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
