@@ -80,12 +80,20 @@ def check_input(self):
     self.removeTrace.clicked.connect(self.update_progressBar)
 
 def connect_instrument(self):
-    measure_thread = Measure_thread(self.instrumentAddress.text(), False, 0, 0)
-    measure_thread.start()
-    self.remoteConnectionLabel.setText(measure_thread.instrument_info)
+    self.measure_thread = Measure_thread(self.instrumentAddress.text())
 
 def update_time(self):
     self.timeLabel.setText(strftime("%d %b %Y %H:%M:%S", gmtime()))
+
+    try:
+        self.remoteConnectionLabel.setText(self.measure_thread.instrument_info)
+    except:
+        pass
+
+    try:
+        self.update_plot()
+    except Exception as e:
+        print(e)
 
     self.timer = QtCore.QTimer()
     self.timer.timeout.connect(self.update_time)
@@ -140,14 +148,14 @@ figure_names = [['Flanges'],
 def create_plot(self):
     number_of_plots = len(plot_names)
 
-    plot = [[] for i in range(number_of_plots)]
-    fig = [[] for i in range(number_of_plots)]
-    canvas = [[] for i in range(number_of_plots)]
-    toolbar = [[] for i in range(number_of_plots)]
+    self.plot = [[] for i in range(number_of_plots)]
+    self.fig = [[] for i in range(number_of_plots)]
+    self.canvas = [[] for i in range(number_of_plots)]
+    self.toolbar = [[] for i in range(number_of_plots)]
 
     # initialize fig
     for i in range(number_of_plots):
-        fig[i] =Figure(figsize=(12,7))
+        self.fig[i] =Figure(figsize=(12,7))
 
     # Figures
     for index in range(number_of_plots):
@@ -156,19 +164,19 @@ def create_plot(self):
             # auto adapt plot number
             subplot_columns = (subplot_number // 3) + (subplot_number % 3)
             subplot_rows = subplot_number // 2
-            subplot = fig[index].add_subplot(subplot_rows, subplot_columns, i + 1)
-            plot[index].append(subplot)
+            subplot = self.fig[index].add_subplot(subplot_rows, subplot_columns, i + 1)
+            self.plot[index].append(subplot)
 
     # auto adj
     for i in range(number_of_plots):
-        fig[i].tight_layout()
+        self.fig[i].tight_layout()
 
     # Canvas & toolbar
-    thisFigure = FigureCanvas(fig[0])
+    thisFigure = FigureCanvas(self.fig[0])
     self.plotTest_2.addWidget(thisFigure)
     self.plotTest_2.addWidget(NavigationToolbar(thisFigure, MainWindow))
 
-    thisFigure = FigureCanvas(fig[1])
+    thisFigure = FigureCanvas(self.fig[1])
     self.plotTest_3.addWidget(thisFigure)
     self.plotTest_3.addWidget(NavigationToolbar(thisFigure, MainWindow))
 
@@ -176,7 +184,8 @@ def create_plot(self):
 def update_plot(self):
     # return wich test you have selected
     channel_number = len(self.measure_thread.measures)
-    selected_frame_number = self.measure_thread.test_number
+    #selected_frame_number = self.measure_thread.test_number
+    selected_frame_number = 0
 
     xValue = []
     yValue = []
@@ -187,10 +196,10 @@ def update_plot(self):
             xValue.append(x)
             yValue.append(y)
             # clean plot line
-            self.plot[selected_frame_number][i].cla()
+            self.plot[selected_frame_number][i].clear()
             # set data on plot
             self.plot[selected_frame_number][i].plot(xValue[i], yValue[i])
-
+        """
         if self.plot_saveRef == True:
             self.xRef = xValue
             self.yRef = yValue
@@ -199,6 +208,7 @@ def update_plot(self):
         if self.plot_reference == True:
             for i in range(channel_number):
                 self.plot[selected_frame_number][i].plot(self.xRef[i], self.yRef[i])
+        """
     except Exception as e:
         print(e)
 
@@ -235,6 +245,7 @@ Ui_MainWindow.create_canvas = create_canvas
 Ui_MainWindow.update_canvas = update_canvas
 
 Ui_MainWindow.create_plot = create_plot
+Ui_MainWindow.update_plot = update_plot
 
 
 #==============================================================================#
@@ -244,13 +255,11 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
-
     #MainWindow.setWindowTitle(settings.__logo__ + " - " + settings.__title__ + " - " + settings.__version__)
     #MainWindow.setWindowIcon(QtGui.QIcon('images/icon.ico'))
     ui.update_time()
     ui.check_input()
     ui.create_canvas()
     ui.create_plot()
-
     MainWindow.show()
     sys.exit(app.exec_())
