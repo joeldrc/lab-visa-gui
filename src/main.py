@@ -55,7 +55,11 @@ def enlarge_window(self):
     if self.checkBox.isChecked():
         MainWindow.setGeometry(100, 100, 600, 400)
         MainWindow.setWindowTitle("PyQT tuts!")
-        #MainWindow.setWindowIcon(QtGui.QIcon('../images/icon.ico'))
+        """
+        import os
+        scriptDir = os.path.dirname(os.path.realpath(__file__))
+        MainWindow.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'images/icon.ico'))
+        """
         from PyQt5.QtWidgets import QStyleFactory
         app.setStyle(QStyleFactory.create('Fusion'))
     else:
@@ -235,9 +239,14 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
+
+    MainWindow.setWindowTitle(settings.__logo__ + " - " + settings.__title__ + " - " + settings.__version__)
+    MainWindow.setWindowIcon(QtGui.QIcon('images/icon.ico'))
+
     ui.update_time()
     ui.check_input()
     ui.create_canvas()
     ui.create_plot()
+
     MainWindow.show()
     sys.exit(app.exec_())
