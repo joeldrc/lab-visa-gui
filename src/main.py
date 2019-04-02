@@ -96,17 +96,19 @@ def update_progressBar(self):
 
 #==============================================================================#
 def create_canvas(self):
+    """
     static_canvas = FigureCanvas(Figure(figsize=(5, 3)))
     self.plotTest.addWidget(static_canvas)
-    #MainWindow.addToolBar(NavigationToolbar(static_canvas, MainWindow))
-
-    dynamic_canvas = FigureCanvas(Figure(figsize=(5, 3)))
-    self.plotTest.addWidget(dynamic_canvas)
-    self.plotTest.addWidget(NavigationToolbar(dynamic_canvas, MainWindow))
+    MainWindow.addToolBar(NavigationToolbar(static_canvas, MainWindow))
 
     self._static_ax = static_canvas.figure.subplots()
     t = np.linspace(0, 10, 501)
     self._static_ax.plot(t, np.tan(t), ".")
+    """
+
+    dynamic_canvas = FigureCanvas(Figure(figsize=(5, 3)))
+    self.plotTest.addWidget(dynamic_canvas)
+    self.plotTest.addWidget(NavigationToolbar(dynamic_canvas, MainWindow))
 
     self._dynamic_ax = dynamic_canvas.figure.subplots()
     self._timer = dynamic_canvas.new_timer(
@@ -134,6 +136,7 @@ plot_names = [[['S21 - delay', 'GHz', 'nS'],
 figure_names = [['Flanges'],
                 ['Pick-Up']]
 
+
 def create_plot(self):
     number_of_plots = len(plot_names)
 
@@ -160,12 +163,14 @@ def create_plot(self):
     for i in range(number_of_plots):
         fig[i].tight_layout()
 
-    # Canvas & # toolbar
-    #for i in range(number_of_plots):
-    for i in range(1):
-        thisFigure = FigureCanvas(fig[i])
-        self.plotTest_2.addWidget(thisFigure)
-        self.plotTest_2.addWidget(NavigationToolbar(thisFigure, MainWindow))
+    # Canvas & toolbar
+    thisFigure = FigureCanvas(fig[0])
+    self.plotTest_2.addWidget(thisFigure)
+    self.plotTest_2.addWidget(NavigationToolbar(thisFigure, MainWindow))
+
+    thisFigure = FigureCanvas(fig[1])
+    self.plotTest_3.addWidget(thisFigure)
+    self.plotTest_3.addWidget(NavigationToolbar(thisFigure, MainWindow))
 
 
 def update_plot(self):
@@ -240,9 +245,8 @@ if __name__ == "__main__":
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
 
-    MainWindow.setWindowTitle(settings.__logo__ + " - " + settings.__title__ + " - " + settings.__version__)
-    MainWindow.setWindowIcon(QtGui.QIcon('images/icon.ico'))
-
+    #MainWindow.setWindowTitle(settings.__logo__ + " - " + settings.__title__ + " - " + settings.__version__)
+    #MainWindow.setWindowIcon(QtGui.QIcon('images/icon.ico'))
     ui.update_time()
     ui.check_input()
     ui.create_canvas()
