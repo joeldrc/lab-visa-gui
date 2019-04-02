@@ -83,11 +83,11 @@ def update_progressBar(self):
 def create_canvas(self):
     static_canvas = FigureCanvas(Figure(figsize=(5, 3)))
     self.plotTest.addWidget(static_canvas)
-    MainWindow.addToolBar(NavigationToolbar(static_canvas, MainWindow))
+    #MainWindow.addToolBar(NavigationToolbar(static_canvas, MainWindow))
 
     dynamic_canvas = FigureCanvas(Figure(figsize=(5, 3)))
     self.plotTest.addWidget(dynamic_canvas)
-    MainWindow.addToolBar(QtCore.Qt.BottomToolBarArea, NavigationToolbar(dynamic_canvas, MainWindow))
+    self.plotTest.addWidget(NavigationToolbar(dynamic_canvas, MainWindow))
 
     self._static_ax = static_canvas.figure.subplots()
     t = np.linspace(0, 10, 501)
