@@ -3,7 +3,7 @@
 import settings
 
 from user_gui import *
-from vna_scpi import *
+from multi_thread import*
 
 import time
 from time import gmtime, strftime
@@ -68,10 +68,17 @@ def check_input(self):
     self.actionQuit.triggered.connect(self.file_quit)
     self.actionFont.triggered.connect(self.edit_font)
     self.actionColor.triggered.connect(self.edit_color)
-    self.checkBox.stateChanged.connect(self.enlarge_window)
 
+    self.connectButton.clicked.connect(self.connect_instrument)
+
+    self.checkBox.stateChanged.connect(self.enlarge_window)
     self.addTrace.clicked.connect(self.update_progressBar)
     self.removeTrace.clicked.connect(self.update_progressBar)
+
+def connect_instrument(self):
+    measure_thread = Measure_thread(self.instrumentAddress.text(), False, 0, 0)
+    measure_thread.start()
+    self.remoteConnectionLabel.setText(measure_thread.instrument_info)
 
 def update_time(self):
     self.timeLabel.setText(strftime("%d %b %Y %H:%M:%S", gmtime()))
@@ -111,6 +118,98 @@ def update_canvas(self):
 
 
 #==============================================================================#
+plot_names = [[['S21 - delay', 'GHz', 'nS'],
+               ['S21 - dB Mag', 'GHz', 'dB'],
+               ['S11 - SWR', 'GHz', 'mU'],
+               ['S11 - SWR', 'GHz', 'mU'],
+               ['S11 - TDR', 'ns', 'mU']],
+
+              [['S11 - TDR', 'x', 'y'],
+               ['S11 - TDR', 'x', 'y']]]
+
+figure_names = [['Flanges'],
+                ['Pick-Up']]
+
+def create_plot(self):
+    number_of_plots = len(plot_names)
+
+    plot = [[] for i in range(number_of_plots)]
+    fig = [[] for i in range(number_of_plots)]
+    canvas = [[] for i in range(number_of_plots)]
+    toolbar = [[] for i in range(number_of_plots)]
+
+    # initialize fig
+    for i in range(number_of_plots):
+        fig[i] =Figure(figsize=(12,7))
+
+    # Figures
+    for index in range(number_of_plots):
+        subplot_number = len(plot_names[index])
+        for i in range(subplot_number):
+            # auto adapt plot number
+            subplot_columns = (subplot_number // 3) + (subplot_number % 3)
+            subplot_rows = subplot_number // 2
+            subplot = fig[index].add_subplot(subplot_rows, subplot_columns, i + 1)
+            plot[index].append(subplot)
+
+    # auto adj
+    for i in range(number_of_plots):
+        fig[i].tight_layout()
+
+    # Canvas & # toolbar
+    #for i in range(number_of_plots):
+    for i in range(1):
+        thisFigure = FigureCanvas(fig[i])
+        self.plotTest_2.addWidget(thisFigure)
+        self.plotTest_2.addWidget(NavigationToolbar(thisFigure, MainWindow))
+
+
+def update_plot(self):
+    # return wich test you have selected
+    channel_number = len(self.measure_thread.measures)
+    selected_frame_number = self.measure_thread.test_number
+
+    xValue = []
+    yValue = []
+
+    try:
+        for i in range(channel_number):
+            x, y = self.measure_thread.measures[i]
+            xValue.append(x)
+            yValue.append(y)
+            # clean plot line
+            self.plot[selected_frame_number][i].cla()
+            # set data on plot
+            self.plot[selected_frame_number][i].plot(xValue[i], yValue[i])
+
+        if self.plot_saveRef == True:
+            self.xRef = xValue
+            self.yRef = yValue
+            self.plot_saveRef = False
+
+        if self.plot_reference == True:
+            for i in range(channel_number):
+                self.plot[selected_frame_number][i].plot(self.xRef[i], self.yRef[i])
+    except Exception as e:
+        print(e)
+
+    # Set names on plot
+    for i in range(len(plot_names[selected_frame_number])):
+        self.plot[selected_frame_number][i].set_title(plot_names[selected_frame_number][i][0])
+        self.plot[selected_frame_number][i].set_xlabel(plot_names[selected_frame_number][i][1])
+        self.plot[selected_frame_number][i].set_ylabel(plot_names[selected_frame_number][i][2])
+        #self.plot[selected_frame_number][i].grid()
+
+    # autoadapt
+    self.fig[selected_frame_number].tight_layout()
+    # update plot
+    #self.canvas[selected_frame_number].draw()
+
+    # markers
+    #Single_marker(self.others_frame, self.canvas[selected_frame_number], self.plot[selected_frame_number], xValue, yValue, len(plot_names[selected_frame_number]), self.plot_markers)
+
+
+#==============================================================================#
 Ui_MainWindow.check_input = check_input
 Ui_MainWindow.file_open = file_open
 Ui_MainWindow.file_save = file_save
@@ -119,11 +218,14 @@ Ui_MainWindow.edit_font = edit_font
 Ui_MainWindow.edit_color = edit_color
 Ui_MainWindow.enlarge_window = enlarge_window
 
+Ui_MainWindow.connect_instrument = connect_instrument
 Ui_MainWindow.update_time = update_time
 Ui_MainWindow.update_progressBar = update_progressBar
 
 Ui_MainWindow.create_canvas = create_canvas
 Ui_MainWindow.update_canvas = update_canvas
+
+Ui_MainWindow.create_plot = create_plot
 
 
 #==============================================================================#
@@ -136,5 +238,6 @@ if __name__ == "__main__":
     ui.update_time()
     ui.check_input()
     ui.create_canvas()
+    ui.create_plot()
     MainWindow.show()
     sys.exit(app.exec_())
