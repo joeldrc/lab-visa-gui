@@ -54,6 +54,10 @@ def edit_color(self):  # Applies on selected text only
 def enlarge_window(self):
     if self.checkBox.isChecked():
         MainWindow.setGeometry(100, 100, 600, 400)
+        MainWindow.setWindowTitle("PyQT tuts!")
+        #MainWindow.setWindowIcon(QtGui.QIcon('../images/icon.ico'))
+        from PyQt5.QtWidgets import QStyleFactory
+        app.setStyle(QStyleFactory.create('Fusion'))
     else:
         MainWindow.setGeometry(100, 100, 400, 300)
 
