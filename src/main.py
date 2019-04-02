@@ -82,25 +82,30 @@ def check_input(self):
 def connect_instrument(self):
     self.measure_thread = Measure_thread(self.instrumentAddress.text())
 
-def update_time(self):
-    self.timeLabel.setText(strftime("%d %b %Y %H:%M:%S", gmtime()))
+    self.instrument_timer = QtCore.QTimer()
+    self.instrument_timer.timeout.connect(self.instrument_refresh)
+    self.instrument_timer.start(1000)
 
+    self.progressBar.setValue(0)
+
+
+#==============================================================================#
+def instrument_refresh(self):
     try:
         self.remoteConnectionLabel.setText(self.measure_thread.instrument_info)
-    except:
-        pass
-
-    try:
         self.update_plot()
+        self.progressBar.setValue(100)
     except Exception as e:
         print(e)
 
+def update_time(self):
+    self.timeLabel.setText(strftime("%d %b %Y %H:%M:%S", gmtime()))
     self.timer = QtCore.QTimer()
     self.timer.timeout.connect(self.update_time)
     self.timer.start(1000)
 
-def update_progressBar(self):
-    self.progressBar.setValue(100)
+def update_progressBar(self, value=0):
+    self.progressBar.setValue(value)
 
 #==============================================================================#
 def create_canvas(self):
@@ -185,7 +190,7 @@ def update_plot(self):
     # return wich test you have selected
     channel_number = len(self.measure_thread.measures)
     #selected_frame_number = self.measure_thread.test_number
-    selected_frame_number = 0
+    selected_frame_number = 1
 
     xValue = []
     yValue = []
@@ -238,6 +243,8 @@ Ui_MainWindow.edit_color = edit_color
 Ui_MainWindow.enlarge_window = enlarge_window
 
 Ui_MainWindow.connect_instrument = connect_instrument
+
+Ui_MainWindow.instrument_refresh = instrument_refresh
 Ui_MainWindow.update_time = update_time
 Ui_MainWindow.update_progressBar = update_progressBar
 
