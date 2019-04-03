@@ -3,7 +3,7 @@
 import settings
 
 from user_gui import *
-from multi_thread import*
+from vna_scpi import *
 
 import time
 from time import gmtime, strftime
@@ -75,13 +75,15 @@ def check_input(self):
     self.actionColor.triggered.connect(self.edit_color)
 
     self.connectButton.clicked.connect(self.connect_instrument)
+    self.startMeasure.clicked.connect(self.start_measure)
 
     self.checkBox.stateChanged.connect(self.enlarge_window)
     self.addTrace.clicked.connect(self.update_progressBar)
     self.removeTrace.clicked.connect(self.update_progressBar)
 
 def connect_instrument(self):
-    self.measure_thread = Measure_thread(self.instrumentAddress.text())
+    address = self.instrumentAddress.text()
+    self.vna_measure = Vna_measure(address, 0, 5) #test_type, chart_number
 
     self.instrument_timer = QtCore.QTimer()
     self.instrument_timer.timeout.connect(self.instrument_refresh)
@@ -89,11 +91,15 @@ def connect_instrument(self):
 
     self.progressBar.setValue(0)
 
+def start_measure(self):
+    self.connect_instrument()
+    print(self.tabWidget.currentIndex())
+
 
 #==============================================================================#
 def instrument_refresh(self):
     try:
-        self.remoteConnectionLabel.setText(self.measure_thread.instrument_info)
+        self.remoteConnectionLabel.setText(self.vna_measure.instrument_info)
         self.update_plot()
         self.progressBar.setValue(100)
     except Exception as e:
@@ -175,15 +181,15 @@ def create_plot(self):
 
 def update_plot(self):
     # return wich test you have selected
-    channel_number = len(self.measure_thread.measures)
-    selected_frame_number = 0 #self.measure_thread.test_number
+    channel_number = len(self.vna_measure.measures)
+    selected_frame_number = 0 #self.vna_measure.test_number
 
     xValue = []
     yValue = []
 
     try:
         for i in range(channel_number):
-            x, y = self.measure_thread.measures[i]
+            x, y = self.vna_measure.measures[i]
             xValue.append(x)
             yValue.append(y)
             # clean plot line
@@ -232,6 +238,7 @@ Ui_MainWindow.edit_color = edit_color
 Ui_MainWindow.enlarge_window = enlarge_window
 
 Ui_MainWindow.connect_instrument = connect_instrument
+Ui_MainWindow.start_measure = start_measure
 
 Ui_MainWindow.instrument_refresh = instrument_refresh
 Ui_MainWindow.update_time = update_time

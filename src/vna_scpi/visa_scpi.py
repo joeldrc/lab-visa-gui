@@ -3,14 +3,31 @@
 
 import time
 import visa
+import threading
 import numpy as np
 
 
-class Vna_measure():
-    def __init__(self, address):
+class Vna_measure(threading.Thread):
+    def __init__(self, address, test_type = 0, chart_numbers = 0):
+        threading.Thread.__init__(self)
+
         print("Init. visa setup")
+
         self.instrument_address = address
 
+        self.test_type = test_type
+        self.chart_numbers = chart_numbers
+
+        self.instrument_info = ''
+        self.data_ready = False
+
+        self.measures = []
+
+        #start thread
+        self.start()
+
+    # run all the time
+    def run(self):
         # TEST is used for debug
         if self.instrument_address == "TEST":
             self.test_mode = True
@@ -22,8 +39,41 @@ class Vna_measure():
             # Some instruments require that at the end of each command.
             self.vna.write_termination = '\n'
 
+        #read instrument info
+        try:
+            self.instrument_info = self.instrumentInfo()
+        except Exception as e:
+            print(e)
+            self.instrument_info = 'NO CONNECTION \n'
 
-    def instrument_info(self):
+        print(self.instrument_info)
+
+        #self.measures = []
+
+        for index in range(self.chart_numbers):
+            if self.test_mode == True:
+                x = np.linspace(1, 301)
+                y = np.sin(x) + np.random.normal(scale=0.1, size = len(x))
+                data = x, y
+
+            elif self.test_type == 0:
+                data = self.flanges(index)
+
+            elif self.test_type == 1:
+                data = self.pick_up(index)
+
+            else:
+                print("exception")
+
+            self.measures.append(data)
+
+
+        self.data_ready = True
+        print('end measures')
+
+
+#==============================================================================#
+    def instrumentInfo(self):
         if self.test_mode == True:
             name = 'TEST MODE ON \n'
         else:
@@ -31,19 +81,8 @@ class Vna_measure():
         time.sleep(1)
         return name
 
-    # return random numbers
-    def read_measure(self, value, index):
-        if self.test_mode == True:
-            x = np.linspace(1, 301)
-            y = np.sin(x) + np.random.normal(scale=0.1, size = len(x))
-            return x, y
 
-        elif value == 0:
-            return self.flanges(index)
-
-        elif value == 1:
-            return self.pick_up(index)
-
+#==============================================================================#
     # for flange tests
     def flanges(self, index):
         #self.vna.write('*RST') # Reset the instrument
@@ -139,6 +178,8 @@ class Vna_measure():
 
         return xDataArray, yDataArray
 
+
+#==============================================================================#
     #for pick-up tests
     def pick_up(self, index):
         #self.vna.write('*RST') # Reset the instrument
@@ -178,26 +219,23 @@ class Vna_measure():
         return xDataArray, yDataArray
 
 
+#==============================================================================#
 # if is used like a main
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
-    try:
-        address = "TCPIP::CFO-MD-BQPVNA1::INSTR" #"TEST"
-        test = Vna_measure(address)
-        print(test.instrument_info())
 
-        values = []
-        for i in range(0, 5, 1):
-            #x, y = test.read_measure_2(i)
-            values.append(test.read_measure(0, i))
-            x, y = values[i]
-            print(x)
-            print(y)
+    address = "TCPIP::CFO-MD-BQPVNA1::INSTR" #"TEST"
+    test = Vna_measure(address, 0, 5) #test_type, chart_number
 
-            plt.title ("Trace Data via Python - PyVisa - SCPI")
-            plt.xlabel("Frequency")
-            plt.ylabel("Amplitude (dBm)")
-            plt.plot(x, y)
-            plt.show()
-    except Exception as e:
-        print(e)
+    while test.data_ready == False:
+        print('wait')
+        time.sleep(0.5)
+
+    for i in range(len(test.measures)):
+        x, y = test.measures[i]
+
+        plt.title ("test")
+        plt.xlabel("x")
+        plt.ylabel("y")
+        plt.plot(x, y)
+        plt.show()
