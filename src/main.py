@@ -81,9 +81,17 @@ def check_input(self):
     self.addTrace.clicked.connect(self.update_progressBar)
     self.removeTrace.clicked.connect(self.update_progressBar)
 
-def connect_instrument(self):
+def connect_instrument(self, current_index = 0):
     address = self.instrumentAddress.text()
-    self.vna_measure = Vna_measure(address, 0, 5) #test_type, chart_number
+
+    #temp code
+    if current_index == 0:
+        chart_number = 0
+    else:
+        current_index -= 1
+        chart_number = len(settings.plot_names[current_index])
+
+    self.vna_measure = Vna_measure(address, current_index, chart_number)
 
     self.instrument_timer = QtCore.QTimer()
     self.instrument_timer.timeout.connect(self.instrument_refresh)
@@ -92,7 +100,7 @@ def connect_instrument(self):
     self.progressBar.setValue(0)
 
 def start_measure(self):
-    self.connect_instrument()
+    self.connect_instrument(self.tabWidget.currentIndex())
     print(self.tabWidget.currentIndex())
 
 
@@ -101,7 +109,9 @@ def instrument_refresh(self):
     try:
         self.remoteConnectionLabel.setText(self.vna_measure.instrument_info)
         self.update_plot()
-        self.progressBar.setValue(100)
+
+        if self.vna_measure.data_ready == True:
+            self.progressBar.setValue(100)
     except Exception as e:
         print(e)
 
@@ -182,7 +192,7 @@ def create_plot(self):
 def update_plot(self):
     # return wich test you have selected
     channel_number = len(self.vna_measure.measures)
-    selected_frame_number = 0 #self.vna_measure.test_number
+    selected_frame_number = self.vna_measure.test_type
 
     xValue = []
     yValue = []
