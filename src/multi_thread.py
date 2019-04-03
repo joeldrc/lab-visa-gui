@@ -15,6 +15,8 @@ class Measure_thread(threading.Thread):
         self.address = address
         self.instrument_info = ""
 
+        self.test_number = 0
+
         self.file_name = ""
         self.time_value = ""
 
@@ -33,7 +35,7 @@ class Measure_thread(threading.Thread):
         self.start()
 
     # run all the time
-    def run(self, start_test= False, test_number = 0,  chart_numbers = 2):
+    def run(self, start_test= False, chart_numbers = 2):
         try:
             self.instrument_info = self.vna.instrument_info()
             print(self.instrument_info)
@@ -49,7 +51,7 @@ class Measure_thread(threading.Thread):
                 #measure vna
                 self.measures = []
                 for i in range(chart_numbers):
-                    self.measures.append(self.vna.read_measure(test_number, i))
+                    self.measures.append(self.vna.read_measure(self.test_number, i))
 
                 self.data_ready = True
                 self.measure_started = False

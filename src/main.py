@@ -65,6 +65,7 @@ def enlarge_window(self):
     else:
         MainWindow.setGeometry(100, 100, 400, 300)
 
+
 #==============================================================================#
 def check_input(self):
     self.actionOpen.triggered.connect(self.file_open)
@@ -107,6 +108,7 @@ def update_time(self):
 def update_progressBar(self, value=0):
     self.progressBar.setValue(value)
 
+
 #==============================================================================#
 def create_canvas(self):
     """
@@ -137,25 +139,11 @@ def update_canvas(self):
 
 
 #==============================================================================#
-plot_names = [[['S21 - delay', 'GHz', 'nS'],
-               ['S21 - dB Mag', 'GHz', 'dB'],
-               ['S11 - SWR', 'GHz', 'mU'],
-               ['S11 - SWR', 'GHz', 'mU'],
-               ['S11 - TDR', 'ns', 'mU']],
-
-              [['S11 - TDR', 'x', 'y'],
-               ['S11 - TDR', 'x', 'y']]]
-
-figure_names = [['Flanges'],
-                ['Pick-Up']]
-
-
 def create_plot(self):
-    number_of_plots = len(plot_names)
+    number_of_plots = len(settings.plot_names)
 
     self.plot = [[] for i in range(number_of_plots)]
     self.fig = [[] for i in range(number_of_plots)]
-    self.canvas = [[] for i in range(number_of_plots)]
     self.toolbar = [[] for i in range(number_of_plots)]
 
     # initialize fig
@@ -164,7 +152,7 @@ def create_plot(self):
 
     # Figures
     for index in range(number_of_plots):
-        subplot_number = len(plot_names[index])
+        subplot_number = len(settings.plot_names[index])
         for i in range(subplot_number):
             # auto adapt plot number
             subplot_columns = (subplot_number // 3) + (subplot_number % 3)
@@ -185,12 +173,10 @@ def create_plot(self):
     self.plotTest_3.addWidget(thisFigure)
     self.plotTest_3.addWidget(NavigationToolbar(thisFigure, MainWindow))
 
-
 def update_plot(self):
     # return wich test you have selected
     channel_number = len(self.measure_thread.measures)
-    #selected_frame_number = self.measure_thread.test_number
-    selected_frame_number = 1
+    selected_frame_number = 0 #self.measure_thread.test_number
 
     xValue = []
     yValue = []
@@ -204,13 +190,16 @@ def update_plot(self):
             self.plot[selected_frame_number][i].clear()
             # set data on plot
             self.plot[selected_frame_number][i].plot(xValue[i], yValue[i])
+
         """
-        if self.plot_saveRef == True:
+        if self.saveReference.isChecked():
+            self.saveRef = True
             self.xRef = xValue
             self.yRef = yValue
-            self.plot_saveRef = False
+        else:
+            self.saveRef = False
 
-        if self.plot_reference == True:
+        if self.saveRef == True:
             for i in range(channel_number):
                 self.plot[selected_frame_number][i].plot(self.xRef[i], self.yRef[i])
         """
@@ -218,19 +207,19 @@ def update_plot(self):
         print(e)
 
     # Set names on plot
-    for i in range(len(plot_names[selected_frame_number])):
-        self.plot[selected_frame_number][i].set_title(plot_names[selected_frame_number][i][0])
-        self.plot[selected_frame_number][i].set_xlabel(plot_names[selected_frame_number][i][1])
-        self.plot[selected_frame_number][i].set_ylabel(plot_names[selected_frame_number][i][2])
+    for i in range(len(settings.plot_names[selected_frame_number])):
+        self.plot[selected_frame_number][i].set_title(settings.plot_names[selected_frame_number][i][0])
+        self.plot[selected_frame_number][i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
+        self.plot[selected_frame_number][i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
         #self.plot[selected_frame_number][i].grid()
 
     # autoadapt
     self.fig[selected_frame_number].tight_layout()
     # update plot
-    #self.canvas[selected_frame_number].draw()
+    self.fig[selected_frame_number].canvas.draw()
 
     # markers
-    #Single_marker(self.others_frame, self.canvas[selected_frame_number], self.plot[selected_frame_number], xValue, yValue, len(plot_names[selected_frame_number]), self.plot_markers)
+    #Single_marker(self.others_frame, self.canvas[selected_frame_number], self.plot[selected_frame_number], xValue, yValue, len(settings.plot_names[selected_frame_number]), self.plot_markers)
 
 
 #==============================================================================#
