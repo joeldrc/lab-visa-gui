@@ -79,8 +79,8 @@ def check_input(self):
     self.startMeasure.clicked.connect(self.start_measure)
 
     self.checkBox.stateChanged.connect(self.enlarge_window)
-    self.addTrace.clicked.connect(self.update_progressBar)
-    self.removeTrace.clicked.connect(self.update_progressBar)
+    #self.addTrace.clicked.connect()
+    #self.removeTrace.clicked.connect()
 
 def connect_instrument(self, current_index = 0):
     address = self.instrumentAddress.text()
@@ -111,8 +111,14 @@ def instrument_refresh(self):
         self.remoteConnectionLabel.setText(self.vna_measure.instrument_info)
         self.update_plot()
 
+        bar_value = self.progressBar.value()
+        if bar_value < 100:
+            bar_value += 5
+            self.progressBar.setValue(bar_value)
+
         if self.vna_measure.data_ready == True:
             self.progressBar.setValue(100)
+
     except Exception as e:
         print(e)
 
@@ -121,9 +127,6 @@ def update_time(self):
     self.timer = QtCore.QTimer()
     self.timer.timeout.connect(self.update_time)
     self.timer.start(1000)
-
-def update_progressBar(self, value=0):
-    self.progressBar.setValue(value)
 
 
 #==============================================================================#
@@ -144,7 +147,7 @@ def create_canvas(self):
 
     self._dynamic_ax = dynamic_canvas.figure.subplots()
     self._timer = dynamic_canvas.new_timer(
-        100, [(self.update_canvas, (), {})])
+        1000, [(self.update_canvas, (), {})])
     self._timer.start()
 
 def update_canvas(self):
@@ -255,7 +258,6 @@ Ui_MainWindow.start_measure = start_measure
 
 Ui_MainWindow.instrument_refresh = instrument_refresh
 Ui_MainWindow.update_time = update_time
-Ui_MainWindow.update_progressBar = update_progressBar
 
 Ui_MainWindow.create_canvas = create_canvas
 Ui_MainWindow.update_canvas = update_canvas
