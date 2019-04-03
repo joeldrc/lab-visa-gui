@@ -9,6 +9,7 @@ import time
 from time import gmtime, strftime
 
 import numpy as np
+import matplotlib.pyplot as plt
 from matplotlib.backends.qt_compat import QtCore, QtWidgets, is_pyqt5
 from matplotlib.backends.backend_qt5agg import (FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 from matplotlib.figure import Figure
@@ -156,6 +157,8 @@ def update_canvas(self):
 
 #==============================================================================#
 def create_plot(self):
+    plt.style.use('seaborn-whitegrid')
+
     number_of_plots = len(settings.plot_names)
 
     self.plot = [[] for i in range(number_of_plots)]
