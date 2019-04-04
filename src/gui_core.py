@@ -146,15 +146,23 @@ def start_measure(self):
 def instrument_refresh(self):
     try:
         self.remoteConnectionLabel.setText(self.vna_measure.instrument_info)
-        self.update_plot()
+        #self.update_plot()
 
         bar_value = self.progressBar.value()
         if bar_value < 100:
             bar_value += 5
             self.progressBar.setValue(bar_value)
 
-        if self.vna_measure.data_ready == True:
+        if self.vna_measure.data_ready == True:        
+            self.update_plot()
             self.progressBar.setValue(100)
+
+            if self.saveReference.isChecked():
+                if self.plotRef != self.tabWidget.currentIndex():
+                    self.saveRef = True
+                    self.plotRef = self.tabWidget.currentIndex()
+            else:
+                self.plotRef = -1
 
     except Exception as e:
         print(e)
@@ -250,18 +258,20 @@ def update_plot(self):
             # set data on plot
             self.plot[selected_frame_number][i].plot(xValue[i], yValue[i])
 
-        """
-        if self.saveReference.isChecked():
-            self.saveRef = True
+        if self.saveRef == True:
             self.xRef = xValue
             self.yRef = yValue
-        else:
             self.saveRef = False
 
-        if self.saveRef == True:
+        if self.delRef == True:
+            self.xRef = []
+            self.yRef = []
+            self.plotRef = False
+
+        if self.plotRef >= 0:
             for i in range(channel_number):
                 self.plot[selected_frame_number][i].plot(self.xRef[i], self.yRef[i])
-        """
+
     except Exception as e:
         print(e)
 
@@ -301,6 +311,13 @@ Ui_MainWindow.update_canvas = update_canvas
 
 Ui_MainWindow.create_plot = create_plot
 Ui_MainWindow.update_plot = update_plot
+
+
+Ui_MainWindow.xRef = []
+Ui_MainWindow.yRef = []
+Ui_MainWindow.saveRef = False
+Ui_MainWindow.delRef = False
+Ui_MainWindow.plotRef = -1
 
 
 #==============================================================================#
