@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import settings
+import os
 
+import settings
 from user_gui import *
 from vna_scpi import *
+
+from openpyxl import *
 
 import time
 from time import gmtime, strftime
@@ -25,13 +28,45 @@ def file_open(self):
             self.textEdit.setText(text)
 
 def file_save(self):
-    name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save File')  # Returns a tuple
+    name, _ = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'test.xlsx', os.getenv('HOME'), 'Microsoft Excel Worksheet(*.xlsx);; All files(*.*)')  # Returns a tuple
     #print(name)  # For debugging
+    """
     if len(name[0]) > 0:
         with open(name[0], 'w') as file:
             #text = self.textEdit.toPlainText()  # Plain text without formatting
             text = self.textEdit.toHtml()  # Rich text with formatting (font, color, etc.)
             file.write(text)
+    """
+    try:
+        self.wb = Workbook()
+        self.sheet = self.wb.active
+
+        xValue = []
+        yValue = []
+
+        measures = self.vna_measure.measures
+
+        for i in range(len(measures)):
+            x, y = measures[i]
+            xValue.append(x)
+            yValue.append(y)
+
+        # Create sheet
+        self.sheet.cell(row=1, column=1).value = "test"
+        self.sheet.cell(row=1, column=2).value = "test 2"
+
+        for i in range(0, len(xValue), 1):
+            self.sheet.cell(row=2, column= (i * 2) + 1).value = 'data: ' + str(i + 1)
+            self.sheet.cell(row=3, column= (i * 2) + 1).value = 'x'
+            self.sheet.cell(row=3, column= (i * 2) + 2).value = 'y'
+            for j in range(0, len(xValue[0]), 1):
+                self.sheet.cell(row=j + 4, column= (i * 2) + 1).value = xValue[i][j]
+                self.sheet.cell(row=j + 4, column= (i * 2) + 2).value = yValue[i][j]
+
+
+            self.wb.save(name)
+    except Exception as e:
+        print(e)
 
 def file_quit(self):
     decision = QtWidgets.QMessageBox.question(MainWindow, 'Question',
@@ -55,14 +90,16 @@ def edit_color(self):  # Applies on selected text only
 def enlarge_window(self):
     if self.checkBox.isChecked():
         MainWindow.setGeometry(100, 100, 600, 400)
-        MainWindow.setWindowTitle("PyQT tuts!")
+        #MainWindow.setWindowTitle("PyQT tuts!")
         """
         import os
         scriptDir = os.path.dirname(os.path.realpath(__file__))
         MainWindow.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'images/icon.ico'))
         """
+        """
         from PyQt5.QtWidgets import QStyleFactory
         app.setStyle(QStyleFactory.create('Fusion'))
+        """
     else:
         MainWindow.setGeometry(100, 100, 400, 300)
 
@@ -102,7 +139,7 @@ def connect_instrument(self, current_index = 0):
 
 def start_measure(self):
     self.connect_instrument(self.tabWidget.currentIndex())
-    print(self.tabWidget.currentIndex())
+    #print(self.tabWidget.currentIndex())
 
 
 #==============================================================================#
@@ -267,6 +304,7 @@ Ui_MainWindow.update_plot = update_plot
 
 
 #==============================================================================#
+"""
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
@@ -281,3 +319,16 @@ if __name__ == "__main__":
     ui.create_plot()
     MainWindow.show()
     sys.exit(app.exec_())
+"""
+
+import sys
+app = QtWidgets.QApplication(sys.argv)
+MainWindow = QtWidgets.QMainWindow()
+ui = Ui_MainWindow()
+ui.setupUi(MainWindow)
+ui.update_time()
+ui.check_input()
+ui.create_canvas()
+ui.create_plot()
+MainWindow.show()
+sys.exit(app.exec_())
