@@ -119,8 +119,8 @@ def check_input(self):
 
     self.checkBox.stateChanged.connect(self.enlarge_window)
     self.saveReference.stateChanged.connect(self.save_reference)
-    #self.addTrace.clicked.connect()
-    #self.removeTrace.clicked.connect()
+    self.addTrace.clicked.connect(self.add_trace)
+    self.removeTrace.clicked.connect(self.remove_trace)
 
 def connect_instrument(self, current_index = 0):
     address = self.instrumentAddress.text()
@@ -145,19 +145,15 @@ def start_measure(self):
     #print(self.tabWidget.currentIndex())
 
 def save_reference(self):
-    try:
-        if self.saveReference.isChecked():
-            self.saveRef = True
-            self.plotRef = self.tabWidget.currentIndex()
-        else:
-            self.plotRef = -1
-            self.delRef = True
-
-    except Exception as e:
-        print(e)
-
     self.update_plot()
 
+def add_trace(self):
+    self.saveRef = True
+    self.update_plot()
+
+def remove_trace(self):
+    self.delRef = True
+    self.update_plot()
 
 #==============================================================================#
 def instrument_refresh(self):
@@ -263,6 +259,11 @@ def update_plot(self):
         self.delRef = True
         self.saveReference.setChecked(False)
 
+    self.plotRef = self.tabWidget.currentIndex()
+
+    if self.saveReference.isChecked():
+        self.saveRef = True
+
     # return wich test you have selected
     channel_number = len(self.vna_measure.measures)
     selected_frame_number = self.vna_measure.test_type
@@ -290,10 +291,9 @@ def update_plot(self):
             self.yRef = []
             self.delRef = False
 
-        if self.plotRef >= 0:
-            for j in range(len(self.xRef)):
-                for i in range(channel_number):
-                    self.plot[selected_frame_number][i].plot(self.xRef[j][i], self.yRef[j][i])
+        for j in range(len(self.xRef)):
+            for i in range(channel_number):
+                self.plot[selected_frame_number][i].plot(self.xRef[j][i], self.yRef[j][i])
 
     except Exception as e:
         print(e)
@@ -327,6 +327,8 @@ Ui_MainWindow.connect_instrument = connect_instrument
 Ui_MainWindow.start_measure = start_measure
 
 Ui_MainWindow.save_reference = save_reference
+Ui_MainWindow.add_trace = add_trace
+Ui_MainWindow.remove_trace = remove_trace
 
 Ui_MainWindow.instrument_refresh = instrument_refresh
 Ui_MainWindow.update_time = update_time
