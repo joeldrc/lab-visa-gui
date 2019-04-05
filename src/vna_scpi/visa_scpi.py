@@ -10,11 +10,9 @@ import numpy as np
 class Vna_measure(threading.Thread):
     def __init__(self, address, test_type = 0, chart_numbers = 0):
         threading.Thread.__init__(self)
-
         print("Init. visa setup")
 
         self.instrument_address = address
-
         self.test_type = test_type
         self.chart_numbers = chart_numbers
 
@@ -26,7 +24,6 @@ class Vna_measure(threading.Thread):
         #start thread
         self.start()
 
-    # run all the time
     def run(self):
         # TEST is used for debug
         if self.instrument_address == "TEST":
@@ -48,8 +45,6 @@ class Vna_measure(threading.Thread):
 
         print(self.instrument_info)
 
-        #self.measures = []
-
         for index in range(self.chart_numbers):
             if self.test_mode == True:
                 x = np.linspace(1, 301)
@@ -66,7 +61,6 @@ class Vna_measure(threading.Thread):
                 print("exception")
 
             self.measures.append(data)
-
 
         self.data_ready = True
         print('end measures')

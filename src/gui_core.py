@@ -28,45 +28,47 @@ def file_open(self):
             self.textEdit.setText(text)
 
 def file_save(self):
-    name, _ = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'test.xlsx', os.getenv('HOME'), 'Microsoft Excel Worksheet(*.xlsx);; All files(*.*)')  # Returns a tuple
-    #print(name)  # For debugging
-    """
-    if len(name[0]) > 0:
-        with open(name[0], 'w') as file:
-            #text = self.textEdit.toPlainText()  # Plain text without formatting
-            text = self.textEdit.toHtml()  # Rich text with formatting (font, color, etc.)
-            file.write(text)
-    """
-    try:
-        self.wb = Workbook()
-        self.sheet = self.wb.active
+    name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'test.xlsx', os.getenv('HOME'), 'Microsoft Excel Worksheet(*.xlsx);; Text file(*.txt);; All files(*.*)')  # Returns a tuple
+    #print(name)
 
-        xValue = []
-        yValue = []
+    if self.tabWidget.currentIndex() == 3:
+        if len(name[0]) > 0:
+            with open(name[0], 'w') as file:
+                #text = self.textEdit.toPlainText()  # Plain text without formatting
+                text = self.textEdit.toHtml()  # Rich text with formatting (font, color, etc.)
+                file.write(text)
+    else:
+        try:
+            name, _ = name
 
-        measures = self.vna_measure.measures
+            xValue = []
+            yValue = []
 
-        for i in range(len(measures)):
-            x, y = measures[i]
-            xValue.append(x)
-            yValue.append(y)
+            measures = self.vna_measure.measures
 
-        # Create sheet
-        self.sheet.cell(row=1, column=1).value = "test"
-        self.sheet.cell(row=1, column=2).value = "test 2"
+            self.wb = Workbook()
+            self.sheet = self.wb.active
 
-        for i in range(0, len(xValue), 1):
-            self.sheet.cell(row=2, column= (i * 2) + 1).value = 'data: ' + str(i + 1)
-            self.sheet.cell(row=3, column= (i * 2) + 1).value = 'x'
-            self.sheet.cell(row=3, column= (i * 2) + 2).value = 'y'
-            for j in range(0, len(xValue[0]), 1):
-                self.sheet.cell(row=j + 4, column= (i * 2) + 1).value = xValue[i][j]
-                self.sheet.cell(row=j + 4, column= (i * 2) + 2).value = yValue[i][j]
+            for i in range(len(measures)):
+                x, y = measures[i]
+                xValue.append(x)
+                yValue.append(y)
 
+            # Create sheet
+            self.sheet.cell(row=1, column=1).value = "test"
+            self.sheet.cell(row=1, column=2).value = "test 2"
 
-            self.wb.save(name)
-    except Exception as e:
-        print(e)
+            for i in range(0, len(xValue), 1):
+                self.sheet.cell(row=2, column= (i * 2) + 1).value = 'data: ' + str(i + 1)
+                self.sheet.cell(row=3, column= (i * 2) + 1).value = 'x'
+                self.sheet.cell(row=3, column= (i * 2) + 2).value = 'y'
+                for j in range(0, len(xValue[0]), 1):
+                    self.sheet.cell(row=j + 4, column= (i * 2) + 1).value = xValue[i][j]
+                    self.sheet.cell(row=j + 4, column= (i * 2) + 2).value = yValue[i][j]
+
+                self.wb.save(name)
+        except Exception as e:
+            print(e)
 
 def file_quit(self):
     decision = QtWidgets.QMessageBox.question(MainWindow, 'Question',
@@ -116,6 +118,7 @@ def check_input(self):
     self.startMeasure.clicked.connect(self.start_measure)
 
     self.checkBox.stateChanged.connect(self.enlarge_window)
+    self.saveReference.stateChanged.connect(self.save_reference)
     #self.addTrace.clicked.connect()
     #self.removeTrace.clicked.connect()
 
@@ -141,6 +144,20 @@ def start_measure(self):
     self.connect_instrument(self.tabWidget.currentIndex())
     #print(self.tabWidget.currentIndex())
 
+def save_reference(self):
+    try:
+        if self.saveReference.isChecked():
+            self.saveRef = True
+            self.plotRef = self.tabWidget.currentIndex()
+        else:
+            self.plotRef = -1
+            self.delRef = True
+
+    except Exception as e:
+        print(e)
+
+    self.update_plot()
+
 
 #==============================================================================#
 def instrument_refresh(self):
@@ -153,16 +170,14 @@ def instrument_refresh(self):
             bar_value += 5
             self.progressBar.setValue(bar_value)
 
-        if self.vna_measure.data_ready == True:        
+        if self.vna_measure.data_ready == True:
+            self.vna_measure.data_ready = False
+
             self.update_plot()
             self.progressBar.setValue(100)
 
-            if self.saveReference.isChecked():
-                if self.plotRef != self.tabWidget.currentIndex():
-                    self.saveRef = True
-                    self.plotRef = self.tabWidget.currentIndex()
-            else:
-                self.plotRef = -1
+            if self.autoSave.isChecked():
+                self.file_save()
 
     except Exception as e:
         print(e)
@@ -191,8 +206,9 @@ def create_canvas(self):
     self.plotTest.addWidget(NavigationToolbar(dynamic_canvas, MainWindow))
 
     self._dynamic_ax = dynamic_canvas.figure.subplots()
+
     self._timer = dynamic_canvas.new_timer(
-        1000, [(self.update_canvas, (), {})])
+        100, [(self.update_canvas, (), {})])
     self._timer.start()
 
 def update_canvas(self):
@@ -241,6 +257,12 @@ def create_plot(self):
     self.plotTest_3.addWidget(NavigationToolbar(thisFigure, MainWindow))
 
 def update_plot(self):
+    #code to review
+    if self.plotRef != self.tabWidget.currentIndex():
+        self.plotRef = -1
+        self.delRef = True
+        self.saveReference.setChecked(False)
+
     # return wich test you have selected
     channel_number = len(self.vna_measure.measures)
     selected_frame_number = self.vna_measure.test_type
@@ -259,18 +281,19 @@ def update_plot(self):
             self.plot[selected_frame_number][i].plot(xValue[i], yValue[i])
 
         if self.saveRef == True:
-            self.xRef = xValue
-            self.yRef = yValue
+            self.xRef.append(xValue)
+            self.yRef.append(yValue)
             self.saveRef = False
 
         if self.delRef == True:
             self.xRef = []
             self.yRef = []
-            self.plotRef = False
+            self.delRef = False
 
         if self.plotRef >= 0:
-            for i in range(channel_number):
-                self.plot[selected_frame_number][i].plot(self.xRef[i], self.yRef[i])
+            for j in range(len(self.xRef)):
+                for i in range(channel_number):
+                    self.plot[selected_frame_number][i].plot(self.xRef[j][i], self.yRef[j][i])
 
     except Exception as e:
         print(e)
@@ -303,6 +326,8 @@ Ui_MainWindow.enlarge_window = enlarge_window
 Ui_MainWindow.connect_instrument = connect_instrument
 Ui_MainWindow.start_measure = start_measure
 
+Ui_MainWindow.save_reference = save_reference
+
 Ui_MainWindow.instrument_refresh = instrument_refresh
 Ui_MainWindow.update_time = update_time
 
@@ -321,23 +346,7 @@ Ui_MainWindow.plotRef = -1
 
 
 #==============================================================================#
-"""
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    #MainWindow.setWindowTitle(settings.__logo__ + " - " + settings.__title__ + " - " + settings.__version__)
-    #MainWindow.setWindowIcon(QtGui.QIcon('images/icon.ico'))
-    ui.update_time()
-    ui.check_input()
-    ui.create_canvas()
-    ui.create_plot()
-    MainWindow.show()
-    sys.exit(app.exec_())
-"""
-
+#if __name__ == "__main__":
 import sys
 app = QtWidgets.QApplication(sys.argv)
 MainWindow = QtWidgets.QMainWindow()
