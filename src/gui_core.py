@@ -253,25 +253,25 @@ def create_plot(self):
     self.plotTest_3.addWidget(NavigationToolbar(thisFigure, MainWindow))
 
 def update_plot(self):
-    #code to review
-    if self.plotRef != self.tabWidget.currentIndex():
-        self.plotRef = -1
-        self.delRef = True
-        self.saveReference.setChecked(False)
-
-    self.plotRef = self.tabWidget.currentIndex()
-
-    if self.saveReference.isChecked():
-        self.saveRef = True
-
-    # return wich test you have selected
-    channel_number = len(self.vna_measure.measures)
-    selected_frame_number = self.vna_measure.test_type
-
-    xValue = []
-    yValue = []
-
     try:
+        #code to review
+        if self.plotRef != self.tabWidget.currentIndex():
+            self.plotRef = -1
+            self.delRef = True
+            self.saveReference.setChecked(False)
+
+        self.plotRef = self.tabWidget.currentIndex()
+
+        if self.saveReference.isChecked():
+            self.saveRef = True
+
+        # return wich test you have selected
+        channel_number = len(self.vna_measure.measures)
+        selected_frame_number = self.vna_measure.test_type
+
+        xValue = []
+        yValue = []
+
         for i in range(channel_number):
             x, y = self.vna_measure.measures[i]
             xValue.append(x)
@@ -295,24 +295,24 @@ def update_plot(self):
             for i in range(channel_number):
                 self.plot[selected_frame_number][i].plot(self.xRef[j][i], self.yRef[j][i])
 
+        # Set names on plot
+        for i in range(len(settings.plot_names[selected_frame_number])):
+            self.plot[selected_frame_number][i].set_title(settings.plot_names[selected_frame_number][i][0])
+            self.plot[selected_frame_number][i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
+            self.plot[selected_frame_number][i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
+            #self.plot[selected_frame_number][i].grid()
+
+        # autoadapt
+        self.fig[selected_frame_number].tight_layout()
+        # update plot
+        self.fig[selected_frame_number].canvas.draw()
+
+        # markers
+        #Single_marker(self.others_frame, self.canvas[selected_frame_number], self.plot[selected_frame_number], xValue, yValue, len(settings.plot_names[selected_frame_number]), self.plot_markers)
+
     except Exception as e:
         print(e)
-
-    # Set names on plot
-    for i in range(len(settings.plot_names[selected_frame_number])):
-        self.plot[selected_frame_number][i].set_title(settings.plot_names[selected_frame_number][i][0])
-        self.plot[selected_frame_number][i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
-        self.plot[selected_frame_number][i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
-        #self.plot[selected_frame_number][i].grid()
-
-    # autoadapt
-    self.fig[selected_frame_number].tight_layout()
-    # update plot
-    self.fig[selected_frame_number].canvas.draw()
-
-    # markers
-    #Single_marker(self.others_frame, self.canvas[selected_frame_number], self.plot[selected_frame_number], xValue, yValue, len(settings.plot_names[selected_frame_number]), self.plot_markers)
-
+        
 
 #==============================================================================#
 Ui_MainWindow.check_input = check_input
