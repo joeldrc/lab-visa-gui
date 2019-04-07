@@ -2,11 +2,12 @@
 
 # Form implementation generated from reading ui file 'user_gui.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.12
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -70,10 +71,10 @@ class Ui_MainWindow(object):
         self.otherOptionsBox.setMinimumSize(QtCore.QSize(280, 0))
         self.otherOptionsBox.setObjectName("otherOptionsBox")
         self.saveReference = QtWidgets.QCheckBox(self.otherOptionsBox)
-        self.saveReference.setGeometry(QtCore.QRect(10, 20, 101, 16))
+        self.saveReference.setGeometry(QtCore.QRect(10, 50, 101, 16))
         self.saveReference.setObjectName("saveReference")
         self.markersOn = QtWidgets.QCheckBox(self.otherOptionsBox)
-        self.markersOn.setGeometry(QtCore.QRect(10, 50, 101, 16))
+        self.markersOn.setGeometry(QtCore.QRect(10, 20, 101, 16))
         self.markersOn.setObjectName("markersOn")
         self.addTrace = QtWidgets.QPushButton(self.otherOptionsBox)
         self.addTrace.setGeometry(QtCore.QRect(10, 80, 111, 23))
@@ -114,7 +115,7 @@ class Ui_MainWindow(object):
         self.addDetails.setObjectName("addDetails")
         self.progressBar = QtWidgets.QProgressBar(self.userDataBox)
         self.progressBar.setGeometry(QtCore.QRect(10, 150, 261, 20))
-        self.progressBar.setProperty("value", 50)
+        self.progressBar.setProperty("value", 0)
         self.progressBar.setTextVisible(False)
         self.progressBar.setObjectName("progressBar")
         self.lcdNumber = QtWidgets.QLCDNumber(self.userDataBox)
@@ -184,7 +185,7 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), _translate("MainWindow", "BUTTONS"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "NOTES"))
         self.otherOptionsBox.setTitle(_translate("MainWindow", "OTHER OPTIONS"))
-        self.saveReference.setText(_translate("MainWindow", "Save Reference"))
+        self.saveReference.setText(_translate("MainWindow", "Auto save trace"))
         self.markersOn.setText(_translate("MainWindow", "Markers ON"))
         self.addTrace.setText(_translate("MainWindow", "Add trace on screen"))
         self.removeTrace.setText(_translate("MainWindow", "Remove all"))
@@ -211,6 +212,8 @@ class Ui_MainWindow(object):
         self.actionColor.setText(_translate("MainWindow", "Color"))
 
 
+
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
@@ -219,4 +222,3 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-
