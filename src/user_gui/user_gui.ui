@@ -178,6 +178,19 @@
             <string>Larger Window</string>
            </property>
           </widget>
+          <widget class="QPushButton" name="saveSparameters">
+           <property name="geometry">
+            <rect>
+             <x>160</x>
+             <y>120</y>
+             <width>111</width>
+             <height>23</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Save S-parameters</string>
+           </property>
+          </widget>
          </widget>
          <widget class="QGroupBox" name="userDataBox">
           <property name="geometry">

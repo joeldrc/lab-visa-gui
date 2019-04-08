@@ -121,6 +121,7 @@ def check_input(self):
     self.saveReference.stateChanged.connect(self.save_reference)
     self.addTrace.clicked.connect(self.add_trace)
     self.removeTrace.clicked.connect(self.remove_trace)
+    self.saveSparameters.clicked.connect(self.save_s_parameters)
 
 def connect_instrument(self, current_index = 0):
     address = self.instrumentAddress.text()
@@ -154,6 +155,13 @@ def add_trace(self):
 def remove_trace(self):
     self.delRef = True
     self.update_plot()
+
+def save_s_parameters(self):
+    print("S-parameters")
+    try:
+        print(self.vna_measure.s_parameters)
+    except Exception as e:
+        print(e)
 
 #==============================================================================#
 def instrument_refresh(self):
@@ -312,7 +320,7 @@ def update_plot(self):
 
     except Exception as e:
         print(e)
-        
+
 
 #==============================================================================#
 Ui_MainWindow.check_input = check_input
@@ -329,6 +337,8 @@ Ui_MainWindow.start_measure = start_measure
 Ui_MainWindow.save_reference = save_reference
 Ui_MainWindow.add_trace = add_trace
 Ui_MainWindow.remove_trace = remove_trace
+
+Ui_MainWindow.save_s_parameters = save_s_parameters
 
 Ui_MainWindow.instrument_refresh = instrument_refresh
 Ui_MainWindow.update_time = update_time

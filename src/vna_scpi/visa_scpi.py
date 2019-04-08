@@ -20,6 +20,7 @@ class Vna_measure(threading.Thread):
         self.data_ready = False
 
         self.measures = []
+        self.s_parameters = []
 
         #start thread
         self.start()
@@ -44,6 +45,9 @@ class Vna_measure(threading.Thread):
             self.instrument_info = 'NO CONNECTION \n'
 
         print(self.instrument_info)
+
+        #tmp code
+        self.s_parameters = []
 
         for index in range(self.chart_numbers):
             if self.test_mode == True:
@@ -153,11 +157,18 @@ class Vna_measure(threading.Thread):
 
         # -----------------------------------------------------------
 
-        # Receive measure
+        # Receive formatted measure
         self.vna.write("CALC1:PAR:SEL 'Trc1'")
         self.vna.write('CALC1:DATA? FDAT')
         yData = self.vna.read()
         #print(yData)
+
+        # Receive S-parameters measure
+        self.vna.write("CALC1:PAR:SEL 'Trc1'")
+        self.vna.write('CALC1:DATA? SDAT')
+        Sp = self.vna.read()
+        self.s_parameters = Sp
+        #print(Sp)
 
         # Receive the number of point measured
         self.vna.write('CALC1:DATA:STIM?')
@@ -194,16 +205,31 @@ class Vna_measure(threading.Thread):
             xData = self.vna.read()
             #print(xData)
 
+            # Receive S-parameters measure
+            self.vna.write("CALC1:PAR:SEL 'Trc1'")
+            self.vna.write('CALC1:DATA? SDAT')
+            Sp = self.vna.read()
+            self.s_parameters = Sp
+            #print(Sp)
+
         elif index == 1:
             # Receive measure
             self.vna.write("CALC2:PAR:SEL 'Trc2'")
             self.vna.write('CALC2:DATA? FDAT')
             yData = self.vna.read()
             #print(yData)
+
             # Receive the number of point measured
             self.vna.write('CALC2:DATA:STIM?')
             xData = self.vna.read()
             #print(xData)
+
+            # Receive S-parameters measure
+            self.vna.write("CALC2:PAR:SEL 'Trc2'")
+            self.vna.write('CALC2:DATA? SDAT')
+            Sp = self.vna.read()
+            self.s_parameters = Sp
+            #print(Sp)
 
         yDataArray = yData.split(",")
         xDataArray = xData.split(",")

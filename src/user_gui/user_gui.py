@@ -2,12 +2,11 @@
 
 # Form implementation generated from reading ui file 'user_gui.ui'
 #
-# Created by: PyQt5 UI code generator 5.12
+# Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -85,6 +84,9 @@ class Ui_MainWindow(object):
         self.checkBox = QtWidgets.QCheckBox(self.otherOptionsBox)
         self.checkBox.setGeometry(QtCore.QRect(10, 120, 101, 20))
         self.checkBox.setObjectName("checkBox")
+        self.saveSparameters = QtWidgets.QPushButton(self.otherOptionsBox)
+        self.saveSparameters.setGeometry(QtCore.QRect(160, 120, 111, 23))
+        self.saveSparameters.setObjectName("saveSparameters")
         self.userDataBox = QtWidgets.QGroupBox(self.widget)
         self.userDataBox.setGeometry(QtCore.QRect(10, 110, 280, 271))
         self.userDataBox.setMinimumSize(QtCore.QSize(280, 0))
@@ -190,6 +192,7 @@ class Ui_MainWindow(object):
         self.addTrace.setText(_translate("MainWindow", "Add trace on screen"))
         self.removeTrace.setText(_translate("MainWindow", "Remove all"))
         self.checkBox.setText(_translate("MainWindow", "Larger Window"))
+        self.saveSparameters.setText(_translate("MainWindow", "Save S-parameters"))
         self.userDataBox.setTitle(_translate("MainWindow", "USER DATA"))
         self.label.setText(_translate("MainWindow", "Name (User):"))
         self.label_2.setText(_translate("MainWindow", "Serial name:"))
@@ -212,8 +215,6 @@ class Ui_MainWindow(object):
         self.actionColor.setText(_translate("MainWindow", "Color"))
 
 
-
-
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
@@ -222,3 +223,4 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
+
