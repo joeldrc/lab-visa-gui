@@ -166,8 +166,13 @@ class Vna_measure(threading.Thread):
         # Receive S-parameters measure
         self.vna.write("CALC1:PAR:SEL 'Trc1'")
         self.vna.write('CALC1:DATA? SDAT')
-        Sp = self.vna.read()
-        self.s_parameters = Sp
+        sData = self.vna.read()
+        #print(sData)
+        sDataArray = sData.split(",")
+        #print(sDataArray)
+        sDataArray = list(np.float_(sDataArray))
+        #print(sDataArray)
+        self.s_parameters = sDataArray
         #print(Sp)
 
         # Receive the number of point measured
@@ -205,12 +210,14 @@ class Vna_measure(threading.Thread):
             xData = self.vna.read()
             #print(xData)
 
+            """
             # Receive S-parameters measure
             self.vna.write("CALC1:PAR:SEL 'Trc1'")
             self.vna.write('CALC1:DATA? SDAT')
             Sp = self.vna.read()
-            self.s_parameters = Sp
+            self.s_parameters.append(Sp)
             #print(Sp)
+            """
 
         elif index == 1:
             # Receive measure
@@ -227,8 +234,13 @@ class Vna_measure(threading.Thread):
             # Receive S-parameters measure
             self.vna.write("CALC2:PAR:SEL 'Trc2'")
             self.vna.write('CALC2:DATA? SDAT')
-            Sp = self.vna.read()
-            self.s_parameters = Sp
+            sData = self.vna.read()
+            #print(sData)
+            sDataArray = sData.split(",")
+            #print(sDataArray)
+            sDataArray = list(np.float_(sDataArray))
+            #print(sDataArray)
+            self.s_parameters = sDataArray
             #print(Sp)
 
         yDataArray = yData.split(",")
@@ -245,7 +257,7 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
     address = "TCPIP::CFO-MD-BQPVNA1::INSTR" #"TEST"
-    test = Vna_measure(address, 0, 5) #test_type, chart_number
+    test = Vna_measure(address, 1, 2) #test_type, chart_number
 
     while test.data_ready == False:
         print('wait')

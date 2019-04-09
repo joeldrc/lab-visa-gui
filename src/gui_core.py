@@ -160,6 +160,36 @@ def save_s_parameters(self):
     print("S-parameters")
     try:
         print(self.vna_measure.s_parameters)
+
+        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'test.xlsx', os.getenv('HOME'), 'Microsoft Excel Worksheet(*.xlsx);; Text file(*.txt);; All files(*.*)')  # Returns a tuple
+        name, _ = name
+
+        xValue = []
+        yValue = []
+
+        measures = self.vna_measure.s_parameters
+
+        self.wb = Workbook()
+        self.sheet = self.wb.active
+
+        xValue = measures[0::2]
+        print(xValue)
+        yValue = measures[1::2]
+        print(yValue)
+
+        # Create sheet
+        self.sheet.cell(row=1, column=1).value = "test"
+        self.sheet.cell(row=1, column=2).value = "test 2"
+
+        self.sheet.cell(row=2, column= 1).value = 'data: ' + str(1)
+        self.sheet.cell(row=3, column= 1).value = 'x'
+        self.sheet.cell(row=3, column= 2).value = 'y'
+        
+        for i in range(len(xValue)):
+            self.sheet.cell(row=i + 4, column= 1).value = xValue[i]
+            self.sheet.cell(row=i + 4, column= 2).value = yValue[i]
+
+        self.wb.save(name)
     except Exception as e:
         print(e)
 
