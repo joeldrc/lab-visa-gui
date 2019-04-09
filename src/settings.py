@@ -13,8 +13,8 @@ plot_names = [[['S21 - delay', 'GHz', 'nS'],
                ['S11 - SWR', 'GHz', 'mU'],
                ['S11 - TDR', 'ns', 'mU']],
 
-              [['S11 - TDR', 'x', 'y'],
-               ['S11 - TDR', 'x', 'y']]]
+              [['S21 - TDR', 'mU', 'nS'],
+               ['S22 - TDR', 'mU', 'nS']]]
 
 figure_names = [['Flanges'],
                 ['Pick-Up']]
