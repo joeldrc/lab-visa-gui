@@ -28,7 +28,8 @@ def file_open(self):
             self.textEdit.setText(text)
 
 def file_save(self):
-    name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'test.xlsx', os.getenv('HOME'), 'Microsoft Excel Worksheet(*.xlsx);; Text file(*.txt);; All files(*.*)')  # Returns a tuple
+    title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text()
+    name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), 'Microsoft Excel Worksheet(*.xlsx);; Text file(*.txt);; All files(*.*)')  # Returns a tuple
     #print(name)
 
     if self.tabWidget.currentIndex() == 3:
@@ -161,7 +162,8 @@ def save_s_parameters(self):
     try:
         print(self.vna_measure.s_parameters)
 
-        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'test.xlsx', os.getenv('HOME'), 'Microsoft Excel Worksheet(*.xlsx);; Text file(*.txt);; All files(*.*)')  # Returns a tuple
+        title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "_s-param"
+        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), 'Microsoft Excel Worksheet(*.xlsx);; Text file(*.txt);; All files(*.*)')  # Returns a tuple
         name, _ = name
 
         xValue = []
@@ -184,7 +186,7 @@ def save_s_parameters(self):
         self.sheet.cell(row=2, column= 1).value = 'data: ' + str(1)
         self.sheet.cell(row=3, column= 1).value = 'x'
         self.sheet.cell(row=3, column= 2).value = 'y'
-        
+
         for i in range(len(xValue)):
             self.sheet.cell(row=i + 4, column= 1).value = xValue[i]
             self.sheet.cell(row=i + 4, column= 2).value = yValue[i]
