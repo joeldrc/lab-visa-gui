@@ -145,6 +145,8 @@ def connect_instrument(self, current_index = 0):
 def start_measure(self):
     self.connect_instrument(self.tabWidget.currentIndex())
     #print(self.tabWidget.currentIndex())
+    counter = self.lcdNumber.value() + 1
+    self.lcdNumber.display(counter)
 
 def save_reference(self):
     self.update_plot()
