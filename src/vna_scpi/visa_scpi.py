@@ -221,19 +221,19 @@ class Vna_measure(threading.Thread):
 
         elif index == 1:
             # Receive measure
-            self.vna.write("CALC2:PAR:SEL 'Trc2'")
-            self.vna.write('CALC2:DATA? FDAT')
+            self.vna.write("CALC1:PAR:SEL 'Trc2'")
+            self.vna.write('CALC1:DATA? FDAT')
             yData = self.vna.read()
             #print(yData)
 
             # Receive the number of point measured
-            self.vna.write('CALC2:DATA:STIM?')
+            self.vna.write('CALC1:DATA:STIM?')
             xData = self.vna.read()
             #print(xData)
 
             # Receive S-parameters measure
-            self.vna.write("CALC2:PAR:SEL 'Trc2'")
-            self.vna.write('CALC2:DATA? SDAT')
+            self.vna.write("CALC1:PAR:SEL 'Trc2'")
+            self.vna.write('CALC1:DATA? SDAT')
             sData = self.vna.read()
             #print(sData)
             sDataArray = sData.split(",")
