@@ -52,10 +52,12 @@ class Vna_measure(threading.Thread):
             data = x, y
 
         elif self.test_type == 0:
-            self.flanges()
+            #self.flanges()
+            self.read_data()
 
         elif self.test_type == 1:
-            self.pick_up()
+            #self.pick_up()
+            self.read_data()
 
         else:
             print("exception")
@@ -85,43 +87,9 @@ class Vna_measure(threading.Thread):
 
 
 #==============================================================================#
+    """
     # for flange tests
     def flanges(self):
-        #self.vna.write('*RST') # Reset the instrument
-        #self.vna.write('*CLS') # Clear the Error queue
-
-        # Display update ON - switch OFF after debugging
-        self.vna.write('SYST:DISP:UPD ON')
-
-        for i in range(self.chart_numbers):
-            #select channel
-            self.vna.write("CALC1:PAR:SEL 'Trc%d'" % (i + 1))
-
-            # Receive measure
-            self.vna.write('CALC1:DATA? FDAT')
-            yData = self.vna.read()
-            print(yData)
-
-            # Receive the number of point measured
-            self.vna.write('CALC1:DATA:STIM?')
-            xData = self.vna.read()
-            print(xData)
-
-            self.measures.append(self.format_values(xData, yData))
-
-        # Receive S-parameters measure
-        self.vna.write('CALC1:DATA? SDAT')
-        sData = self.vna.read()
-        #print(sData)
-        sDataArray = sData.split(",")
-        #print(sDataArray)
-        sDataArray = list(np.float_(sDataArray))
-        #print(sDataArray)
-        self.s_parameters = sDataArray
-        #print(Sp)
-
-
-        """
         #self.vna.write('*RST') # Reset the instrument
         #self.vna.write('*CLS') # Clear the Error queue
 
@@ -219,13 +187,23 @@ class Vna_measure(threading.Thread):
 
 
 #==============================================================================#
-    #for pick-up tests
-    def pick_up(self):
-        #self.vna.write('*RST') # Reset the instrument
-        #self.vna.write('*CLS') # Clear the Error queue
+    #for tests
+    def read_data(self):
+        self.vna.write('*RST') # Reset the instrument
+        self.vna.write('*CLS') # Clear the Error queue
 
         # Display update ON - switch OFF after debugging
         self.vna.write('SYST:DISP:UPD ON')
+
+        #self.vna.write('MMEM:CDIR "C:\Program Files\Automatic_tests" ')
+        print(self.vna.query('MMEMory:CDIRectory?'))
+
+        #self.vna.write('MMEMory:STORe:STATe 1,"Automatic_tests\Feedthrought_test" ')
+        #time.sleep(20)
+        #if self.first_test == True:
+        self.vna.write('MMEMory:LOAD:STATe 1,"Automatic_tests\Feedthrought_test" ')
+        time.sleep(20)
+        #self.first_test = False
 
         for i in range(self.chart_numbers):
             #select channel
