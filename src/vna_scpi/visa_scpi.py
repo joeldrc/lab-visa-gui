@@ -10,7 +10,6 @@ import numpy as np
 class Vna_measure(threading.Thread):
     def __init__(self, address, test_type = 0, chart_numbers = 0):
         threading.Thread.__init__(self)
-        print("Init. visa setup")
 
         self.instrument_address = address
         self.test_type = test_type
@@ -18,11 +17,11 @@ class Vna_measure(threading.Thread):
 
         self.instrument_info = ''
         self.data_ready = False
-
         self.measures = []
         self.s_parameters = []
 
         #start thread
+        print("Init. visa setup")
         self.start()
 
     def run(self):
@@ -46,28 +45,33 @@ class Vna_measure(threading.Thread):
 
         print(self.instrument_info)
 
-        #tmp code
-        self.s_parameters = []
+        #start measures
+        if self.test_mode == True:
+            x = np.linspace(1, 301)
+            y = np.sin(x) + np.random.normal(scale=0.1, size = len(x))
+            data = x, y
 
-        for index in range(self.chart_numbers):
-            if self.test_mode == True:
-                x = np.linspace(1, 301)
-                y = np.sin(x) + np.random.normal(scale=0.1, size = len(x))
-                data = x, y
+        elif self.test_type == 0:
+            self.flanges()
 
-            elif self.test_type == 0:
-                data = self.flanges(index)
+        elif self.test_type == 1:
+            self.pick_up()
 
-            elif self.test_type == 1:
-                data = self.pick_up(index)
-
-            else:
-                print("exception")
-
-            self.measures.append(data)
+        else:
+            print("exception")
 
         self.data_ready = True
         print('end measures')
+
+
+#==============================================================================#
+    def format_values(self, x, y):
+        yArray = y.split(",")
+        xArray = x.split(",")
+        yArray = list(np.float_(yArray))
+        xArray = list(np.float_(xArray))
+
+        return xArray, yArray
 
 
 #==============================================================================#
@@ -82,89 +86,30 @@ class Vna_measure(threading.Thread):
 
 #==============================================================================#
     # for flange tests
-    def flanges(self, index):
+    def flanges(self):
         #self.vna.write('*RST') # Reset the instrument
         #self.vna.write('*CLS') # Clear the Error queue
 
         # Display update ON - switch OFF after debugging
         self.vna.write('SYST:DISP:UPD ON')
 
-        # -----------------------------------------------------------
-        if index == 0:
-            self.vna.write("CALC1:PAR:DEF 'Trc1', S21")
-            self.vna.write('DISP:WIND:STAT ON')
-            self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+        for i in range(self.chart_numbers):
+            #select channel
+            self.vna.write("CALC1:PAR:SEL 'Trc%d'" % (i + 1))
 
-            # marker
-            self.vna.write('CALC1:MARK ON')
-            self.vna.write('CALCulate1:MARKer1:X 2Ghz')
-            self.vna.write('CALC1:FORM GDELay')
-            time.sleep(1)
-            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
-            time.sleep(1)
+            # Receive measure
+            self.vna.write('CALC1:DATA? FDAT')
+            yData = self.vna.read()
+            print(yData)
 
-        # -----------------------------------------------------------
-        elif index == 1:
-            self.vna.write("CALC1:PAR:DEF 'Trc1', S21")
-            self.vna.write('DISP:WIND:STAT ON')
-            self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
-            # marker
-            self.vna.write('CALC1:MARK ON')
-            self.vna.write('CALCulate1:MARKer1:X 2Ghz')
-            self.vna.write('CALC1:FORM MLOG')
-            time.sleep(1)
-            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
-            time.sleep(1)
+            # Receive the number of point measured
+            self.vna.write('CALC1:DATA:STIM?')
+            xData = self.vna.read()
+            print(xData)
 
-        # -----------------------------------------------------------
-        elif index == 2:
-            self.vna.write("CALC1:PAR:DEF 'Trc1', S11")
-            self.vna.write('DISP:WIND:STAT ON')
-            self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
-            # marker
-            self.vna.write('CALC1:MARK ON')
-            self.vna.write('CALCulate1:MARKer1:X 2Ghz')
-            self.vna.write('CALC1:FORM SWR')
-            time.sleep(1)
-            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
-            time.sleep(1)
-
-        # -----------------------------------------------------------
-        elif index == 3:
-            self.vna.write("CALC1:PAR:DEF 'Trc1', S22")
-            self.vna.write('DISP:WIND:STAT ON')
-            self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
-            # marker
-            self.vna.write('CALC1:MARK ON')
-            self.vna.write('CALCulate1:MARKer1:X 2Ghz')
-            self.vna.write('CALC1:FORM SWR')
-            time.sleep(1)
-            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
-            time.sleep(1)
-
-        # -----------------------------------------------------------
-        elif index == 4:
-            self.vna.write("CALC1:PAR:DEF 'Trc1', S11")
-            self.vna.write('DISP:WIND:STAT ON')
-            self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
-            self.vna.write('CALC1:FORM REAL')
-            # time domain
-            self.vna.write('CALC1:TRAN:TIME:STAT ON')
-            self.vna.write('CALC1:TRAN:TIME LPAS; TIME:STIM STEP')
-            time.sleep(1)
-            self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
-            time.sleep(1)
-
-        # -----------------------------------------------------------
-
-        # Receive formatted measure
-        self.vna.write("CALC1:PAR:SEL 'Trc1'")
-        self.vna.write('CALC1:DATA? FDAT')
-        yData = self.vna.read()
-        #print(yData)
+            self.measures.append(self.format_values(xData, yData))
 
         # Receive S-parameters measure
-        self.vna.write("CALC1:PAR:SEL 'Trc1'")
         self.vna.write('CALC1:DATA? SDAT')
         sData = self.vna.read()
         #print(sData)
@@ -175,80 +120,139 @@ class Vna_measure(threading.Thread):
         self.s_parameters = sDataArray
         #print(Sp)
 
-        # Receive the number of point measured
-        self.vna.write('CALC1:DATA:STIM?')
-        xData = self.vna.read()
-        #print(xData)
 
-        yDataArray = yData.split(",")
-        xDataArray = xData.split(",")
-
-        yDataArray = list(np.float_(yDataArray))
-        xDataArray = list(np.float_(xDataArray))
-
-        return xDataArray, yDataArray
-
-
-#==============================================================================#
-    #for pick-up tests
-    def pick_up(self, index):
+        """
         #self.vna.write('*RST') # Reset the instrument
         #self.vna.write('*CLS') # Clear the Error queue
 
         # Display update ON - switch OFF after debugging
         self.vna.write('SYST:DISP:UPD ON')
 
-        if index == 0:
+        # -----------------------------------------------------------
+        self.vna.write("CALC1:PAR:DEF 'Trc1', S21")
+        self.vna.write('DISP:WIND:STAT ON')
+        self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+
+        # marker
+        self.vna.write('CALC1:MARK ON')
+        self.vna.write('CALCulate1:MARKer1:X 2Ghz')
+        self.vna.write('CALC1:FORM GDELay')
+        time.sleep(1)
+        self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
+        time.sleep(1)
+
+        # -----------------------------------------------------------
+        self.vna.write("CALC1:PAR:DEF 'Trc1', S21")
+        self.vna.write('DISP:WIND:STAT ON')
+        self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+        # marker
+        self.vna.write('CALC1:MARK ON')
+        self.vna.write('CALCulate1:MARKer1:X 2Ghz')
+        self.vna.write('CALC1:FORM MLOG')
+        time.sleep(1)
+        self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
+        time.sleep(1)
+
+        # -----------------------------------------------------------
+        self.vna.write("CALC1:PAR:DEF 'Trc1', S11")
+        self.vna.write('DISP:WIND:STAT ON')
+        self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+        # marker
+        self.vna.write('CALC1:MARK ON')
+        self.vna.write('CALCulate1:MARKer1:X 2Ghz')
+        self.vna.write('CALC1:FORM SWR')
+        time.sleep(1)
+        self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
+        time.sleep(1)
+
+        # -----------------------------------------------------------
+        self.vna.write("CALC1:PAR:DEF 'Trc1', S22")
+        self.vna.write('DISP:WIND:STAT ON')
+        self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+        # marker
+        self.vna.write('CALC1:MARK ON')
+        self.vna.write('CALCulate1:MARKer1:X 2Ghz')
+        self.vna.write('CALC1:FORM SWR')
+        time.sleep(1)
+        self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
+        time.sleep(1)
+
+        # -----------------------------------------------------------
+        self.vna.write("CALC1:PAR:DEF 'Trc1', S11")
+        self.vna.write('DISP:WIND:STAT ON')
+        self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+        self.vna.write('CALC1:FORM REAL')
+        # time domain
+        self.vna.write('CALC1:TRAN:TIME:STAT ON')
+        self.vna.write('CALC1:TRAN:TIME LPAS; TIME:STIM STEP')
+        time.sleep(1)
+        self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
+        time.sleep(1)
+
+        # -----------------------------------------------------------
+
+        # Receive formatted measure
+        self.vna.write("CALC1:PAR:SEL 'Trc1'")
+        self.vna.write('CALC1:DATA? FDAT')
+        yData = self.vna.read()
+        #print(yData)
+
+        # Receive the number of point measured
+        self.vna.write('CALC1:DATA:STIM?')
+        xData = self.vna.read()
+        #print(xData)
+
+        return format_values(xData, yData)
+
+
+        # Receive S-parameters measure
+        self.vna.write('CALC1:DATA? SDAT')
+        sData = self.vna.read()
+        #print(sData)
+        sDataArray = sData.split(",")
+        #print(sDataArray)
+        sDataArray = list(np.float_(sDataArray))
+        #print(sDataArray)
+        self.s_parameters = sDataArray
+        #print(Sp)
+        """
+
+
+#==============================================================================#
+    #for pick-up tests
+    def pick_up(self):
+        #self.vna.write('*RST') # Reset the instrument
+        #self.vna.write('*CLS') # Clear the Error queue
+
+        # Display update ON - switch OFF after debugging
+        self.vna.write('SYST:DISP:UPD ON')
+
+        for i in range(self.chart_numbers):
+            #select channel
+            self.vna.write("CALC1:PAR:SEL 'Trc%d'" % (i + 1))
+
             # Receive measure
-            self.vna.write("CALC1:PAR:SEL 'Trc1'")
             self.vna.write('CALC1:DATA? FDAT')
             yData = self.vna.read()
-            #print(yData)
+            print(yData)
 
             # Receive the number of point measured
             self.vna.write('CALC1:DATA:STIM?')
             xData = self.vna.read()
-            #print(xData)
+            print(xData)
 
-            """
-            # Receive S-parameters measure
-            self.vna.write("CALC1:PAR:SEL 'Trc1'")
-            self.vna.write('CALC1:DATA? SDAT')
-            Sp = self.vna.read()
-            self.s_parameters.append(Sp)
-            #print(Sp)
-            """
+            self.measures.append(self.format_values(xData, yData))
 
-        elif index == 1:
-            # Receive measure
-            self.vna.write("CALC1:PAR:SEL 'Trc2'")
-            self.vna.write('CALC1:DATA? FDAT')
-            yData = self.vna.read()
-            #print(yData)
-
-            # Receive the number of point measured
-            self.vna.write('CALC1:DATA:STIM?')
-            xData = self.vna.read()
-            #print(xData)
-
-            # Receive S-parameters measure
-            self.vna.write("CALC1:PAR:SEL 'Trc2'")
-            self.vna.write('CALC1:DATA? SDAT')
-            sData = self.vna.read()
-            #print(sData)
-            sDataArray = sData.split(",")
-            #print(sDataArray)
-            sDataArray = list(np.float_(sDataArray))
-            #print(sDataArray)
-            self.s_parameters = sDataArray
-            #print(Sp)
-
-        yDataArray = yData.split(",")
-        xDataArray = xData.split(",")
-        yDataArray = list(np.float_(yDataArray))
-        xDataArray = list(np.float_(xDataArray))
-
-        return xDataArray, yDataArray
+        # Receive S-parameters measure
+        self.vna.write('CALC1:DATA? SDAT')
+        sData = self.vna.read()
+        #print(sData)
+        sDataArray = sData.split(",")
+        #print(sDataArray)
+        sDataArray = list(np.float_(sDataArray))
+        #print(sDataArray)
+        self.s_parameters = sDataArray
+        #print(Sp)
 
 
 #==============================================================================#
