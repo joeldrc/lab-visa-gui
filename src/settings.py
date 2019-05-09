@@ -7,11 +7,11 @@ __logo__ = 'JD soft'
 __author__ = 'joel.daricou@cern.ch 2018'
 __version__ = 'V.1.0'
 
-plot_names = [[['S21 - delay', 'GHz', 'nS'],
+plot_names = [[['S21 - delay group', 'GHz', 'nS'],
                ['S21 - dB Mag', 'GHz', 'dB'],
                ['S11 - SWR', 'GHz', 'mU'],
-               ['S11 - SWR', 'GHz', 'mU'],
-               ['S11 - TDR', 'ns', 'mU']],
+               ['S22 - SWR', 'GHz', 'mU'],
+               ['S11 - Z(Ω)', 'nS', 'Ω']],
 
               [['S21 - TDR', 'nS', 'U'],
                ['S22 - TDR', 'nS', 'U']]]
