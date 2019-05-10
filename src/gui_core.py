@@ -134,7 +134,7 @@ def connect_instrument(self, current_index = 0):
         current_index -= 1
         chart_number = len(settings.plot_names[current_index])
 
-    self.vna_measure = Vna_measure(address, current_index, chart_number)
+    self.vna_measure = Vna_measure(address, current_index)
 
     self.instrument_timer = QtCore.QTimer()
     self.instrument_timer.timeout.connect(self.instrument_refresh)

@@ -8,12 +8,11 @@ import numpy as np
 
 
 class Vna_measure(threading.Thread):
-    def __init__(self, address, test_type = 0, chart_numbers = 0):
+    def __init__(self, address, test_type = 0):
         threading.Thread.__init__(self)
 
         self.instrument_address = address
         self.test_type = test_type
-        self.chart_numbers = chart_numbers
 
         self.instrument_info = ''
         self.data_ready = False
@@ -64,16 +63,6 @@ class Vna_measure(threading.Thread):
 
         self.data_ready = True
         print('end measures')
-
-
-#==============================================================================#
-    def format_values(self, x, y):
-        yArray = y.split(",")
-        xArray = x.split(",")
-        yArray = list(np.float_(yArray))
-        xArray = list(np.float_(xArray))
-
-        return xArray, yArray
 
 
 #==============================================================================#
@@ -171,18 +160,6 @@ class Vna_measure(threading.Thread):
         #print(xData)
 
         return format_values(xData, yData)
-
-
-        # Receive S-parameters measure
-        self.vna.write('CALC1:DATA? SDAT')
-        sData = self.vna.read()
-        #print(sData)
-        sDataArray = sData.split(",")
-        #print(sDataArray)
-        sDataArray = list(np.float_(sDataArray))
-        #print(sDataArray)
-        self.s_parameters = sDataArray
-        #print(Sp)
         """
 
 
@@ -200,12 +177,18 @@ class Vna_measure(threading.Thread):
 
         #self.vna.write('MMEMory:STORe:STATe 1,"Automatic_tests\Feedthrought_test" ')
         #time.sleep(20)
-        #if self.first_test == True:
         self.vna.write('MMEMory:LOAD:STATe 1,"Automatic_tests\Feedthrought_test" ')
         time.sleep(20)
-        #self.first_test = False
 
-        for i in range(self.chart_numbers):
+        # read trace and measure type (Trc1, S21)
+        trace_number = self.vna.query(':CALCULATE1:PARAMETER:CATALOG?')
+        trace_number = trace_number.split(",")
+        #print(len(trace_number))
+        trace_number = trace_number[0::2]
+        #print(trace_number)
+        print(len(trace_number))
+
+        for i in range(len(trace_number)):
             #select channel
             self.vna.write("CALC1:PAR:SEL 'Trc%d'" % (i + 1))
 
@@ -219,7 +202,12 @@ class Vna_measure(threading.Thread):
             xData = self.vna.read()
             print(xData)
 
-            self.measures.append(self.format_values(xData, yData))
+            yDataArray = yData.split(",")
+            xDataArray = xData.split(",")
+            yDataArray = list(np.float_(yDataArray))
+            xDataArray = list(np.float_(xDataArray))
+
+            self.measures.append((xDataArray, yDataArray))
 
         # Receive S-parameters measure
         self.vna.write('CALC1:DATA? SDAT')
@@ -239,7 +227,7 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
     address = "TCPIP::CFO-MD-BQPVNA1::INSTR" #"TEST"
-    test = Vna_measure(address, 1, 2) #test_type, chart_number
+    test = Vna_measure(address, 1) #test_type
 
     while test.data_ready == False:
         print('wait')
@@ -247,7 +235,6 @@ if __name__ == '__main__':
 
     for i in range(len(test.measures)):
         x, y = test.measures[i]
-
         plt.title ("test")
         plt.xlabel("x")
         plt.ylabel("y")
