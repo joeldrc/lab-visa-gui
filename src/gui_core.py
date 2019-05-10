@@ -162,7 +162,7 @@ def save_s_parameters(self):
         file = open(name,"a")
         file.write(self.vna_measure.s_parameters)
         file.close()
-        
+
         print('File saved')
 
     except Exception as e:

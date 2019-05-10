@@ -215,6 +215,9 @@ class Vna_measure(threading.Thread):
 
         # read S-parameters from VNA
         self.s_parameters = self.vna.query("MMEM:DATA? 'Automatic_tests\Test_01.s2p' ")
+
+        # remove new row
+        self.s_parameters = self.s_parameters.replace("\r", "")
         print(self.s_parameters)
 
 
