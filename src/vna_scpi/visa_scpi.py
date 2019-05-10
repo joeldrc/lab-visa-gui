@@ -17,6 +17,7 @@ class Vna_measure(threading.Thread):
         self.instrument_info = ''
         self.data_ready = False
         self.measures = []
+        self.all_traces = []
         self.s_parameters = []
 
         #start thread
@@ -40,7 +41,7 @@ class Vna_measure(threading.Thread):
             self.instrument_info = self.instrumentInfo()
         except Exception as e:
             print(e)
-            self.instrument_info = 'NO CONNECTION \n'
+            self.instrument_info = 'NO CONNECTION'
 
         print(self.instrument_info)
 
@@ -53,15 +54,16 @@ class Vna_measure(threading.Thread):
         elif self.test_type == 1:
             #self.flanges()
             self.load_instrument_state('Automatic_tests\Feedthrought_test')
-            self.read_data()
 
         elif self.test_type == 2:
             #self.pick_up()
             self.load_instrument_state('Automatic_tests\pick_up_test')
-            self.read_data()
 
         else:
             print("exception")
+
+        self.read_data()
+        self.export_data('Automatic_tests', 'Test_001')
 
         self.data_ready = True
         print('end measures')
@@ -70,9 +72,10 @@ class Vna_measure(threading.Thread):
 #==============================================================================#
     def instrumentInfo(self):
         if self.test_mode == True:
-            name = 'TEST MODE ON \n'
+            name = 'TEST MODE ON'
         else:
             name = self.vna.query('*IDN?')  # Query the Identification string
+            name = name.replace("\r", "") #remove new row
         time.sleep(1)
         return name
 
@@ -213,11 +216,23 @@ class Vna_measure(threading.Thread):
 
             self.measures.append((xDataArray, yDataArray))
 
-        # read S-parameters from VNA
-        self.s_parameters = self.vna.query("MMEM:DATA? 'Automatic_tests\Test_01.s2p' ")
 
-        # remove new row
-        self.s_parameters = self.s_parameters.replace("\r", "")
+#==============================================================================#
+    def export_data(self, pathname, fileName):
+        #file to save all traces
+        self.vna.write("MMEM:STOR:TRAC:CHAN 1, '%s\%s.csv', FORMatted" % (pathname, fileName))
+
+        #file to save S-Param
+        self.vna.write("MMEM:STOR:TRAC:PORT  1, '%s\%s.s2p', COMPlex, 1,2" % (pathname, fileName))
+
+        # read all traces from VNA (.csv file)
+        self.all_traces = self.vna.query("MMEM:DATA? '%s\%s.csv' "% (pathname, fileName))
+        self.all_traces = self.all_traces.replace("\r", "") #remove new row
+        print(self.all_traces)
+
+        # read S-parameters from VNA (.sp file)
+        self.s_parameters = self.vna.query("MMEM:DATA? '%s\%s.s2p' " % (pathname, fileName))
+        self.s_parameters = self.s_parameters.replace("\r", "") #remove new row
         print(self.s_parameters)
 
 

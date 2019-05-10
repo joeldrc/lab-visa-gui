@@ -162,7 +162,16 @@ def save_s_parameters(self):
         file = open(name,"a")
         file.write(self.vna_measure.s_parameters)
         file.close()
+        print('File saved')
 
+        # export csv file
+        title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "all_traces"
+        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), 'All files(*.*)')  # Returns a tuple
+        name, _ = name
+
+        file = open(name,"a")
+        file.write(self.vna_measure.all_traces)
+        file.close()
         print('File saved')
 
     except Exception as e:
