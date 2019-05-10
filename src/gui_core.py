@@ -155,38 +155,16 @@ def remove_trace(self):
 def save_s_parameters(self):
     print("S-parameters")
     try:
-        print(self.vna_measure.s_parameters)
-
         title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "_s-param"
-        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), 'Microsoft Excel Worksheet(*.xlsx);; Text file(*.txt);; All files(*.*)')  # Returns a tuple
+        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), 'All files(*.*)')  # Returns a tuple
         name, _ = name
 
-        xValue = []
-        yValue = []
+        file = open(name,"a")
+        file.write(self.vna_measure.s_parameters)
+        file.close()
+        
+        print('File saved')
 
-        measures = self.vna_measure.s_parameters
-
-        self.wb = Workbook()
-        self.sheet = self.wb.active
-
-        xValue = measures[0::2]
-        print(xValue)
-        yValue = measures[1::2]
-        print(yValue)
-
-        # Create sheet
-        self.sheet.cell(row=1, column=1).value = "test"
-        self.sheet.cell(row=1, column=2).value = "test 2"
-
-        self.sheet.cell(row=2, column= 1).value = 'data: ' + str(1)
-        self.sheet.cell(row=3, column= 1).value = 'x'
-        self.sheet.cell(row=3, column= 2).value = 'y'
-
-        for i in range(len(xValue)):
-            self.sheet.cell(row=i + 4, column= 1).value = xValue[i]
-            self.sheet.cell(row=i + 4, column= 2).value = yValue[i]
-
-        self.wb.save(name)
     except Exception as e:
         print(e)
 

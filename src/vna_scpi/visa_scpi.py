@@ -213,16 +213,9 @@ class Vna_measure(threading.Thread):
 
             self.measures.append((xDataArray, yDataArray))
 
-        # Receive S-parameters measure
-        self.vna.write('CALC1:DATA? SDAT')
-        sData = self.vna.read()
-        #print(sData)
-        sDataArray = sData.split(",")
-        #print(sDataArray)
-        sDataArray = list(np.float_(sDataArray))
-        #print(sDataArray)
-        self.s_parameters = sDataArray
-        #print(Sp)
+        # read S-parameters from VNA
+        self.s_parameters = self.vna.query("MMEM:DATA? 'Automatic_tests\Test_01.s2p' ")
+        print(self.s_parameters)
 
 
 #==============================================================================#
