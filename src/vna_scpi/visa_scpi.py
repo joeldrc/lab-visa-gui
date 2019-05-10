@@ -48,14 +48,16 @@ class Vna_measure(threading.Thread):
         if self.test_mode == True:
             x = np.linspace(1, 301)
             y = np.sin(x) + np.random.normal(scale=0.1, size = len(x))
-            data = x, y
-
-        elif self.test_type == 0:
-            #self.flanges()
-            self.read_data()
+            self.measures.append((x, y))
 
         elif self.test_type == 1:
+            #self.flanges()
+            self.load_instrument_state('Automatic_tests\Feedthrought_test')
+            self.read_data()
+
+        elif self.test_type == 2:
             #self.pick_up()
+            self.load_instrument_state('Automatic_tests\pick_up_test')
             self.read_data()
 
         else:
@@ -164,8 +166,7 @@ class Vna_measure(threading.Thread):
 
 
 #==============================================================================#
-    #for tests
-    def read_data(self):
+    def load_instrument_state(self, pathname):
         self.vna.write('*RST') # Reset the instrument
         self.vna.write('*CLS') # Clear the Error queue
 
@@ -177,9 +178,12 @@ class Vna_measure(threading.Thread):
 
         #self.vna.write('MMEMory:STORe:STATe 1,"Automatic_tests\Feedthrought_test" ')
         #time.sleep(20)
-        self.vna.write('MMEMory:LOAD:STATe 1,"Automatic_tests\Feedthrought_test" ')
+        self.vna.write('MMEMory:LOAD:STATe 1,"%s" ' % (pathname))
         time.sleep(20)
 
+
+#==============================================================================#
+    def read_data(self):
         # read trace and measure type (Trc1, S21)
         trace_number = self.vna.query(':CALCULATE1:PARAMETER:CATALOG?')
         trace_number = trace_number.split(",")

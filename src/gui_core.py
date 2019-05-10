@@ -127,13 +127,6 @@ def check_input(self):
 def connect_instrument(self, current_index = 0):
     address = self.instrumentAddress.text()
 
-    #temp code
-    if current_index == 0:
-        chart_number = 0
-    else:
-        current_index -= 1
-        chart_number = len(settings.plot_names[current_index])
-
     self.vna_measure = Vna_measure(address, current_index)
 
     self.instrument_timer = QtCore.QTimer()
@@ -308,8 +301,12 @@ def update_plot(self):
             self.saveRef = True
 
         # return wich test you have selected
-        channel_number = len(self.vna_measure.measures)
-        selected_frame_number = self.vna_measure.test_type
+        selected_frame_number = self.vna_measure.test_type - 1
+
+        if (len(self.vna_measure.measures)) < (len(settings.plot_names[selected_frame_number])):
+            channel_number = len(self.vna_measure.measures)
+        else:
+            channel_number = len(settings.plot_names[selected_frame_number])
 
         xValue = []
         yValue = []
