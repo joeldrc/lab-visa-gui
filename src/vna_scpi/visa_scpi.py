@@ -64,7 +64,7 @@ class Vna_measure(threading.Thread):
             print("exception")
 
         self.read_data()
-        self.export_data('Automatic_tests', 'Test_001')
+        self.export_data('C:\Rohde&schwarz\\Nwa\Automatic_tests\\', 'Test_001')
 
         self.data_ready = True
         print('end measures')
@@ -226,8 +226,14 @@ class Vna_measure(threading.Thread):
         #file to save S-Param
         self.vna.write("MMEM:STOR:TRAC:PORT  1, '%s\%s.s2p', COMPlex, 1,2" % (pathname, fileName))
 
+        #file to save png
+        self.vna.write("HCOP:DEV:LANG PNG")
+        self.vna.write("MMEM:NAME '%s\%s.png' " % (pathname, fileName))
+        self.vna.write("HCOP:MPAG:WIND ALL")
+        self.vna.write("HCOP:DEST 'MMEM'; :HCOP")
+
         # read all traces from VNA (.csv file)
-        self.all_traces = self.vna.query("MMEM:DATA? '%s\%s.csv' "% (pathname, fileName))
+        self.all_traces = self.vna.query("MMEM:DATA? '%s\%s.csv' " % (pathname, fileName))
         self.all_traces = self.all_traces.replace("\r", "") #remove new row
         print(self.all_traces)
 
