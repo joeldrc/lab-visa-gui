@@ -16,171 +16,61 @@ class Vna_measure(threading.Thread):
 
         self.instrument_info = ''
         self.data_ready = False
-        self.measures = []
-        self.all_traces = []
-        self.s_parameters = []
-        self.picture = []
 
-        #start thread
-        print("Init. visa setup")
-        self.start()
+        self.start()    #start thread
 
     def run(self):
-        # TEST is used for debug
-        if self.instrument_address == "TEST":
-            self.test_mode = True
-        else:
-            self.test_mode = False
+        print("Init. visa setup")
 
-            rm = visa.ResourceManager()
-            self.vna = rm.open_resource(self.instrument_address)
-            # Some instruments require that at the end of each command.
-            self.vna.write_termination = '\n'
+        if self.instrument_address == "TEST":   # TEST is used for debug
+            self.instrument_info = 'TEST MODE ON'
 
-        #read instrument info
-        try:
-            self.instrument_info = self.instrumentInfo()
-        except Exception as e:
-            print(e)
-            self.instrument_info = 'NO CONNECTION'
-
-        print(self.instrument_info)
-
-        #start measures
-        if self.test_mode == True:
             x = np.linspace(1, 301)
             y = np.sin(x) + np.random.normal(scale=0.1, size = len(x))
             self.measures.append((x, y))
 
-        elif self.test_type == 1:
-            #self.flanges()
-            self.load_instrument_state('Automatic_tests\Feedthrought_test')
-
-        elif self.test_type == 2:
-            #self.pick_up()
-            self.load_instrument_state('Automatic_tests\pick_up_test')
-
         else:
-            print("exception")
+            try:
+                rm = visa.ResourceManager()
+                self.vna = rm.open_resource(self.instrument_address)
+                self.vna.write_termination = '\n'   # Some instruments require that at the end of each command.
 
-        self.read_data()
-        self.export_data('C:\Rohde&schwarz\\Nwa\Automatic_tests\\', 'Test_001')
+                #read instrument info
+                self.instrument_info = self.vna.query('*IDN?')                  #Query the Identification string
+                self.instrument_info = self.instrument_info.replace("\r", "")   #remove new row
+                print(self.instrument_info)
 
-        self.data_ready = True
-        print('end measures')
+                #start measures
+                if self.test_type == 1:
+                    self.load_instrument_state('C:\Rohde&schwarz\\Nwa\Automatic_tests\\Feedthrought_test')
 
+                elif self.test_type == 2:
+                    self.load_instrument_state('C:\Rohde&schwarz\\Nwa\Automatic_tests\\pick_up_test')
 
-#==============================================================================#
-    def instrumentInfo(self):
-        if self.test_mode == True:
-            name = 'TEST MODE ON'
-        else:
-            name = self.vna.query('*IDN?')  # Query the Identification string
-            name = name.replace("\r", "") #remove new row
-        time.sleep(1)
-        return name
+                self.read_data()
+                self.export_data('C:\Rohde&schwarz\\Nwa\Automatic_tests\\', 'Test_001')
 
+                self.data_ready = True
+                print('end measures')
 
-#==============================================================================#
-    """
-    # for flange tests
-    def flanges(self):
-        #self.vna.write('*RST') # Reset the instrument
-        #self.vna.write('*CLS') # Clear the Error queue
-
-        # Display update ON - switch OFF after debugging
-        self.vna.write('SYST:DISP:UPD ON')
-
-        # -----------------------------------------------------------
-        self.vna.write("CALC1:PAR:DEF 'Trc1', S21")
-        self.vna.write('DISP:WIND:STAT ON')
-        self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
-
-        # marker
-        self.vna.write('CALC1:MARK ON')
-        self.vna.write('CALCulate1:MARKer1:X 2Ghz')
-        self.vna.write('CALC1:FORM GDELay')
-        time.sleep(1)
-        self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
-        time.sleep(1)
-
-        # -----------------------------------------------------------
-        self.vna.write("CALC1:PAR:DEF 'Trc1', S21")
-        self.vna.write('DISP:WIND:STAT ON')
-        self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
-        # marker
-        self.vna.write('CALC1:MARK ON')
-        self.vna.write('CALCulate1:MARKer1:X 2Ghz')
-        self.vna.write('CALC1:FORM MLOG')
-        time.sleep(1)
-        self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
-        time.sleep(1)
-
-        # -----------------------------------------------------------
-        self.vna.write("CALC1:PAR:DEF 'Trc1', S11")
-        self.vna.write('DISP:WIND:STAT ON')
-        self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
-        # marker
-        self.vna.write('CALC1:MARK ON')
-        self.vna.write('CALCulate1:MARKer1:X 2Ghz')
-        self.vna.write('CALC1:FORM SWR')
-        time.sleep(1)
-        self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
-        time.sleep(1)
-
-        # -----------------------------------------------------------
-        self.vna.write("CALC1:PAR:DEF 'Trc1', S22")
-        self.vna.write('DISP:WIND:STAT ON')
-        self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
-        # marker
-        self.vna.write('CALC1:MARK ON')
-        self.vna.write('CALCulate1:MARKer1:X 2Ghz')
-        self.vna.write('CALC1:FORM SWR')
-        time.sleep(1)
-        self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
-        time.sleep(1)
-
-        # -----------------------------------------------------------
-        self.vna.write("CALC1:PAR:DEF 'Trc1', S11")
-        self.vna.write('DISP:WIND:STAT ON')
-        self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
-        self.vna.write('CALC1:FORM REAL')
-        # time domain
-        self.vna.write('CALC1:TRAN:TIME:STAT ON')
-        self.vna.write('CALC1:TRAN:TIME LPAS; TIME:STIM STEP')
-        time.sleep(1)
-        self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
-        time.sleep(1)
-
-        # -----------------------------------------------------------
-
-        # Receive formatted measure
-        self.vna.write("CALC1:PAR:SEL 'Trc1'")
-        self.vna.write('CALC1:DATA? FDAT')
-        yData = self.vna.read()
-        #print(yData)
-
-        # Receive the number of point measured
-        self.vna.write('CALC1:DATA:STIM?')
-        xData = self.vna.read()
-        #print(xData)
-
-        return format_values(xData, yData)
-        """
+            except Exception as e:
+                print(e)
+                self.instrument_info = 'NO CONNECTION'
+                print(self.instrument_info)
 
 
 #==============================================================================#
     def load_instrument_state(self, pathname):
-        self.vna.write('*RST') # Reset the instrument
-        self.vna.write('*CLS') # Clear the Error queue
+        self.vna.write('*RST')  # Reset the instrument
+        self.vna.write('*CLS')  # Clear the Error queue
 
         # Display update ON - switch OFF after debugging
         self.vna.write('SYST:DISP:UPD ON')
 
-        #self.vna.write('MMEM:CDIR "C:\Program Files\Automatic_tests" ')
+        # Read default directory
         print(self.vna.query('MMEMory:CDIRectory?'))
 
-        #self.vna.write('MMEMory:STORe:STATe 1,"Automatic_tests\Feedthrought_test" ')
+        #self.vna.write('MMEMory:STORe:STATe 1,"%s" ' % (pathname))
         #time.sleep(20)
         self.vna.write('MMEMory:LOAD:STATe 1,"%s" ' % (pathname))
         time.sleep(20)
@@ -188,12 +78,11 @@ class Vna_measure(threading.Thread):
 
 #==============================================================================#
     def read_data(self):
-        # read trace and measure type (Trc1, S21)
+        # read trace and measure type (Trc1, S21, ...)
         trace_number = self.vna.query(':CALCULATE1:PARAMETER:CATALOG?')
         trace_number = trace_number.split(",")
-        #print(len(trace_number))
         trace_number = trace_number[0::2]
-        #print(trace_number)
+        print(trace_number)
         print(len(trace_number))
 
         for i in range(len(trace_number)):
@@ -223,7 +112,7 @@ class Vna_measure(threading.Thread):
         # create a new dir
         pathname = pathname + '\%s' % (fileName)
         print(pathname)
-        
+
         self.vna.write("MMEM:MDIR '%s' " % (pathname))
 
         #file to save all traces
@@ -275,3 +164,73 @@ if __name__ == '__main__':
         plt.ylabel("y")
         plt.plot(x, y)
         plt.show()
+
+
+"""
+#self.vna.write('*RST') # Reset the instrument
+#self.vna.write('*CLS') # Clear the Error queue
+
+# Display update ON - switch OFF after debugging
+self.vna.write('SYST:DISP:UPD ON')
+
+# -----------------------------------------------------------
+self.vna.write("CALC1:PAR:DEF 'Trc1', S21")
+self.vna.write('DISP:WIND:STAT ON')
+self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+
+# marker
+self.vna.write('CALC1:MARK ON')
+self.vna.write('CALCulate1:MARKer1:X 2Ghz')
+self.vna.write('CALC1:FORM GDELay')
+time.sleep(1)
+self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
+time.sleep(1)
+
+# -----------------------------------------------------------
+self.vna.write("CALC1:PAR:DEF 'Trc1', S21")
+self.vna.write('DISP:WIND:STAT ON')
+self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+# marker
+self.vna.write('CALC1:MARK ON')
+self.vna.write('CALCulate1:MARKer1:X 2Ghz')
+self.vna.write('CALC1:FORM MLOG')
+time.sleep(1)
+self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
+time.sleep(1)
+
+# -----------------------------------------------------------
+self.vna.write("CALC1:PAR:DEF 'Trc1', S11")
+self.vna.write('DISP:WIND:STAT ON')
+self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+# marker
+self.vna.write('CALC1:MARK ON')
+self.vna.write('CALCulate1:MARKer1:X 2Ghz')
+self.vna.write('CALC1:FORM SWR')
+time.sleep(1)
+self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
+time.sleep(1)
+
+# -----------------------------------------------------------
+self.vna.write("CALC1:PAR:DEF 'Trc1', S22")
+self.vna.write('DISP:WIND:STAT ON')
+self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+# marker
+self.vna.write('CALC1:MARK ON')
+self.vna.write('CALCulate1:MARKer1:X 2Ghz')
+self.vna.write('CALC1:FORM SWR')
+time.sleep(1)
+self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
+time.sleep(1)
+
+# -----------------------------------------------------------
+self.vna.write("CALC1:PAR:DEF 'Trc1', S11")
+self.vna.write('DISP:WIND:STAT ON')
+self.vna.write("DISP:WIND:TRAC1:FEED 'Trc1'")
+self.vna.write('CALC1:FORM REAL')
+# time domain
+self.vna.write('CALC1:TRAN:TIME:STAT ON')
+self.vna.write('CALC1:TRAN:TIME LPAS; TIME:STIM STEP')
+time.sleep(1)
+self.vna.write('DISP:WIND:TRAC1:Y:SCAL:AUTO ONCE')
+time.sleep(1)
+"""
