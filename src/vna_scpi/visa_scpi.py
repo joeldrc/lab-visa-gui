@@ -220,6 +220,10 @@ class Vna_measure(threading.Thread):
 
 #==============================================================================#
     def export_data(self, pathname, fileName):
+        # create a new dir
+        pathname = pathname + '\%s' % (fileName)
+        self.vna.write("MMEM:MDIR '%s' " % (pathname))
+        
         #file to save all traces
         self.vna.write("MMEM:STOR:TRAC:CHAN 1, '%s\%s.csv', FORMatted" % (pathname, fileName))
 
