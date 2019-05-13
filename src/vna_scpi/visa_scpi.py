@@ -19,6 +19,7 @@ class Vna_measure(threading.Thread):
         self.measures = []
         self.all_traces = []
         self.s_parameters = []
+        self.picture = []
 
         #start thread
         print("Init. visa setup")
@@ -234,6 +235,13 @@ class Vna_measure(threading.Thread):
         self.s_parameters = self.vna.query("MMEM:DATA? '%s\%s.s2p' " % (pathname, fileName))
         self.s_parameters = self.s_parameters.replace("\r", "") #remove new row
         print(self.s_parameters)
+
+        # read pictures from VNA (.png file)
+        self.vna.write("MMEM:DATA? '%s\%s.png' " % (pathname, fileName))
+        self.picture = self.vna.read_raw()
+        cutting_character = self.picture.find(b'\x89')
+        self.picture = self.picture[cutting_character:] #remove characters up to \x89
+        print(self.picture)
 
 
 #==============================================================================#
