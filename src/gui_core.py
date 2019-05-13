@@ -157,7 +157,7 @@ def save_s_parameters(self):
     try:
         # export sp file
         title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "_s-param"
-        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), 'All files(*.*)')  # Returns a tuple
+        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), 'All files(*.s2p)')  # Returns a tuple
         name, _ = name
 
         file = open(name,"a")
@@ -167,7 +167,7 @@ def save_s_parameters(self):
 
         # export csv file
         title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "all_traces"
-        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), 'All files(*.*)')  # Returns a tuple
+        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), 'All files(*.csv)')  # Returns a tuple
         name, _ = name
 
         file = open(name,"a")
@@ -177,7 +177,7 @@ def save_s_parameters(self):
 
         # export png files
         title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "all_traces"
-        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), 'All files(*.*)')  # Returns a tuple
+        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), 'All files(*.png)')  # Returns a tuple
         name, _ = name
 
         file = open(name,"ab")

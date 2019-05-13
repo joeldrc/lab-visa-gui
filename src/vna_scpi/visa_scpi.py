@@ -14,6 +14,8 @@ class Vna_measure(threading.Thread):
         self.instrument_address = address
         self.test_type = test_type
 
+        self.measures = []
+
         self.instrument_info = ''
         self.data_ready = False
 
