@@ -83,29 +83,44 @@ class Vna_measure(threading.Thread):
         self.vna.write('MMEMory:LOAD:STATe 1,"%s" ' % (pathname))
         time.sleep(20)
 
+        # Wait until the command is executed
+        print(self.vna.query('*WAI; *OPC?'))
+
 
 #==============================================================================#
     def read_data(self):
         # read trace and measure type (Trc1, S21, ...)
         trace_number = self.vna.query(':CALCULATE1:PARAMETER:CATALOG?')
+        # Wait until the command is executed
+        print(self.vna.query('*WAI; *OPC?'))
+
         trace_number = trace_number.split(",")
         trace_number = trace_number[0::2]
         print(trace_number)
         print(len(trace_number))
 
-        for i in range(len(trace_number)):
+        for i in range(len(trace_number)):          
             #select channel
             self.vna.write("CALC1:PAR:SEL 'Trc%d'" % (i + 1))
+
+            # Wait until the command is executed
+            print(self.vna.query('*WAI; *OPC?'))
 
             # Receive measure
             self.vna.write('CALC1:DATA? FDAT')
             yData = self.vna.read()
             print(yData)
 
+            # Wait until the command is executed
+            print(self.vna.query('*WAI; *OPC?'))
+
             # Receive the number of point measured
             self.vna.write('CALC1:DATA:STIM?')
             xData = self.vna.read()
             print(xData)
+
+            # Wait until the command is executed
+            print(self.vna.query('*WAI; *OPC?'))
 
             yDataArray = yData.split(",")
             xDataArray = xData.split(",")
@@ -122,11 +137,20 @@ class Vna_measure(threading.Thread):
         print(pathname)
         self.vna.write("MMEM:MDIR '%s' " % (pathname))
 
+        # Wait until the command is executed
+        print(self.vna.query('*WAI; *OPC?'))
+
         #file to save all traces
         self.vna.write("MMEM:STOR:TRAC:CHAN 1, '%s\%s.csv', FORMatted" % (pathname, fileName))
 
+        # Wait until the command is executed
+        print(self.vna.query('*WAI; *OPC?'))
+
         #file to save S-Param
         self.vna.write("MMEM:STOR:TRAC:PORT  1, '%s\%s.s2p', COMPlex, 1,2" % (pathname, fileName))
+
+        # Wait until the command is executed
+        print(self.vna.query('*WAI; *OPC?'))
 
         #file to save png
         self.vna.write("HCOP:DEV:LANG PNG")
@@ -134,15 +158,24 @@ class Vna_measure(threading.Thread):
         self.vna.write("HCOP:MPAG:WIND ALL")
         self.vna.write("HCOP:DEST 'MMEM'; :HCOP")
 
+        # Wait until the command is executed
+        print(self.vna.query('*WAI; *OPC?'))
+
         # read all traces from VNA (.csv file)
         self.all_traces = self.vna.query("MMEM:DATA? '%s\%s.csv' " % (pathname, fileName))
         self.all_traces = self.all_traces.replace("\r", "") #remove new row
         print(self.all_traces)
 
+        # Wait until the command is executed
+        print(self.vna.query('*WAI; *OPC?'))
+
         # read S-parameters from VNA (.sp file)
         self.s_parameters = self.vna.query("MMEM:DATA? '%s\%s.s2p' " % (pathname, fileName))
         self.s_parameters = self.s_parameters.replace("\r", "") #remove new row
         print(self.s_parameters)
+
+        # Wait until the command is executed
+        print(self.vna.query('*WAI; *OPC?'))
 
         # read pictures from VNA (.png file)
         self.vna.write("MMEM:DATA? '%s\%s.png' " % (pathname, fileName))
@@ -150,6 +183,9 @@ class Vna_measure(threading.Thread):
         cutting_character = self.picture.find(b'\x89')
         self.picture = self.picture[cutting_character:] #remove characters up to \x89
         print(self.picture)
+
+        # Wait until the command is executed
+        print(self.vna.query('*WAI; *OPC?'))
 
 
 #==============================================================================#
