@@ -199,7 +199,8 @@ def instrument_refresh(self):
             self.progressBar.setValue(100)
 
             if self.autoSave.isChecked():
-                self.file_save()
+                #self.file_save()
+                self.save_s_parameters()
 
     except Exception as e:
         print(e)
