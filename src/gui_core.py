@@ -127,7 +127,7 @@ def check_input(self):
 def connect_instrument(self, current_index = 0):
     address = self.instrumentAddress.text()
 
-    self.vna_measure = Vna_measure(address, current_index)
+    self.vna_measure = Vna_measure(address, current_index, folder_name = strftime("%d%m%Y", gmtime()), test_name = strftime("%d%m%Y_%H%M%S", gmtime()))
 
     self.instrument_timer = QtCore.QTimer()
     self.instrument_timer.timeout.connect(self.instrument_refresh)

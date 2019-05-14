@@ -11,12 +11,13 @@ calibration = 0
 
 
 class Vna_measure(threading.Thread):
-    def __init__(self, address, test_type = 0, test_name = 'Test_001'):
+    def __init__(self, address, test_type = 0, folder_name = 'none', test_name = 'none'):
         threading.Thread.__init__(self)
 
         self.instrument_address = address
         self.test_type = test_type
 
+        self.folder_name = folder_name
         self.test_name = test_name
         self.measures = []
 
@@ -52,21 +53,19 @@ class Vna_measure(threading.Thread):
                 #start measures
                 if self.test_type == 1:
                     pathname = 'C:\Rohde&schwarz\\Nwa\Automatic_tests\\Feedthrough\\'
-                    typeName = 'Feedthrough_test'
+                    typeName = 'Feedthrough_test.zvx'
 
                 elif self.test_type == 2:
                     pathname = 'C:\Rohde&schwarz\\Nwa\Automatic_tests\\Pick_up\\'
-                    typeName = 'Pick_up_test'
-
-                print(pathname + typeName)
+                    typeName = 'Pick_up_test.zvx'
 
                 global calibration
                 if (calibration != self.test_type):
                     self.load_instrument_state(pathname + typeName)
                     calibration = self.test_type
-                    
+
                 self.read_data()
-                self.export_data(pathname, self.test_name)
+                self.export_data(pathname + self.folder_name, self.test_name)
 
                 self.data_ready = True
                 print('End measures')
@@ -106,7 +105,7 @@ class Vna_measure(threading.Thread):
         print(trace_number)
         print(len(trace_number))
 
-        for i in range(len(trace_number)):          
+        for i in range(len(trace_number)):
             #select channel
             self.vna.write("CALC1:PAR:SEL 'Trc%d'" % (i + 1))
 
@@ -140,7 +139,6 @@ class Vna_measure(threading.Thread):
 #==============================================================================#
     def export_data(self, pathname, fileName):
         # create a new dir
-        pathname = pathname + fileName
         print(pathname)
         self.vna.write("MMEM:MDIR '%s' " % (pathname))
 
