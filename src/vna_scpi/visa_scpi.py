@@ -8,12 +8,13 @@ import numpy as np
 
 
 class Vna_measure(threading.Thread):
-    def __init__(self, address, test_type = 0):
+    def __init__(self, address, test_type = 0, test_name = 'Test_001'):
         threading.Thread.__init__(self)
 
         self.instrument_address = address
         self.test_type = test_type
 
+        self.test_name = test_name
         self.measures = []
 
         self.instrument_info = ''
@@ -42,18 +43,26 @@ class Vna_measure(threading.Thread):
                 self.instrument_info = self.instrument_info.replace("\r", "")   #remove new row
                 print(self.instrument_info)
 
+                # Read default directory
+                print(self.vna.query('MMEMory:CDIRectory?'))
+
                 #start measures
                 if self.test_type == 1:
-                    self.load_instrument_state('C:\Rohde&schwarz\\Nwa\Automatic_tests\\Feedthrought_test')
+                    pathname = 'C:\Rohde&schwarz\\Nwa\Automatic_tests\\Feedthrough\\'
+                    typeName = 'Feedthrough_test'
 
                 elif self.test_type == 2:
-                    self.load_instrument_state('C:\Rohde&schwarz\\Nwa\Automatic_tests\\pick_up_test')
+                    pathname = 'C:\Rohde&schwarz\\Nwa\Automatic_tests\\Pick_up\\'
+                    typeName = 'Pick_up_test'
 
+                print(pathname + typeName)
+
+                self.load_instrument_state(pathname + typeName)
                 self.read_data()
-                self.export_data('C:\Rohde&schwarz\\Nwa\Automatic_tests\\', 'Test_001')
+                self.export_data(pathname, self.test_name)
 
                 self.data_ready = True
-                print('end measures')
+                print('End measures')
 
             except Exception as e:
                 print(e)
@@ -68,9 +77,6 @@ class Vna_measure(threading.Thread):
 
         # Display update ON - switch OFF after debugging
         self.vna.write('SYST:DISP:UPD ON')
-
-        # Read default directory
-        print(self.vna.query('MMEMory:CDIRectory?'))
 
         #self.vna.write('MMEMory:STORe:STATe 1,"%s" ' % (pathname))
         #time.sleep(20)
@@ -112,9 +118,8 @@ class Vna_measure(threading.Thread):
 #==============================================================================#
     def export_data(self, pathname, fileName):
         # create a new dir
-        pathname = pathname + '\%s' % (fileName)
+        pathname = pathname + fileName
         print(pathname)
-
         self.vna.write("MMEM:MDIR '%s' " % (pathname))
 
         #file to save all traces

@@ -153,40 +153,33 @@ def remove_trace(self):
     self.update_plot()
 
 def save_s_parameters(self):
-    print("S-parameters")
+    print("All-parameters")
     try:
-        # export sp file
-        title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "_s-param"
-        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), 'All files(*.s2p)')  # Returns a tuple
+        title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "_all_traces"
+        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title))  # Returns a tuple
         name, _ = name
 
-        file = open(name,"a")
+        # export sp file
+        file = open(name + '.s2p',"a")
         file.write(self.vna_measure.s_parameters)
         file.close()
         print('File saved')
 
         # export csv file
-        title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "all_traces"
-        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), 'All files(*.csv)')  # Returns a tuple
-        name, _ = name
-
-        file = open(name,"a")
+        file = open(name + '.csv',"a")
         file.write(self.vna_measure.all_traces)
         file.close()
         print('File saved')
 
         # export png files
-        title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "all_traces"
-        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), 'All files(*.png)')  # Returns a tuple
-        name, _ = name
-
-        file = open(name,"ab")
+        file = open(name + '.png',"ab")
         file.write(self.vna_measure.picture)
         file.close()
         print('File saved')
 
     except Exception as e:
         print(e)
+
 
 #==============================================================================#
 def instrument_refresh(self):
