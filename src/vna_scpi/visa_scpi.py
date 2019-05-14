@@ -7,6 +7,9 @@ import threading
 import numpy as np
 
 
+calibration = 0
+
+
 class Vna_measure(threading.Thread):
     def __init__(self, address, test_type = 0, test_name = 'Test_001'):
         threading.Thread.__init__(self)
@@ -57,7 +60,11 @@ class Vna_measure(threading.Thread):
 
                 print(pathname + typeName)
 
-                self.load_instrument_state(pathname + typeName)
+                global calibration
+                if (calibration != self.test_type):
+                    self.load_instrument_state(pathname + typeName)
+                    calibration = self.test_type
+                    
                 self.read_data()
                 self.export_data(pathname, self.test_name)
 
