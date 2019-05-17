@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import os
-
 import settings
 from user_gui import *
 from vna_scpi import *
 
+import os
 from openpyxl import *
-
 import time
 from time import gmtime, strftime
-
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.qt_compat import QtCore, QtWidgets, is_pyqt5
@@ -28,20 +25,18 @@ def file_open(self):
             self.textEdit.setText(text)
 
 def file_save(self):
-    title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text()
-    name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), 'Microsoft Excel Worksheet(*.xlsx);; Text file(*.txt);; All files(*.*)')  # Returns a tuple
-    #print(name)
+    title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "_all_traces"
+    name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title))  # Returns a tuple
+    name, _ = name
 
     if self.tabWidget.currentIndex() == 3:
-        if len(name[0]) > 0:
-            with open(name[0], 'w') as file:
+        if len(name) > 0:
+            with open(name, 'w') as file:
                 #text = self.textEdit.toPlainText()  # Plain text without formatting
                 text = self.textEdit.toHtml()  # Rich text with formatting (font, color, etc.)
                 file.write(text)
     else:
         try:
-            name, _ = name
-
             xValue = []
             yValue = []
 
@@ -67,7 +62,30 @@ def file_save(self):
                     self.sheet.cell(row=j + 4, column= (i * 2) + 1).value = xValue[i][j]
                     self.sheet.cell(row=j + 4, column= (i * 2) + 2).value = yValue[i][j]
 
-                self.wb.save(name)
+                self.wb.save(name + '.xlsx')
+        except Exception as e:
+            print(e)
+
+        print("All-parameters")
+        try:
+            # export sp file
+            file = open(name + '.s2p',"a")
+            file.write(self.vna_measure.s_parameters)
+            file.close()
+            print('File saved')
+
+            # export csv file
+            file = open(name + '.csv',"a")
+            file.write(self.vna_measure.all_traces)
+            file.close()
+            print('File saved')
+
+            # export png files
+            file = open(name + '.png',"ab")
+            file.write(self.vna_measure.picture)
+            file.close()
+            print('File saved')
+
         except Exception as e:
             print(e)
 
@@ -122,7 +140,7 @@ def check_input(self):
     self.saveReference.stateChanged.connect(self.save_reference)
     self.addTrace.clicked.connect(self.add_trace)
     self.removeTrace.clicked.connect(self.remove_trace)
-    self.saveSparameters.clicked.connect(self.save_s_parameters)
+    self.saveSparameters.clicked.connect(self.file_save)
 
 def connect_instrument(self, current_index = 0):
     address = self.instrumentAddress.text()
@@ -152,34 +170,6 @@ def remove_trace(self):
     self.delRef = True
     self.update_plot()
 
-def save_s_parameters(self):
-    print("All-parameters")
-    try:
-        title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "_all_traces"
-        name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title))  # Returns a tuple
-        name, _ = name
-
-        # export sp file
-        file = open(name + '.s2p',"a")
-        file.write(self.vna_measure.s_parameters)
-        file.close()
-        print('File saved')
-
-        # export csv file
-        file = open(name + '.csv',"a")
-        file.write(self.vna_measure.all_traces)
-        file.close()
-        print('File saved')
-
-        # export png files
-        file = open(name + '.png',"ab")
-        file.write(self.vna_measure.picture)
-        file.close()
-        print('File saved')
-
-    except Exception as e:
-        print(e)
-
 
 #==============================================================================#
 def instrument_refresh(self):
@@ -199,8 +189,7 @@ def instrument_refresh(self):
             self.progressBar.setValue(100)
 
             if self.autoSave.isChecked():
-                #self.file_save()
-                self.save_s_parameters()
+                self.file_save()
 
     except Exception as e:
         print(e)
@@ -361,7 +350,7 @@ Ui_MainWindow.save_reference = save_reference
 Ui_MainWindow.add_trace = add_trace
 Ui_MainWindow.remove_trace = remove_trace
 
-Ui_MainWindow.save_s_parameters = save_s_parameters
+Ui_MainWindow.save_s_parameters = file_save
 
 Ui_MainWindow.instrument_refresh = instrument_refresh
 Ui_MainWindow.update_time = update_time
@@ -373,6 +362,7 @@ Ui_MainWindow.create_plot = create_plot
 Ui_MainWindow.update_plot = update_plot
 
 
+#==============================================================================#
 Ui_MainWindow.xRef = []
 Ui_MainWindow.yRef = []
 Ui_MainWindow.saveRef = False
