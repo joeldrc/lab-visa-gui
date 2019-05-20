@@ -18,11 +18,49 @@ from matplotlib.figure import Figure
 #==============================================================================#
 def file_open(self):
     name = QtWidgets.QFileDialog.getOpenFileName(MainWindow, 'Open File')  # Returns a tuple
+    name, _ = name
+
+    """
     #print(name)  # For debugging
     if len(name[0]) > 0:
         with open(name[0], 'r') as file:
             text = file.read()
             self.textEdit.setText(text)
+    """
+
+    test = []
+    file = open(name, "r")
+    line_cnt = 0
+
+    #read data
+    for row in file:
+        #start from the line number 3
+        if line_cnt > 2:
+            row = row.replace(";\n", '') #remove last column
+            column = row.split(";")
+            test.append(column)
+        else:
+            line_cnt += 1
+    #print(test[0][:])
+
+    #re-order data
+    measures = []
+    for j in range(len(test[0])):
+        tmp = []
+        for i in range(len(test)):
+            try:
+                tmp.append(np.float_(test[i][j]))
+            except:
+                pass
+        measures.append(tmp)
+    #print(measures[1])
+    print(measures)
+
+    self.vna_measure.measures = []
+    for i in range(1,len(measures)):
+        self.vna_measure.measures.append((measures[0], measures[i]))
+
+    self.csv_data_ready = True
 
 def file_save(self):
     title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "_all_traces"
@@ -147,9 +185,11 @@ def connect_instrument(self, current_index = 0):
 
     self.vna_measure = Vna_measure(address, current_index, folder_name = strftime("%d%m%Y", gmtime()), test_name = strftime("%d%m%Y_%H%M%S", gmtime()))
 
+    """
     self.instrument_timer = QtCore.QTimer()
     self.instrument_timer.timeout.connect(self.instrument_refresh)
     self.instrument_timer.start(1000)
+    """
 
     self.progressBar.setValue(0)
 
@@ -194,11 +234,21 @@ def instrument_refresh(self):
     except Exception as e:
         print(e)
 
+    if self.csv_data_ready == True:
+        self.csv_data_ready = False
+
+        self.update_plot()
+        self.progressBar.setValue(100)
+
 def update_time(self):
     self.timeLabel.setText(strftime("%d %b %Y %H:%M:%S", gmtime()))
     self.timer = QtCore.QTimer()
     self.timer.timeout.connect(self.update_time)
     self.timer.start(1000)
+
+    self.instrument_timer = QtCore.QTimer()
+    self.instrument_timer.timeout.connect(self.instrument_refresh)
+    self.instrument_timer.start(1000)
 
 
 #==============================================================================#
@@ -282,7 +332,8 @@ def update_plot(self):
             self.saveRef = True
 
         # return wich test you have selected
-        selected_frame_number = self.vna_measure.test_type - 1
+        #selected_frame_number = self.vna_measure.test_type - 1
+        selected_frame_number = self.tabWidget.currentIndex() - 1
 
         if (len(self.vna_measure.measures)) < (len(settings.plot_names[selected_frame_number])):
             channel_number = len(self.vna_measure.measures)
@@ -368,6 +419,8 @@ Ui_MainWindow.yRef = []
 Ui_MainWindow.saveRef = False
 Ui_MainWindow.delRef = False
 Ui_MainWindow.plotRef = -1
+
+Ui_MainWindow.csv_data_ready = False
 
 
 #==============================================================================#
