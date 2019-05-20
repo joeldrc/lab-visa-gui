@@ -59,16 +59,17 @@ class Vna_measure(threading.Thread):
                     pathname = 'C:\Rohde&schwarz\\Nwa\Automatic_tests\\Pick_up\\'
                     typeName = 'Pick_up_test.zvx'
 
-                global calibration
-                if (calibration != self.test_type):
-                    self.load_instrument_state(pathname + typeName)
-                    calibration = self.test_type
+                if self.test_type > 0:
+                    global calibration
+                    if (calibration != self.test_type):
+                        self.load_instrument_state(pathname + typeName)
+                        calibration = self.test_type
 
-                self.read_data()
-                self.export_data(pathname + self.folder_name, self.test_name)
+                    self.read_data()
+                    self.export_data(pathname + self.folder_name, self.test_name)
+                    print('End measures')
 
                 self.data_ready = True
-                print('End measures')
 
             except Exception as e:
                 print(e)
