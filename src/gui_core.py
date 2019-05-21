@@ -29,7 +29,6 @@ def file_open(self):
 
         # Read file
         file = open(name, "r")
-        file.close()
 
         test = []
         line_cnt = 0
