@@ -7,7 +7,9 @@ import threading
 import numpy as np
 
 
+# Global variables
 calibration = 0
+loading_time = 20 #seconds
 
 
 class Vna_measure(threading.Thread):
@@ -16,22 +18,19 @@ class Vna_measure(threading.Thread):
 
         self.instrument_address = address
         self.test_type = test_type
-
         self.folder_name = folder_name
         self.test_name = test_name
         self.measures = []
-
         self.instrument_info = ''
         self.data_ready = False
 
-        self.start()    #start thread
+        self.start() # Start thread
 
     def run(self):
         print("Init. visa setup")
 
         if self.instrument_address == "TEST":   # TEST is used for debug
             self.instrument_info = 'TEST MODE ON'
-
             x = np.linspace(1, 301)
             y = np.sin(x) + np.random.normal(scale=0.1, size = len(x))
             self.measures.append((x, y))
@@ -78,56 +77,52 @@ class Vna_measure(threading.Thread):
 
 
 #==============================================================================#
-    def load_instrument_state(self, pathname):
-        self.vna.write('*RST')  # Reset the instrument
-        self.vna.write('*CLS')  # Clear the Error queue
-
-        # Display update ON - switch OFF after debugging
-        self.vna.write('SYST:DISP:UPD ON')
-
-        #self.vna.write('MMEMory:STORe:STATe 1,"%s" ' % (pathname))
-        #time.sleep(20)
-        self.vna.write('MMEMory:LOAD:STATe 1,"%s" ' % (pathname))
-        time.sleep(20)
+    def wait(self, seconds = 0):
+        if (seconds > 0):
+            time.sleep(seconds)
 
         # Wait until the command is executed
         print(self.vna.query('*WAI; *OPC?'))
 
 
 #==============================================================================#
+    def load_instrument_state(self, pathname):
+        self.vna.write('*RST')  # Reset the instrument
+        self.vna.write('*CLS')  # Clear the Error queue
+
+        # Set display update ON
+        self.vna.write('SYST:DISP:UPD ON')
+
+        # load instrument state
+        self.vna.write('MMEMory:LOAD:STATe 1,"%s" ' % (pathname)) # Use 'STORe' to save the setup
+        global loading_time
+        self.wait(loading_time)
+
+
+#==============================================================================#
     def read_data(self):
         # read trace and measure type (Trc1, S21, ...)
         trace_number = self.vna.query(':CALCULATE1:PARAMETER:CATALOG?')
-        # Wait until the command is executed
-        print(self.vna.query('*WAI; *OPC?'))
+        self.wait()
 
         trace_number = trace_number.split(",")
         trace_number = trace_number[0::2]
         print(trace_number)
-        print(len(trace_number))
 
         for i in range(len(trace_number)):
             #select channel
             self.vna.write("CALC1:PAR:SEL 'Trc%d'" % (i + 1))
-
-            # Wait until the command is executed
-            print(self.vna.query('*WAI; *OPC?'))
+            self.wait()
 
             # Receive measure
-            self.vna.write('CALC1:DATA? FDAT')
-            yData = self.vna.read()
+            yData = self.vna.query('CALC1:DATA? FDAT')
             print(yData)
-
-            # Wait until the command is executed
-            print(self.vna.query('*WAI; *OPC?'))
+            self.wait()
 
             # Receive the number of point measured
-            self.vna.write('CALC1:DATA:STIM?')
-            xData = self.vna.read()
+            xData = self.vna.query('CALC1:DATA:STIM?')
             print(xData)
-
-            # Wait until the command is executed
-            print(self.vna.query('*WAI; *OPC?'))
+            self.wait()
 
             yDataArray = yData.split(",")
             xDataArray = xData.split(",")
@@ -139,62 +134,39 @@ class Vna_measure(threading.Thread):
 
 #==============================================================================#
     def export_data(self, pathname, fileName):
-        # create a new dir
-        print(pathname)
+        # create a new dir in the vna
         self.vna.write("MMEM:MDIR '%s' " % (pathname))
-
-        # Wait until the command is executed
-        print(self.vna.query('*WAI; *OPC?'))
+        self.wait()
 
         #file to save all traces
         self.vna.write("MMEM:STOR:TRAC:CHAN 1, '%s\%s.csv', FORMatted" % (pathname, fileName)) #MMEM:STOR:TRAC:CHAN {}
-
-        # Wait until the command is executed
-        print(self.vna.query('*WAI; *OPC?'))
+        self.wait()
 
         #file to save S-Param
-        self.vna.write("MMEM:STOR:TRAC:PORT  1, '%s\%s.s2p', COMPlex, 1,2" % (pathname, fileName))
+        self.vna.write("MMEM:STOR:TRAC:PORT 1, '%s\%s.s2p', COMPlex, 1,2" % (pathname, fileName))
+        self.wait()
 
-        # Wait until the command is executed
-        print(self.vna.query('*WAI; *OPC?'))
-
-        #file to save png
+        # save png file
         self.vna.write("HCOP:DEV:LANG PNG")
         self.vna.write("MMEM:NAME '%s\%s.png' " % (pathname, fileName))
         self.vna.write("HCOP:MPAG:WIND ALL")
         self.vna.write("HCOP:DEST 'MMEM'; :HCOP")
-
-        # Wait until the command is executed
-        print(self.vna.query('*WAI; *OPC?'))
+        self.wait()
 
         # read all traces from VNA (.csv file)
-        #self.all_traces = self.vna.query("MMEM:DATA? '%s\%s.csv' " % (pathname, fileName))
-        #self.all_traces = self.all_traces.replace("\r", "") #remove new row
         self.all_traces = self.vna.query_binary_values("MMEM:DATA? '%s\%s.csv' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
         print(self.all_traces)
-
-        # Wait until the command is executed
-        print(self.vna.query('*WAI; *OPC?'))
+        self.wait()
 
         # read S-parameters from VNA (.sp file)
-        #self.s_parameters = self.vna.query("MMEM:DATA? '%s\%s.s2p' " % (pathname, fileName))
-        #self.s_parameters = self.s_parameters.replace("\r", "") #remove new row
         self.s_parameters = self.vna.query_binary_values("MMEM:DATA? '%s\%s.s2p' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
         print(self.s_parameters)
-
-        # Wait until the command is executed
-        print(self.vna.query('*WAI; *OPC?'))
+        self.wait()
 
         # read pictures from VNA (.png file)
-        #self.vna.write("MMEM:DATA? '%s\%s.png' " % (pathname, fileName))
-        #self.picture = self.vna.read_raw()
-        #cutting_character = self.picture.find(b'\x89')
-        #self.picture = self.picture[cutting_character:] #remove characters up to \x89
         self.picture = self.vna.query_binary_values("MMEM:DATA? '%s\%s.png' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
         print(self.picture)
-
-        # Wait until the command is executed
-        print(self.vna.query('*WAI; *OPC?'))
+        self.wait()
 
 
 #==============================================================================#
@@ -219,6 +191,24 @@ if __name__ == '__main__':
 
 
 """
+# -----------------------------------------------------------
+# read all traces from VNA (.csv file)
+#self.all_traces = self.vna.query("MMEM:DATA? '%s\%s.csv' " % (pathname, fileName))
+#self.all_traces = self.all_traces.replace("\r", "") #remove new row
+
+# -----------------------------------------------------------
+# read S-parameters from VNA (.sp file)
+#self.s_parameters = self.vna.query("MMEM:DATA? '%s\%s.s2p' " % (pathname, fileName))
+#self.s_parameters = self.s_parameters.replace("\r", "") #remove new row
+
+# -----------------------------------------------------------
+# read pictures from VNA (.png file)
+#self.vna.write("MMEM:DATA? '%s\%s.png' " % (pathname, fileName))
+#self.picture = self.vna.read_raw()
+#cutting_character = self.picture.find(b'\x89')
+#self.picture = self.picture[cutting_character:] #remove characters up to \x89
+
+# -----------------------------------------------------------
 #self.vna.write('*RST') # Reset the instrument
 #self.vna.write('*CLS') # Clear the Error queue
 
