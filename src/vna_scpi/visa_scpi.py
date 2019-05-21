@@ -147,7 +147,7 @@ class Vna_measure(threading.Thread):
         print(self.vna.query('*WAI; *OPC?'))
 
         #file to save all traces
-        self.vna.write("MMEM:STOR:TRAC:CHAN 1, '%s\%s.csv', FORMatted" % (pathname, fileName))
+        self.vna.write("MMEM:STOR:TRAC:CHAN 1, '%s\%s.csv', FORMatted" % (pathname, fileName)) #MMEM:STOR:TRAC:CHAN {}
 
         # Wait until the command is executed
         print(self.vna.query('*WAI; *OPC?'))
