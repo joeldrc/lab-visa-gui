@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import settings
@@ -20,47 +21,53 @@ def file_open(self):
     name = QtWidgets.QFileDialog.getOpenFileName(MainWindow, 'Open File')  # Returns a tuple
     name, _ = name
 
-    """
-    #print(name)  # For debugging
-    if len(name[0]) > 0:
-        with open(name[0], 'r') as file:
-            text = file.read()
-            self.textEdit.setText(text)
-    """
+    try:
+        if self.tabWidget.currentIndex() == 3:
+            with open(name[0], 'r') as file:
+                text = file.read()
+                self.textEdit.setText(text)
 
-    test = []
-    file = open(name, "r")
-    line_cnt = 0
+        # Read file
+        file = open(name, "r")
+        file.close()
 
-    #read data
-    for row in file:
-        #start from the line number 3
-        if line_cnt > 2:
-            row = row.replace(";\n", '') #remove last column
-            column = row.split(";")
-            test.append(column)
-        else:
-            line_cnt += 1
-    #print(test[0][:])
+        test = []
+        line_cnt = 0
 
-    #re-order data
-    measures = []
-    for j in range(len(test[0])):
-        tmp = []
-        for i in range(len(test)):
-            try:
-                tmp.append(np.float_(test[i][j]))
-            except:
-                pass
-        measures.append(tmp)
-    #print(measures[1])
-    print(measures)
+        #read data
+        for row in file:
+            #start from the line number 3
+            if line_cnt > 2:
+                row = row.replace(";\n", '') #remove last column
+                column = row.split(";")
+                test.append(column)
+            else:
+                line_cnt += 1
+        #print(test[0][:])
 
-    self.vna_measure.measures = []
-    for i in range(1,len(measures)):
-        self.vna_measure.measures.append((measures[0], measures[i]))
+        file.close()
 
-    self.csv_data_ready = True
+        #re-order data
+        measures = []
+        for j in range(len(test[0])):
+            tmp = []
+            for i in range(len(test)):
+                try:
+                    tmp.append(np.float_(test[i][j]))
+                except:
+                    pass
+            measures.append(tmp)
+        #print(measures[1])
+        print(measures)
+
+        self.vna_measure.measures = []
+        for i in range(1,len(measures)):
+            self.vna_measure.measures.append((measures[0], measures[i]))
+
+        self.csv_data_ready = True
+
+    except Exception as e:
+        print(e)
 
 def file_save(self):
     title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "_all_traces"
@@ -74,6 +81,31 @@ def file_save(self):
                 text = self.textEdit.toHtml()  # Rich text with formatting (font, color, etc.)
                 file.write(text)
     else:
+        # Save all files received from vna
+        print("All-parameters")
+        try:
+            # export sp file
+            file = open(name + '.s2p',"ab")
+            file.write(self.vna_measure.s_parameters)
+            file.close()
+            print('File saved')
+
+            # export csv file
+            file = open(name + '.csv',"ab")
+            file.write(self.vna_measure.all_traces)
+            file.close()
+            print('File saved')
+
+            # export png files
+            file = open(name + '.png',"ab")
+            file.write(self.vna_measure.picture)
+            file.close()
+            print('File saved')
+
+        except Exception as e:
+            print(e)
+
+        # Save all traces in excell file
         try:
             xValue = []
             yValue = []
@@ -100,28 +132,7 @@ def file_save(self):
                     self.sheet.cell(row=j + 4, column= (i * 2) + 1).value = xValue[i][j]
                     self.sheet.cell(row=j + 4, column= (i * 2) + 2).value = yValue[i][j]
 
-                self.wb.save(name + '.xlsx')
-        except Exception as e:
-            print(e)
-
-        print("All-parameters")
-        try:
-            # export sp file
-            file = open(name + '.s2p',"ab")
-            file.write(self.vna_measure.s_parameters)
-            file.close()
-            print('File saved')
-
-            # export csv file
-            file = open(name + '.csv',"ab")
-            file.write(self.vna_measure.all_traces)
-            file.close()
-            print('File saved')
-
-            # export png files
-            file = open(name + '.png',"ab")
-            file.write(self.vna_measure.picture)
-            file.close()
+            self.wb.save(name + '.xlsx')
             print('File saved')
 
         except Exception as e:
