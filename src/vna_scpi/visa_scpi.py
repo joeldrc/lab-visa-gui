@@ -168,26 +168,29 @@ class Vna_measure(threading.Thread):
         print(self.vna.query('*WAI; *OPC?'))
 
         # read all traces from VNA (.csv file)
-        self.all_traces = self.vna.query("MMEM:DATA? '%s\%s.csv' " % (pathname, fileName))
-        self.all_traces = self.all_traces.replace("\r", "") #remove new row
+        #self.all_traces = self.vna.query("MMEM:DATA? '%s\%s.csv' " % (pathname, fileName))
+        #self.all_traces = self.all_traces.replace("\r", "") #remove new row
+        self.all_traces = self.vna.query_binary_values("MMEM:DATA? '%s\%s.csv' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
         print(self.all_traces)
 
         # Wait until the command is executed
         print(self.vna.query('*WAI; *OPC?'))
 
         # read S-parameters from VNA (.sp file)
-        self.s_parameters = self.vna.query("MMEM:DATA? '%s\%s.s2p' " % (pathname, fileName))
-        self.s_parameters = self.s_parameters.replace("\r", "") #remove new row
+        #self.s_parameters = self.vna.query("MMEM:DATA? '%s\%s.s2p' " % (pathname, fileName))
+        #self.s_parameters = self.s_parameters.replace("\r", "") #remove new row
+        self.s_parameters = self.vna.query_binary_values("MMEM:DATA? '%s\%s.s2p' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
         print(self.s_parameters)
 
         # Wait until the command is executed
         print(self.vna.query('*WAI; *OPC?'))
 
         # read pictures from VNA (.png file)
-        self.vna.write("MMEM:DATA? '%s\%s.png' " % (pathname, fileName))
-        self.picture = self.vna.read_raw()
-        cutting_character = self.picture.find(b'\x89')
-        self.picture = self.picture[cutting_character:] #remove characters up to \x89
+        #self.vna.write("MMEM:DATA? '%s\%s.png' " % (pathname, fileName))
+        #self.picture = self.vna.read_raw()
+        #cutting_character = self.picture.find(b'\x89')
+        #self.picture = self.picture[cutting_character:] #remove characters up to \x89
+        self.picture = self.vna.query_binary_values("MMEM:DATA? '%s\%s.png' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
         print(self.picture)
 
         # Wait until the command is executed
