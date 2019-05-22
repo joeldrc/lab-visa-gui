@@ -18,12 +18,11 @@ from matplotlib.figure import Figure
 
 #==============================================================================#
 def file_open(self):
-    name = QtWidgets.QFileDialog.getOpenFileName(MainWindow, 'Open File')  # Returns a tuple
-    name, _ = name
+    name, _ = QtWidgets.QFileDialog.getOpenFileName(MainWindow, 'Open File', "", "Text file (*.csv *.txt)")  # Returns a tuple
 
     try:
         if self.tabWidget.currentIndex() == 3:
-            with open(name[0], 'r') as file:
+            with open(name, 'r') as file:
                 text = file.read()
                 self.textEdit.setText(text)
 
@@ -59,9 +58,9 @@ def file_open(self):
         #print(measures[1])
         print(measures)
 
-        self.vna_measure.measures = []
+        self.measures_stored = []
         for i in range(1,len(measures)):
-            self.vna_measure.measures.append((measures[0], measures[i]))
+            self.measures_stored.append((measures[0], measures[i]))
 
         self.csv_data_ready = True
 
@@ -70,8 +69,7 @@ def file_open(self):
 
 def file_save(self):
     title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "_all_traces"
-    name = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title))  # Returns a tuple
-    name, _ = name
+    name, _ = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title))  # Returns a tuple
 
     if self.tabWidget.currentIndex() == 3:
         if len(name) > 0:
@@ -109,7 +107,7 @@ def file_save(self):
             xValue = []
             yValue = []
 
-            measures = self.vna_measure.measures
+            measures = self.measures_stored
 
             self.wb = Workbook()
             self.sheet = self.wb.active
@@ -225,7 +223,6 @@ def remove_trace(self):
 def instrument_refresh(self):
     try:
         self.remoteConnectionLabel.setText(self.vna_measure.instrument_info)
-        #self.update_plot()
 
         bar_value = self.progressBar.value()
         if bar_value < 100:
@@ -234,6 +231,9 @@ def instrument_refresh(self):
 
         if self.vna_measure.data_ready == True:
             self.vna_measure.data_ready = False
+
+            # copy array
+            self.measures_stored = self.vna_measure.measures
 
             self.update_plot()
             self.progressBar.setValue(100)
@@ -345,8 +345,8 @@ def update_plot(self):
         #selected_frame_number = self.vna_measure.test_type - 1
         selected_frame_number = self.tabWidget.currentIndex() - 1
 
-        if (len(self.vna_measure.measures)) < (len(settings.plot_names[selected_frame_number])):
-            channel_number = len(self.vna_measure.measures)
+        if (len(self.measures_stored)) < (len(settings.plot_names[selected_frame_number])):
+            channel_number = len(self.measures_stored)
         else:
             channel_number = len(settings.plot_names[selected_frame_number])
 
@@ -354,7 +354,7 @@ def update_plot(self):
         yValue = []
 
         for i in range(channel_number):
-            x, y = self.vna_measure.measures[i]
+            x, y = self.measures_stored[i]
             xValue.append(x)
             yValue.append(y)
             # clean plot line
@@ -431,6 +431,7 @@ Ui_MainWindow.delRef = False
 Ui_MainWindow.plotRef = -1
 
 Ui_MainWindow.csv_data_ready = False
+Ui_MainWindow.measures_stored = []
 
 
 #==============================================================================#
