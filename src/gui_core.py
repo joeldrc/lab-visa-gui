@@ -68,15 +68,16 @@ def file_open(self):
         print(e)
 
 def file_save(self):
-    title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "_all_traces"
-    name, _ = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title))  # Returns a tuple
+    title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "_" + str(int(self.lcdNumber.value()))
+    name, _ = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), "all traces file (*)")  # Returns a tuple
 
     if self.tabWidget.currentIndex() == 3:
         if len(name) > 0:
-            with open(name, 'w') as file:
-                #text = self.textEdit.toPlainText()  # Plain text without formatting
-                text = self.textEdit.toHtml()  # Rich text with formatting (font, color, etc.)
+            with open(name + '.txt', 'a') as file:
+                text = self.textEdit.toPlainText()  # Plain text without formatting
+                #text = self.textEdit.toHtml()  # Rich text with formatting (font, color, etc.)
                 file.write(text)
+                file.close()
     else:
         # Save all files received from vna
         print("All-parameters")
