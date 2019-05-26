@@ -29,14 +29,14 @@ class Vna_measure(threading.Thread):
     def run(self):
         print("Init. visa setup")
 
-        if self.instrument_address == "TEST":   # TEST is used for debug
-            self.instrument_info = 'TEST MODE ON'
-            x = np.linspace(1, 301)
-            y = np.sin(x) + np.random.normal(scale=0.1, size = len(x))
-            self.measures.append((x, y))
+        try:
+            if self.instrument_address == "TEST":   # TEST is used for debug
+                self.instrument_info = 'TEST MODE ON'
+                x = np.linspace(1, 301)
+                y = np.sin(x) + np.random.normal(scale=0.1, size = len(x))
+                self.measures.append((x, y))
 
-        else:
-            try:
+            else:
                 rm = visa.ResourceManager()
                 self.vna = rm.open_resource(self.instrument_address)
                 self.vna.write_termination = '\n'   # Some instruments require that at the end of each command.
@@ -68,12 +68,12 @@ class Vna_measure(threading.Thread):
                     self.export_data(pathname + self.folder_name, self.test_name)
                     print('End measures')
 
-                self.data_ready = True
+            self.data_ready = True
 
-            except Exception as e:
-                print(e)
-                self.instrument_info = 'NO CONNECTION'
-                print(self.instrument_info)
+        except Exception as e:
+            print(e)
+            self.instrument_info = 'NO CONNECTION'
+            print(self.instrument_info)
 
 
 #==============================================================================#
