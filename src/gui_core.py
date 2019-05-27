@@ -68,7 +68,7 @@ def file_open(self):
         print(e)
 
 def file_save(self):
-    title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "_" + str(int(self.lcdNumber.value()))
+    title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text()
     name, _ = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), "all traces file (*)")  # Returns a tuple
 
     if name != "":
@@ -183,7 +183,7 @@ def check_input(self):
     self.actionQuit.triggered.connect(self.file_quit)
     self.actionFont.triggered.connect(self.edit_font)
     self.actionColor.triggered.connect(self.edit_color)
-    self.actionInfo.triggered.connect(self.file_info)
+    #self.actionInfo.triggered.connect(self.file_info)
 
     self.connectButton.clicked.connect(self.connect_instrument)
     self.startMeasure.clicked.connect(self.start_measure)
