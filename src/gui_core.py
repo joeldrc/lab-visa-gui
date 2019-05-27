@@ -71,70 +71,71 @@ def file_save(self):
     title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text() + "_" + str(int(self.lcdNumber.value()))
     name, _ = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), "all traces file (*)")  # Returns a tuple
 
-    if self.tabWidget.currentIndex() == 3:
-        if len(name) > 0:
-            with open(name + '.txt', 'a') as file:
-                text = self.textEdit.toPlainText()  # Plain text without formatting
-                #text = self.textEdit.toHtml()  # Rich text with formatting (font, color, etc.)
-                file.write(text)
+    if name != "":
+        if self.tabWidget.currentIndex() == 3:
+            if len(name) > 0:
+                with open(name + '.txt', 'a') as file:
+                    text = self.textEdit.toPlainText()  # Plain text without formatting
+                    #text = self.textEdit.toHtml()  # Rich text with formatting (font, color, etc.)
+                    file.write(text)
+                    file.close()
+        else:
+            # Save all files received from vna
+            print("All-parameters")
+            try:
+                # export sp file
+                file = open(name + '.s2p',"ab")
+                file.write(self.vna_measure.s_parameters)
                 file.close()
-    else:
-        # Save all files received from vna
-        print("All-parameters")
-        try:
-            # export sp file
-            file = open(name + '.s2p',"ab")
-            file.write(self.vna_measure.s_parameters)
-            file.close()
-            print('File saved')
+                print('File saved')
 
-            # export csv file
-            file = open(name + '.csv',"ab")
-            file.write(self.vna_measure.all_traces)
-            file.close()
-            print('File saved')
+                # export csv file
+                file = open(name + '.csv',"ab")
+                file.write(self.vna_measure.all_traces)
+                file.close()
+                print('File saved')
 
-            # export png files
-            file = open(name + '.png',"ab")
-            file.write(self.vna_measure.picture)
-            file.close()
-            print('File saved')
+                # export png files
+                file = open(name + '.png',"ab")
+                file.write(self.vna_measure.picture)
+                file.close()
+                print('File saved')
 
-        except Exception as e:
-            print(e)
+            except Exception as e:
+                print(e)
 
-        # Save all traces in excell file
-        try:
-            xValue = []
-            yValue = []
+            # Save all traces in excell file
+            try:
+                xValue = []
+                yValue = []
 
-            measures = self.measures_stored
+                measures = self.measures_stored
 
-            self.wb = Workbook()
-            self.sheet = self.wb.active
+                self.wb = Workbook()
+                self.sheet = self.wb.active
 
-            for i in range(len(measures)):
-                x, y = measures[i]
-                xValue.append(x)
-                yValue.append(y)
+                for i in range(len(measures)):
+                    x, y = measures[i]
+                    xValue.append(x)
+                    yValue.append(y)
 
-            # Create sheet
-            self.sheet.cell(row=1, column=1).value = "test"
-            self.sheet.cell(row=1, column=2).value = "test 2"
+                # Create sheet
+                self.sheet.cell(row=1, column=1).value = "test"
+                self.sheet.cell(row=1, column=2).value = "test 2"
 
-            for i in range(0, len(xValue), 1):
-                self.sheet.cell(row=2, column= (i * 2) + 1).value = 'data: ' + str(i + 1)
-                self.sheet.cell(row=3, column= (i * 2) + 1).value = 'x'
-                self.sheet.cell(row=3, column= (i * 2) + 2).value = 'y'
-                for j in range(0, len(xValue[0]), 1):
-                    self.sheet.cell(row=j + 4, column= (i * 2) + 1).value = xValue[i][j]
-                    self.sheet.cell(row=j + 4, column= (i * 2) + 2).value = yValue[i][j]
+                for i in range(0, len(xValue), 1):
+                    self.sheet.cell(row=2, column= (i * 2) + 1).value = 'data: ' + str(i + 1)
+                    self.sheet.cell(row=3, column= (i * 2) + 1).value = 'x'
+                    self.sheet.cell(row=3, column= (i * 2) + 2).value = 'y'
+                    for j in range(0, len(xValue[0]), 1):
+                        self.sheet.cell(row=j + 4, column= (i * 2) + 1).value = xValue[i][j]
+                        self.sheet.cell(row=j + 4, column= (i * 2) + 2).value = yValue[i][j]
 
-            self.wb.save(name + '.xlsx')
-            print('File saved')
+                self.wb.save(name + '.xlsx')
+                print('File saved')
 
-        except Exception as e:
-            print(e)
+            except Exception as e:
+                print(e)
 
 def file_quit(self):
     decision = QtWidgets.QMessageBox.question(MainWindow, 'Question',
