@@ -172,6 +172,9 @@ def enlarge_window(self):
     else:
         MainWindow.setGeometry(100, 100, 400, 300)
 
+def file_info(self):
+    QtWidgets.QMessageBox.question(MainWindow, 'Info','joel.daricou@cern.ch')
+
 
 #==============================================================================#
 def check_input(self):
@@ -180,6 +183,7 @@ def check_input(self):
     self.actionQuit.triggered.connect(self.file_quit)
     self.actionFont.triggered.connect(self.edit_font)
     self.actionColor.triggered.connect(self.edit_color)
+    self.actionInfo.triggered.connect(self.file_info)
 
     self.connectButton.clicked.connect(self.connect_instrument)
     self.startMeasure.clicked.connect(self.start_measure)
@@ -404,6 +408,7 @@ Ui_MainWindow.file_save = file_save
 Ui_MainWindow.file_quit = file_quit
 Ui_MainWindow.edit_font = edit_font
 Ui_MainWindow.edit_color = edit_color
+Ui_MainWindow.file_info = file_info
 Ui_MainWindow.enlarge_window = enlarge_window
 
 Ui_MainWindow.connect_instrument = connect_instrument
