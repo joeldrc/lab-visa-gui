@@ -64,6 +64,7 @@ class Vna_measure(threading.Thread):
                         self.load_instrument_state(pathname + typeName)
                         calibration = self.test_type
 
+                    self.auto_scale_screen()
                     self.read_data()
                     self.export_data(pathname + self.folder_name, self.test_name)
                     print('End measures')
@@ -100,16 +101,40 @@ class Vna_measure(threading.Thread):
 
 
 #==============================================================================#
+    def auto_scale_screen(self):
+        # read windows number (1, 1, ...)
+        windows_number = self.vna.query("DISPlay:WINDow:CATalog? ")
+        self.wait()
+
+        windows_number = windows_number.split(",")
+        print(windows_number)
+
+        for i in range(int(len(windows_number)/2)):
+            # read trace in window (1,Trc1, ...)
+            trace_in_window = self.vna.query("DISPlay:WINDow%d:TRACe:CATalog?" % (i + 1))
+            self.wait()
+
+            trace_in_window = trace_in_window.split(",")
+            print(trace_in_window)
+
+            for j in range(int(len(trace_in_window)/2)):
+                self.vna.write("DISPlay:WINDow%d:TRACe%d:Y:SCALe:AUTO ONCE" % (i + 1, j + 1))
+                self.wait()
+
+                print('autoscale window %d and trace %d' % (i + 1, j + 1))
+
+
+#==============================================================================#
     def read_data(self):
         # read trace and measure type (Trc1, S21, ...)
         trace_number = self.vna.query(':CALCULATE1:PARAMETER:CATALOG?')
         self.wait()
 
         trace_number = trace_number.split(",")
-        trace_number = trace_number[0::2]
+        #trace_number = trace_number[0::2]
         print(trace_number)
 
-        for i in range(len(trace_number)):
+        for i in range(int(len(trace_number)/2)):
             #select channel
             self.vna.write("CALC1:PAR:SEL 'Trc%d'" % (i + 1))
             self.wait()
