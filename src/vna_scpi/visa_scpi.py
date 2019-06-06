@@ -78,6 +78,14 @@ class Vna_measure(threading.Thread):
 
 
 #==============================================================================#
+    def clean_string(self, string):
+        string = string.replace("'", "")
+        string = string.replace("\n", "")
+        string = string.split(",")
+        return string
+
+
+#==============================================================================#
     def wait(self, seconds = 0):
         if (seconds > 0):
             time.sleep(seconds)
@@ -106,22 +114,26 @@ class Vna_measure(threading.Thread):
         windows_number = self.vna.query("DISPlay:WINDow:CATalog? ")
         self.wait()
 
-        windows_number = windows_number.split(",")
+        windows_number = self.clean_string(windows_number)
+        print(windows_number)
+        windows_number = windows_number[0::2]
         print(windows_number)
 
-        for i in range(int(len(windows_number)/2)):
+        for i in range(len(windows_number)):
             # read trace in window (1,Trc1, ...)
-            trace_in_window = self.vna.query("DISPlay:WINDow%d:TRACe:CATalog?" % (i + 1))
+            trace_number = self.vna.query("DISPlay:WINDow%d:TRACe:CATalog?" % (i + 1))
             self.wait()
 
-            trace_in_window = trace_in_window.split(",")
-            print(trace_in_window)
+            trace_number = self.clean_string(trace_number)
+            print(trace_number)
+            trace_number = trace_number[0::2]
+            print(trace_number)
 
-            for j in range(int(len(trace_in_window)/2)):
-                self.vna.write("DISPlay:WINDow%d:TRACe%d:Y:SCALe:AUTO ONCE" % (i + 1, j + 1))
+            for j in range(len(trace_number)):
+                self.vna.write("DISPlay:WINDow%d:TRACe%d:Y:SCALe:AUTO ONCE" % (i + 1, int(trace_number[j])))
                 self.wait()
 
-                print('autoscale window %d and trace %d' % (i + 1, j + 1))
+                print('autoscale window %d and trace %d' % (i + 1, int(trace_number[j])))
 
 
 #==============================================================================#
@@ -130,11 +142,12 @@ class Vna_measure(threading.Thread):
         trace_number = self.vna.query(':CALCULATE1:PARAMETER:CATALOG?')
         self.wait()
 
-        trace_number = trace_number.split(",")
-        #trace_number = trace_number[0::2]
+        trace_number = self.clean_string(trace_number)
+        print(trace_number)
+        trace_number = trace_number[0::2]
         print(trace_number)
 
-        for i in range(int(len(trace_number)/2)):
+        for i in range(len(trace_number)):
             #select channel
             self.vna.write("CALC1:PAR:SEL 'Trc%d'" % (i + 1))
             self.wait()
