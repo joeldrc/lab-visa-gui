@@ -3,6 +3,7 @@
 
 import time
 import visa
+import pyvisa as visa
 import threading
 import numpy as np
 
