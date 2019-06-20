@@ -84,19 +84,19 @@ def file_save(self):
             print("All-parameters")
             try:
                 # export sp file
-                file = open(name + '.s2p',"ab")
+                file = open(name + '.s2p',"wb")
                 file.write(self.vna_measure.s_parameters)
                 file.close()
                 print('File saved')
 
                 # export csv file
-                file = open(name + '.csv',"ab")
+                file = open(name + '.csv',"wb")
                 file.write(self.vna_measure.all_traces)
                 file.close()
                 print('File saved')
 
                 # export png files
-                file = open(name + '.png',"ab")
+                file = open(name + '.png',"wb")
                 file.write(self.vna_measure.picture)
                 file.close()
                 print('File saved')
