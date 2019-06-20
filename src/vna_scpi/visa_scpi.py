@@ -173,16 +173,31 @@ class Vna_measure(threading.Thread):
 
 #==============================================================================#
     def export_data(self, pathname, fileName):
-        # create a new dir in the vna
-        self.vna.write("MMEM:MDIR '%s' " % (pathname))
+        # check if the current DIR already exist
+        check_folder = self.vna.query("MMEM:CAT? '%s' " % (pathname))
+        print(len(check_folder))
         self.wait()
 
-        #file to save all traces
+        if (len(check_folder) <= 1):
+            # create a new dir in the vna
+            print("create a new DIR")
+            self.vna.write("MMEM:MDIR '%s' " % (pathname))
+            self.wait()
+
+        # save all traces
         self.vna.write("MMEM:STOR:TRAC:CHAN 1, '%s\%s.csv', FORMatted" % (pathname, fileName)) #MMEM:STOR:TRAC:CHAN {}
         self.wait()
+        # read all traces from VNA (.csv file)
+        self.all_traces = self.vna.query_binary_values("MMEM:DATA? '%s\%s.csv' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
+        print(self.all_traces)
+        self.wait()
 
-        #file to save S-Param
+        # save S-Param
         self.vna.write("MMEM:STOR:TRAC:PORT 1, '%s\%s.s2p', COMPlex, 1,2" % (pathname, fileName))
+        self.wait()
+        # read S-parameters from VNA (.sp file)
+        self.s_parameters = self.vna.query_binary_values("MMEM:DATA? '%s\%s.s2p' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
+        print(self.s_parameters)
         self.wait()
 
         # save png file
@@ -191,17 +206,6 @@ class Vna_measure(threading.Thread):
         self.vna.write("HCOP:MPAG:WIND ALL")
         self.vna.write("HCOP:DEST 'MMEM'; :HCOP")
         self.wait()
-
-        # read all traces from VNA (.csv file)
-        self.all_traces = self.vna.query_binary_values("MMEM:DATA? '%s\%s.csv' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
-        print(self.all_traces)
-        self.wait()
-
-        # read S-parameters from VNA (.sp file)
-        self.s_parameters = self.vna.query_binary_values("MMEM:DATA? '%s\%s.s2p' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
-        print(self.s_parameters)
-        self.wait()
-
         # read pictures from VNA (.png file)
         self.picture = self.vna.query_binary_values("MMEM:DATA? '%s\%s.png' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
         print(self.picture)
