@@ -179,6 +179,8 @@ class Vna_measure(threading.Thread):
         self.wait()
 
         if (len(check_folder) <= 1):
+            self.vna.write('*CLS')  # Clear the Error queue
+
             # create a new dir in the vna
             print("create a new DIR")
             self.vna.write("MMEM:MDIR '%s' " % (pathname))
