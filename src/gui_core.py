@@ -336,15 +336,7 @@ def create_plot(self):
 
 def update_plot(self):
     try:
-        #code to review
-        if self.plotRef != self.tabWidget.currentIndex():
-            self.plotRef = -1
-            self.delRef = True
-            self.saveReference.setChecked(False)
-
-        self.plotRef = self.tabWidget.currentIndex()
-
-        if self.saveReference.isChecked():
+        if (self.saveReference.isChecked()):
             self.saveRef = True
 
         # return wich test you have selected
@@ -365,18 +357,21 @@ def update_plot(self):
             yValue.append(y)
             # clean plot line
             self.plot[selected_frame_number][i].clear()
-            # set data on plot
-            self.plot[selected_frame_number][i].plot(xValue[i], yValue[i])
-
-        if self.saveRef == True:
-            self.xRef.append(xValue)
-            self.yRef.append(yValue)
-            self.saveRef = False
 
         if self.delRef == True:
-            self.xRef = []
-            self.yRef = []
+            if (len(self.xRef) > 0):
+                del(self.xRef[-1])
+                del(self.yRef[-1])
             self.delRef = False
+        else:
+            if self.saveRef == True:
+                self.xRef.append(xValue)
+                self.yRef.append(yValue)
+                self.saveRef = False
+
+            for i in range(channel_number):
+                # set data on plot
+                self.plot[selected_frame_number][i].plot(xValue[i], yValue[i])
 
         for j in range(len(self.xRef)):
             for i in range(channel_number):
@@ -393,7 +388,6 @@ def update_plot(self):
         self.fig[selected_frame_number].tight_layout()
         # update plot
         self.fig[selected_frame_number].canvas.draw()
-
         # markers
         #Single_marker(self.others_frame, self.canvas[selected_frame_number], self.plot[selected_frame_number], xValue, yValue, len(settings.plot_names[selected_frame_number]), self.plot_markers)
 
