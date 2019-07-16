@@ -15,6 +15,3 @@ plot_names = [[['S21 - delay group', 'GHz', 'nS'],
 
               [['S21 - TDR', 'nS', 'U'],
                ['S11 - TDR', 'nS', 'U']]]
-
-figure_names = [['Flanges'],
-                ['Pick-Up']]
