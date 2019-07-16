@@ -275,7 +275,9 @@ def create_canvas(self):
 
     #self.comboBox_test_type.setItemText(2, "ciao")
 
-    dynamic_canvas = FigureCanvas(Figure(figsize=(5, 3)))
+    self.demo_fig = Figure(figsize=(5, 3))
+
+    dynamic_canvas = FigureCanvas(self.demo_fig)
     self.plotTest.addWidget(dynamic_canvas)
     self.plotTest.addWidget(NavigationToolbar(dynamic_canvas, MainWindow))
 
@@ -291,6 +293,9 @@ def update_canvas(self):
     # Shift the sinusoid as a function of time.
     self._dynamic_ax.plot(t, np.sin(t + time.time()))
     self._dynamic_ax.figure.canvas.draw()
+
+    # auto adj
+    self.demo_fig.tight_layout()
 
 
 #==============================================================================#
@@ -337,10 +342,15 @@ def create_plot(self):
 
     # Figures
     subplot_number = len(self.measures_stored)
+    # auto adapt plot number
+    if subplot_number > 3:
+        subplot_rows = 2
+        subplot_columns = 3
+    else:
+        subplot_rows = 1
+        subplot_columns = subplot_number
+
     for i in range(subplot_number):
-        # auto adapt plot number
-        subplot_columns = (subplot_number // 3) + (subplot_number % 3)
-        subplot_rows = subplot_number // 2
         subplot = self.fig.add_subplot(subplot_rows, subplot_columns, i + 1)
         self.plot.append(subplot)
 
@@ -372,10 +382,7 @@ def update_plot(self):
         # return wich test you have selected
         selected_frame_number = self.comboBox_test_type.currentIndex() - 1
 
-        if (len(self.measures_stored)) < (len(settings.plot_names[selected_frame_number])):
-            channel_number = len(self.measures_stored)
-        else:
-            channel_number = len(settings.plot_names[selected_frame_number])
+        channel_number = len(self.measures_stored)
 
         xValue = []
         yValue = []
@@ -408,11 +415,12 @@ def update_plot(self):
 
 
         # Set names on plot
-        for i in range(len(settings.plot_names[selected_frame_number])):
-            self.plot[i].set_title(settings.plot_names[selected_frame_number][i][0])
-            self.plot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
-            self.plot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
-            #self.plot[i].grid()
+        if selected_frame_number > 0:
+            for i in range(len(settings.plot_names[selected_frame_number])):
+                self.plot[i].set_title(settings.plot_names[selected_frame_number][i][0])
+                self.plot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
+                self.plot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
+                #self.plot[i].grid()
 
         # autoadapt
         self.fig.tight_layout()
