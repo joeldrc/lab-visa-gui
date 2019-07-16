@@ -188,28 +188,22 @@ def check_input(self):
     self.connectButton.clicked.connect(self.connect_instrument)
     self.startMeasure.clicked.connect(self.start_measure)
 
-    self.checkBox.stateChanged.connect(self.enlarge_window)
     self.saveReference.stateChanged.connect(self.save_reference)
     self.addTrace.clicked.connect(self.add_trace)
     self.removeTrace.clicked.connect(self.remove_trace)
-    self.saveSparameters.clicked.connect(self.file_save)
 
-def connect_instrument(self, current_index = 0):
-    address = self.instrumentAddress.text()
-
-    self.vna_measure = Vna_measure(address, current_index, folder_name = strftime("%d%m%Y", gmtime()), test_name = strftime("%d%m%Y_%H%M%S", gmtime()))
-
+def connect_instrument(self, current_test = ''):
+    self.vna_measure = Vna_measure(self.instrumentAddress.text(), current_test)
+    self.progressBar.setValue(0)
     """
     self.instrument_timer = QtCore.QTimer()
     self.instrument_timer.timeout.connect(self.instrument_refresh)
     self.instrument_timer.start(1000)
     """
 
-    self.progressBar.setValue(0)
-
 def start_measure(self):
-    self.connect_instrument(self.tabWidget.currentIndex())
-    #print(self.tabWidget.currentIndex())
+    self.connect_instrument(self.comboBox_test_type.currentText())
+
     counter = self.lcdNumber.value() + 1
     self.lcdNumber.display(counter)
 
@@ -279,6 +273,8 @@ def create_canvas(self):
     self._static_ax.plot(t, np.tan(t), ".")
     """
 
+    #self.comboBox_test_type.setItemText(2, "ciao")
+
     dynamic_canvas = FigureCanvas(Figure(figsize=(5, 3)))
     self.plotTest.addWidget(dynamic_canvas)
     self.plotTest.addWidget(NavigationToolbar(dynamic_canvas, MainWindow))
@@ -301,6 +297,7 @@ def update_canvas(self):
 def create_plot(self):
     plt.style.use('seaborn-whitegrid')
 
+    """
     number_of_plots = len(settings.plot_names)
 
     self.plot = [[] for i in range(number_of_plots)]
@@ -309,7 +306,7 @@ def create_plot(self):
 
     # initialize fig
     for i in range(number_of_plots):
-        self.fig[i] =Figure(figsize=(12,7))
+        self.fig[i] = Figure(figsize=(12,7))
 
     # Figures
     for index in range(number_of_plots):
@@ -329,19 +326,51 @@ def create_plot(self):
     thisFigure = FigureCanvas(self.fig[0])
     self.plotTest_2.addWidget(thisFigure)
     self.plotTest_2.addWidget(NavigationToolbar(thisFigure, MainWindow))
+    """
 
-    thisFigure = FigureCanvas(self.fig[1])
-    self.plotTest_3.addWidget(thisFigure)
-    self.plotTest_3.addWidget(NavigationToolbar(thisFigure, MainWindow))
+    self.plot = []
+    self.fig = []
+    self.toolbar = []
+
+    # initialize fig
+    self.fig = Figure(figsize=(12,7))
+
+    # Figures
+    subplot_number = len(self.measures_stored)
+    for i in range(subplot_number):
+        # auto adapt plot number
+        subplot_columns = (subplot_number // 3) + (subplot_number % 3)
+        subplot_rows = subplot_number // 2
+        subplot = self.fig.add_subplot(subplot_rows, subplot_columns, i + 1)
+        self.plot.append(subplot)
+
+    # auto adj
+    self.fig.tight_layout()
+
+    # Canvas & toolbar
+    self.thisFigure = FigureCanvas(self.fig)
+    self.plotTest_2.addWidget(self.thisFigure)
+
+    self.thisToolbar = NavigationToolbar(self.thisFigure, MainWindow)
+    self.plotTest_2.addWidget(self.thisToolbar)
 
 def update_plot(self):
     try:
+        self.plotTest_2.removeWidget(self.thisFigure)
+        self.thisFigure.deleteLater()
+        self.thisFigure = None
+
+        self.plotTest_2.removeWidget(self.thisToolbar)
+        self.thisToolbar.deleteLater()
+        self.thisToolbar = None
+
+        self.create_plot()
+
         if (self.saveReference.isChecked()):
             self.saveRef = True
 
         # return wich test you have selected
-        #selected_frame_number = self.vna_measure.test_type - 1
-        selected_frame_number = self.tabWidget.currentIndex() - 1
+        selected_frame_number = self.comboBox_test_type.currentIndex() - 1
 
         if (len(self.measures_stored)) < (len(settings.plot_names[selected_frame_number])):
             channel_number = len(self.measures_stored)
@@ -356,7 +385,7 @@ def update_plot(self):
             xValue.append(x)
             yValue.append(y)
             # clean plot line
-            self.plot[selected_frame_number][i].clear()
+            self.plot[i].clear()
 
         if self.delRef == True:
             if (len(self.xRef) > 0):
@@ -371,25 +400,24 @@ def update_plot(self):
 
             for i in range(channel_number):
                 # set data on plot
-                self.plot[selected_frame_number][i].plot(xValue[i], yValue[i])
+                self.plot[i].plot(xValue[i], yValue[i])
 
         for j in range(len(self.xRef)):
             for i in range(channel_number):
-                self.plot[selected_frame_number][i].plot(self.xRef[j][i], self.yRef[j][i])
+                self.plot[i].plot(self.xRef[j][i], self.yRef[j][i])
+
 
         # Set names on plot
         for i in range(len(settings.plot_names[selected_frame_number])):
-            self.plot[selected_frame_number][i].set_title(settings.plot_names[selected_frame_number][i][0])
-            self.plot[selected_frame_number][i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
-            self.plot[selected_frame_number][i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
-            #self.plot[selected_frame_number][i].grid()
+            self.plot[i].set_title(settings.plot_names[selected_frame_number][i][0])
+            self.plot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
+            self.plot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
+            #self.plot[i].grid()
 
         # autoadapt
-        self.fig[selected_frame_number].tight_layout()
+        self.fig.tight_layout()
         # update plot
-        self.fig[selected_frame_number].canvas.draw()
-        # markers
-        #Single_marker(self.others_frame, self.canvas[selected_frame_number], self.plot[selected_frame_number], xValue, yValue, len(settings.plot_names[selected_frame_number]), self.plot_markers)
+        self.fig.canvas.draw()
 
     except Exception as e:
         print(e)
@@ -403,9 +431,9 @@ Ui_MainWindow.file_quit = file_quit
 Ui_MainWindow.edit_font = edit_font
 Ui_MainWindow.edit_color = edit_color
 Ui_MainWindow.file_info = file_info
-Ui_MainWindow.enlarge_window = enlarge_window
 
 Ui_MainWindow.connect_instrument = connect_instrument
+
 Ui_MainWindow.start_measure = start_measure
 
 Ui_MainWindow.save_reference = save_reference
