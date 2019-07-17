@@ -6,7 +6,7 @@ from user_gui import *
 from vna_scpi import *
 
 import os
-from openpyxl import *
+#from openpyxl import *
 import time
 from time import gmtime, strftime
 import numpy as np
@@ -156,7 +156,7 @@ def edit_color(self):  # Applies on selected text only
         self.textEdit.setTextColor(newcolor)
 
 def file_info(self):
-    QtWidgets.QMessageBox.question(MainWindow, 'Info','joel.daricou@cern.ch')
+    QtWidgets.QMessageBox.question(MainWindow, 'Info', settings.__author__ + '\n' + settings.__version__)
 
 
 #==============================================================================#
@@ -175,18 +175,20 @@ def check_input(self):
     self.addTrace.clicked.connect(self.add_trace)
     self.removeTrace.clicked.connect(self.remove_trace)
 
-def connect_instrument(self, current_test = ''):
-    self.vna_measure = Vna_measure(self.instrumentAddress.text(), current_test)
+def connect_instrument(self):
+    self.vna_measure = Vna_measure(self.instrumentAddress.currentText())
     self.progressBar.setValue(0)
 
-    self.instrument_timer = QtCore.QTimer()
-    self.instrument_timer.timeout.connect(self.instrument_refresh)
-    self.instrument_timer.start(1000)
+    self.instrument_refresh()
 
 def start_measure(self):
-    self.connect_instrument(self.comboBox_test_type.currentText())
+    self.vna_measure = Vna_measure(self.instrumentAddress.currentText(), self.comboBox_test_type.currentText())
+    self.progressBar.setValue(0)
+
     counter = self.lcdNumber.value() + 1
     self.lcdNumber.display(counter)
+
+    self.instrument_refresh()
 
 def save_reference(self):
     self.update_plot()
@@ -224,6 +226,10 @@ def instrument_refresh(self):
 
     except Exception as e:
         print(e)
+
+    self.instrument_timer = QtCore.QTimer()
+    self.instrument_timer.timeout.connect(self.instrument_refresh)
+    self.instrument_timer.start(1000)
 
 def update_time(self):
     self.timeLabel.setText(strftime("%d %b %Y %H:%M:%S", gmtime()))
