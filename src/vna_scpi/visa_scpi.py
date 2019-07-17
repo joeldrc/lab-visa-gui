@@ -54,7 +54,7 @@ class Vna_measure(threading.Thread):
                 print(self.vna.query('MMEMory:CDIRectory?'))
 
                 try:
-                    pathname = 'C:\Rohde&schwarz\\Nwa\Automatic_tests\\%s\\' % (self.test_type)
+                    pathname = 'C:\Rohde&schwarz\\Nwa\Automatic_tests\\'
                     typeName = '%s_test.zvx' % (self.test_type)
 
                     if self.test_type > '':
@@ -65,7 +65,7 @@ class Vna_measure(threading.Thread):
 
                         self.auto_scale_screen()
                         self.read_data()
-                        self.export_data(pathname + self.folder_name, self.test_name)
+                        self.export_data(pathname + self.test_type + self.folder_name, self.test_name)
                         print('End measures')
 
                 except Exception as e:

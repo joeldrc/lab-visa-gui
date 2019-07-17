@@ -42,7 +42,6 @@ def file_open(self):
             else:
                 line_cnt += 1
         #print(test[0][:])
-
         file.close()
 
         #re-order data
@@ -62,7 +61,7 @@ def file_open(self):
         for i in range(1,len(measures)):
             self.measures_stored.append((measures[0], measures[i]))
 
-        self.csv_data_ready = True
+        self.update_plot()
 
     except Exception as e:
         print(e)
@@ -72,7 +71,7 @@ def file_save(self):
     name, _ = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), "all traces file (*)")  # Returns a tuple
 
     if name != "":
-        if self.tabWidget.currentIndex() == 3:
+        if self.tabWidget.currentIndex() == 2:
             if len(name) > 0:
                 with open(name + '.txt', 'a') as file:
                     text = self.textEdit.toPlainText()  # Plain text without formatting
@@ -104,11 +103,11 @@ def file_save(self):
             except Exception as e:
                 print(e)
 
+            """
             # Save all traces in excell file
             try:
                 xValue = []
                 yValue = []
-
                 measures = self.measures_stored
 
                 self.wb = Workbook()
@@ -133,9 +132,9 @@ def file_save(self):
 
                 self.wb.save(name + '.xlsx')
                 print('File saved')
-
             except Exception as e:
                 print(e)
+            """
 
 def file_quit(self):
     decision = QtWidgets.QMessageBox.question(MainWindow, 'Question',
@@ -156,22 +155,6 @@ def edit_color(self):  # Applies on selected text only
     if newcolor.isValid():
         self.textEdit.setTextColor(newcolor)
 
-def enlarge_window(self):
-    if self.checkBox.isChecked():
-        MainWindow.setGeometry(100, 100, 600, 400)
-        #MainWindow.setWindowTitle("PyQT tuts!")
-        """
-        import os
-        scriptDir = os.path.dirname(os.path.realpath(__file__))
-        MainWindow.setWindowIcon(QtGui.QIcon(scriptDir + os.path.sep + 'images/icon.ico'))
-        """
-        """
-        from PyQt5.QtWidgets import QStyleFactory
-        app.setStyle(QStyleFactory.create('Fusion'))
-        """
-    else:
-        MainWindow.setGeometry(100, 100, 400, 300)
-
 def file_info(self):
     QtWidgets.QMessageBox.question(MainWindow, 'Info','joel.daricou@cern.ch')
 
@@ -183,7 +166,7 @@ def check_input(self):
     self.actionQuit.triggered.connect(self.file_quit)
     self.actionFont.triggered.connect(self.edit_font)
     self.actionColor.triggered.connect(self.edit_color)
-    #self.actionInfo.triggered.connect(self.file_info)
+    self.actionAbout.triggered.connect(self.file_info)
 
     self.connectButton.clicked.connect(self.connect_instrument)
     self.startMeasure.clicked.connect(self.start_measure)
@@ -195,15 +178,13 @@ def check_input(self):
 def connect_instrument(self, current_test = ''):
     self.vna_measure = Vna_measure(self.instrumentAddress.text(), current_test)
     self.progressBar.setValue(0)
-    """
+
     self.instrument_timer = QtCore.QTimer()
     self.instrument_timer.timeout.connect(self.instrument_refresh)
     self.instrument_timer.start(1000)
-    """
 
 def start_measure(self):
     self.connect_instrument(self.comboBox_test_type.currentText())
-
     counter = self.lcdNumber.value() + 1
     self.lcdNumber.display(counter)
 
@@ -244,21 +225,11 @@ def instrument_refresh(self):
     except Exception as e:
         print(e)
 
-    if self.csv_data_ready == True:
-        self.csv_data_ready = False
-
-        self.update_plot()
-        self.progressBar.setValue(100)
-
 def update_time(self):
     self.timeLabel.setText(strftime("%d %b %Y %H:%M:%S", gmtime()))
     self.timer = QtCore.QTimer()
     self.timer.timeout.connect(self.update_time)
     self.timer.start(1000)
-
-    self.instrument_timer = QtCore.QTimer()
-    self.instrument_timer.timeout.connect(self.instrument_refresh)
-    self.instrument_timer.start(1000)
 
 
 #==============================================================================#
@@ -273,8 +244,6 @@ def create_canvas(self):
     self._static_ax.plot(t, np.tan(t), ".")
     """
 
-    #self.comboBox_test_type.setItemText(2, "ciao")
-
     self.demo_fig = Figure(figsize=(5, 3))
 
     dynamic_canvas = FigureCanvas(self.demo_fig)
@@ -283,8 +252,7 @@ def create_canvas(self):
 
     self._dynamic_ax = dynamic_canvas.figure.subplots()
 
-    self._timer = dynamic_canvas.new_timer(
-        100, [(self.update_canvas, (), {})])
+    self._timer = dynamic_canvas.new_timer(100, [(self.update_canvas, (), {})])
     self._timer.start()
 
 def update_canvas(self):
@@ -301,37 +269,6 @@ def update_canvas(self):
 #==============================================================================#
 def create_plot(self):
     plt.style.use('seaborn-whitegrid')
-
-    """
-    number_of_plots = len(settings.plot_names)
-
-    self.plot = [[] for i in range(number_of_plots)]
-    self.fig = [[] for i in range(number_of_plots)]
-    self.toolbar = [[] for i in range(number_of_plots)]
-
-    # initialize fig
-    for i in range(number_of_plots):
-        self.fig[i] = Figure(figsize=(12,7))
-
-    # Figures
-    for index in range(number_of_plots):
-        subplot_number = len(settings.plot_names[index])
-        for i in range(subplot_number):
-            # auto adapt plot number
-            subplot_columns = (subplot_number // 3) + (subplot_number % 3)
-            subplot_rows = subplot_number // 2
-            subplot = self.fig[index].add_subplot(subplot_rows, subplot_columns, i + 1)
-            self.plot[index].append(subplot)
-
-    # auto adj
-    for i in range(number_of_plots):
-        self.fig[i].tight_layout()
-
-    # Canvas & toolbar
-    thisFigure = FigureCanvas(self.fig[0])
-    self.plotTest_2.addWidget(thisFigure)
-    self.plotTest_2.addWidget(NavigationToolbar(thisFigure, MainWindow))
-    """
 
     self.plot = []
     self.fig = []
@@ -366,22 +303,24 @@ def create_plot(self):
 
 def update_plot(self):
     try:
+        # delete old fig
         self.plotTest_2.removeWidget(self.thisFigure)
         self.thisFigure.deleteLater()
         self.thisFigure = None
 
+        # delete old toolbar
         self.plotTest_2.removeWidget(self.thisToolbar)
         self.thisToolbar.deleteLater()
         self.thisToolbar = None
 
         self.create_plot()
 
+        """ to be reviewed """
         if (self.saveReference.isChecked()):
             self.saveRef = True
 
         # return wich test you have selected
         selected_frame_number = self.comboBox_test_type.currentIndex() - 1
-
         channel_number = len(self.measures_stored)
 
         xValue = []
@@ -412,7 +351,6 @@ def update_plot(self):
         for j in range(len(self.xRef)):
             for i in range(channel_number):
                 self.plot[i].plot(self.xRef[j][i], self.yRef[j][i])
-
 
         # Set names on plot
         if selected_frame_number > 0:
@@ -465,9 +403,6 @@ Ui_MainWindow.xRef = []
 Ui_MainWindow.yRef = []
 Ui_MainWindow.saveRef = False
 Ui_MainWindow.delRef = False
-Ui_MainWindow.plotRef = -1
-
-Ui_MainWindow.csv_data_ready = False
 Ui_MainWindow.measures_stored = []
 
 
