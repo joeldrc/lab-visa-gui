@@ -48,6 +48,7 @@ class Vna_measure(threading.Thread):
                 #read instrument info
                 self.instrument_info = self.vna.query('*IDN?')                  #Query the Identification string
                 self.instrument_info = self.instrument_info.replace("\r", "")   #remove new row
+                self.instrument_info = self.instrument_info.replace("\n", "")   #remove new row
                 print(self.instrument_info)
 
                 # Read default directory
