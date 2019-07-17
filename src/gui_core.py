@@ -209,7 +209,7 @@ def instrument_refresh(self):
 
         bar_value = self.progressBar.value()
         if bar_value < 100:
-            bar_value += 5
+            bar_value += 3
             self.progressBar.setValue(bar_value)
 
         if self.vna_measure.data_ready == True:
