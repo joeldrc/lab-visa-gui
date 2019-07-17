@@ -209,7 +209,7 @@ def instrument_refresh(self):
 
         bar_value = self.progressBar.value()
         if bar_value < 100:
-            bar_value += 3
+            bar_value += 2
             self.progressBar.setValue(bar_value)
 
         if self.vna_measure.data_ready == True:
@@ -285,6 +285,9 @@ def create_plot(self):
 
     # Figures
     subplot_number = len(self.measures_stored)
+    if subplot_number < 1:
+        subplot_number = 1
+
     # auto adapt plot number
     if subplot_number > 3:
         subplot_rows = 2
