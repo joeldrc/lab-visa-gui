@@ -108,7 +108,7 @@ class Ui_MainWindow(object):
         self.groupBox.setObjectName("groupBox")
         self.comboBox_test_type = QtWidgets.QComboBox(self.groupBox)
         self.comboBox_test_type.setGeometry(QtCore.QRect(10, 20, 261, 21))
-        self.comboBox_test_type.setEditable(False)
+        self.comboBox_test_type.setEditable(True)
         self.comboBox_test_type.setObjectName("comboBox_test_type")
         self.comboBox_test_type.addItem("")
         self.comboBox_test_type.addItem("")
