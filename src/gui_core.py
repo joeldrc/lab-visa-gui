@@ -201,6 +201,10 @@ def remove_trace(self):
     self.delRef = True
     self.update_plot()
 
+def newkeyPressEvent(self, e):
+    if e.key() == QtCore.Qt.Key_Enter:
+        print ("User has pushed Enter")
+
 
 #==============================================================================#
 def instrument_refresh(self):
@@ -407,6 +411,8 @@ Ui_MainWindow.update_canvas = update_canvas
 Ui_MainWindow.create_plot = create_plot
 Ui_MainWindow.update_plot = update_plot
 
+Ui_MainWindow.newkeyPressEvent = newkeyPressEvent
+
 
 #==============================================================================#
 Ui_MainWindow.xRef = []
@@ -427,5 +433,6 @@ ui.update_time()
 ui.check_input()
 ui.create_canvas()
 ui.create_plot()
+MainWindow.keyPressEvent = ui.newkeyPressEvent
 MainWindow.show()
 sys.exit(app.exec_())
