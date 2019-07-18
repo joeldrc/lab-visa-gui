@@ -262,14 +262,15 @@ def create_canvas(self):
     self._timer.start()
 
 def update_canvas(self):
-    self._dynamic_ax.clear()
-    t = np.linspace(0, 10, 101)
-    # Shift the sinusoid as a function of time.
-    self._dynamic_ax.plot(t, np.sin(t + time.time()))
-    self._dynamic_ax.figure.canvas.draw()
+    if self.tabWidget.currentIndex() == 0:
+        self._dynamic_ax.clear()
+        t = np.linspace(0, 10, 101)
+        # Shift the sinusoid as a function of time.
+        self._dynamic_ax.plot(t, np.sin(t + time.time()))
+        self._dynamic_ax.figure.canvas.draw()
 
-    # auto adj
-    self.demo_fig.tight_layout()
+        # auto adj
+        self.demo_fig.tight_layout()
 
 
 #==============================================================================#
