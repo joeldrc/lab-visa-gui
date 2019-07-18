@@ -205,6 +205,8 @@ def newkeyPressEvent(self, e):
     if e.key() == QtCore.Qt.Key_Enter:
         print ("User has pushed Enter")
 
+        self.start_measure()
+
 
 #==============================================================================#
 def instrument_refresh(self):
