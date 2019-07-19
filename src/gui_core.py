@@ -100,6 +100,7 @@ def file_save(self):
                 file.close()
                 print('File saved')
 
+                QtWidgets.QMessageBox.question(MainWindow, 'Info', 'Files saved!', QtWidgets.QMessageBox.Ok)
             except Exception as e:
                 print(e)
 
@@ -156,7 +157,7 @@ def edit_color(self):  # Applies on selected text only
         self.textEdit.setTextColor(newcolor)
 
 def file_info(self):
-    QtWidgets.QMessageBox.question(MainWindow, 'Info', settings.__author__ + '\n' + settings.__version__)
+    QtWidgets.QMessageBox.question(MainWindow, 'Info', settings.__author__ + '\n' + settings.__version__, QtWidgets.QMessageBox.Ok)
 
 
 #==============================================================================#
