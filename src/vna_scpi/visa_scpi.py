@@ -15,7 +15,7 @@ loading_time = 20 #seconds
 
 
 class Vna_measure(threading.Thread):
-    def __init__(self, address, test_type = '', folder_name = 'data', test_name = strftime("%d%m%Y_%H%M%S", gmtime())):
+    def __init__(self, address, test_type = '', folder_name = 'data', test_name = 'test'):
         threading.Thread.__init__(self)
 
         self.instrument_address = address
@@ -46,16 +46,18 @@ class Vna_measure(threading.Thread):
                 self.vna.write_termination = '\n'   # Some instruments require that at the end of each command.
 
                 #read instrument info
-                self.instrument_info = self.vna.query('*IDN?')                  #Query the Identification string
-                self.instrument_info = self.instrument_info.replace("\r", "")   #remove new row
-                self.instrument_info = self.instrument_info.replace("\n", "")   #remove new row
+                self.instrument_info = self.vna.query('*IDN?')  #Query the Identification string
+                self.instrument_info = self.clean_string(self.instrument_info, clean_txt = True)
                 print(self.instrument_info)
 
                 # Read default directory
-                print(self.vna.query('MMEMory:CDIRectory?'))
+                default_dir = self.vna.query('MMEMory:CDIRectory?') # 'C:\Rohde&schwarz\\Nwa'
+                default_dir = self.clean_string(default_dir, clean_txt = True)
+                print(default_dir)
 
                 try:
-                    pathname = 'C:\Rohde&schwarz\\Nwa\Automatic_tests\\'
+                    pathname = default_dir + '\\Automatic_tests\\'
+                    print(pathname)
                     typeName = '%s_test.zvx' % (self.test_type)
 
                     if self.test_type > '':
@@ -66,7 +68,7 @@ class Vna_measure(threading.Thread):
 
                         self.auto_scale_screen()
                         self.read_data()
-                        self.export_data(pathname + self.test_type + self.folder_name, self.test_name)
+                        self.export_data(pathname + self.test_type + '_' + self.folder_name, self.test_name)
                         print('End measures')
 
                 except Exception as e:
@@ -81,10 +83,14 @@ class Vna_measure(threading.Thread):
 
 
 #==============================================================================#
-    def clean_string(self, string):
+    def clean_string(self, string, clean_txt = False):      
         string = string.replace("'", "")
+        string = string.replace("\r", "")
         string = string.replace("\n", "")
-        string = string.split(",")
+        
+        if clean_txt == False:
+            string = string.split(",")
+            
         return string
 
 
@@ -222,7 +228,7 @@ class Vna_measure(threading.Thread):
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    print("Pyton test software 2019\n")
+    print("Python test software 2019\n")
 
     while(1):
         run_script =  input('Continue [y/n](enter to default)?:')

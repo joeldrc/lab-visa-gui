@@ -182,7 +182,7 @@ def connect_instrument(self):
     self.instrument_refresh()
 
 def start_measure(self):
-    self.vna_measure = Vna_measure(self.instrumentAddress.currentText(), self.comboBox_test_type.currentText())
+    self.vna_measure = Vna_measure(self.instrumentAddress.currentText(), self.comboBox_test_type.currentText(), test_name = strftime("%d%m%Y_%H%M%S", gmtime()))
     self.progressBar.setValue(0)
 
     counter = self.lcdNumber.value() + 1
