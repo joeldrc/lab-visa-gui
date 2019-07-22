@@ -269,7 +269,7 @@ def create_canvas(self):
     self._timer.start()
 
 def update_canvas(self):
-    if self.tabWidget.currentIndex() == 0:
+    if self.tabWidget.currentIndex() == 2:
         self._dynamic_ax.clear()
         t = np.linspace(0, 10, 101)
         # Shift the sinusoid as a function of time.

@@ -404,16 +404,6 @@
          <property name="movable">
           <bool>false</bool>
          </property>
-         <widget class="QWidget" name="tab">
-          <attribute name="title">
-           <string>Home (demo)</string>
-          </attribute>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0">
-            <layout class="QVBoxLayout" name="plotTest"/>
-           </item>
-          </layout>
-         </widget>
          <widget class="QWidget" name="tab_2">
           <attribute name="title">
            <string>Test mode</string>
@@ -431,6 +421,16 @@
           <layout class="QGridLayout" name="gridLayout_5">
            <item row="0" column="0">
             <widget class="QTextEdit" name="textEdit"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab">
+          <attribute name="title">
+           <string>Demo</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="0" column="0">
+            <layout class="QVBoxLayout" name="plotTest"/>
            </item>
           </layout>
          </widget>
