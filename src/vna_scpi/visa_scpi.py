@@ -74,23 +74,25 @@ class Vna_measure(threading.Thread):
                 except Exception as e:
                     print(e)
 
-            self.data_ready = True
+            #self.data_ready = True
 
         except Exception as e:
             print(e)
             self.instrument_info = 'NO CONNECTION'
             print(self.instrument_info)
 
+        self.data_ready = True
+
 
 #==============================================================================#
-    def clean_string(self, string, clean_txt = False):      
+    def clean_string(self, string, clean_txt = False):
         string = string.replace("'", "")
         string = string.replace("\r", "")
         string = string.replace("\n", "")
-        
+
         if clean_txt == False:
             string = string.split(",")
-            
+
         return string
 
 
