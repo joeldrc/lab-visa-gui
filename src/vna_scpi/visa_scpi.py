@@ -15,13 +15,12 @@ loading_time = 20 #seconds
 
 
 class Vna_measure(threading.Thread):
-    def __init__(self, address, test_type = '', folder_name = 'data', test_name = 'test'):
+    def __init__(self, address, test_type = '', test_name = 'test'):
         threading.Thread.__init__(self)
 
         self.instrument_address = address
         self.test_type = test_type
 
-        self.folder_name = folder_name
         self.test_name = test_name
 
         self.measures = []
@@ -58,7 +57,7 @@ class Vna_measure(threading.Thread):
                 try:
                     pathname = default_dir + '\\Automatic_tests\\'
                     print(pathname)
-                    typeName = '%s_test.zvx' % (self.test_type)
+                    typeName = '%s.zvx' % (self.test_type)
 
                     if self.test_type > '':
                         global calibration
@@ -68,7 +67,7 @@ class Vna_measure(threading.Thread):
 
                         self.auto_scale_screen()
                         self.read_data()
-                        self.export_data(pathname + self.test_type + '_' + self.folder_name, self.test_name)
+                        self.export_data(pathname + self.test_type, self.test_name)
                         print('End measures')
 
                 except Exception as e:
