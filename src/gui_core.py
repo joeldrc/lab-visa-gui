@@ -21,7 +21,7 @@ def file_open(self):
     name, _ = QtWidgets.QFileDialog.getOpenFileName(MainWindow, 'Open File', "", "Text file (*.csv *.txt)")  # Returns a tuple
 
     try:
-        if self.tabWidget.currentIndex() == 3:
+        if self.tabWidget.currentIndex() == 1:
             with open(name, 'r') as file:
                 text = file.read()
                 self.textEdit.setText(text)
@@ -71,7 +71,7 @@ def file_save(self):
     name, _ = QtWidgets.QFileDialog.getSaveFileName(MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), "all traces file (*)")  # Returns a tuple
 
     if name != "":
-        if self.tabWidget.currentIndex() == 2:
+        if self.tabWidget.currentIndex() == 1:
             if len(name) > 0:
                 with open(name + '.txt', 'a') as file:
                     text = self.textEdit.toPlainText()  # Plain text without formatting
