@@ -28,7 +28,6 @@ def file_open(self):
 
         # Read file
         file = open(name, "r")
-
         test = []
         line_cnt = 0
 
@@ -175,6 +174,13 @@ def check_input(self):
     self.saveReference.stateChanged.connect(self.save_reference)
     self.addTrace.clicked.connect(self.add_trace)
     self.removeTrace.clicked.connect(self.remove_trace)
+
+    for i in range(len(settings.instrument_address)):
+        #self.instrumentAddress.setItemText(i, settings.instrument_address[i])
+        self.instrumentAddress.addItem(settings.instrument_address[i])
+
+    for i in range(len(settings.test_name)):
+        self.comboBox_test_type.addItem(settings.test_name[i])
 
 def connect_instrument(self):
     self.vna_measure = Vna_measure(self.instrumentAddress.currentText())

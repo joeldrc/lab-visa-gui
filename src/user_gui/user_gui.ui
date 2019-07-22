@@ -332,16 +332,6 @@
            <property name="editable">
             <bool>true</bool>
            </property>
-           <item>
-            <property name="text">
-             <string>TCPIP::CFO-MD-BQPVNA1::INSTR</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>TEST</string>
-            </property>
-           </item>
           </widget>
          </widget>
          <widget class="QGroupBox" name="groupBox">
@@ -369,23 +359,8 @@
             <bool>true</bool>
            </property>
            <property name="currentText">
-            <string>No_cal.</string>
+            <string/>
            </property>
-           <item>
-            <property name="text">
-             <string>No_cal.</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Feedthrough</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Pick_up</string>
-            </property>
-           </item>
           </widget>
          </widget>
         </widget>
