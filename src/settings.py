@@ -16,13 +16,11 @@ plot_names = [ [ ['S21 - delay group', 'GHz', 'nS'],
                [ ['S21 - TDR', 'nS', 'U'],
                  ['S11 - TDR', 'nS', 'U']]]
 
-
 instrument_address = [ 'TCPIP::CFO-MD-BQPVNA1::INSTR',
                        'TCPIP::VNA-ZNB8-BI-QP::INSTR',
                        'TCPIP::VNA-ZNB4-BI-QP::INSTR',
                        'TEST']
 
-
-test_name = [ 'No_cal',
+test_name = [ 'Test',
               'Feedthrough',
               'Pick_up']
