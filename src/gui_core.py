@@ -376,7 +376,7 @@ def update_plot(self):
                 self.plot[i].plot(self.xRef[j][i], self.yRef[j][i])
 
         # Set names on plot
-        if selected_frame_number > 0:
+        if selected_frame_number < len(settings.plot_names):
             for i in range(len(settings.plot_names[selected_frame_number])):
                 self.plot[i].set_title(settings.plot_names[selected_frame_number][i][0])
                 self.plot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])

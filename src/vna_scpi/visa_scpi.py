@@ -20,14 +20,14 @@ class Vna_measure(threading.Thread):
 
         self.instrument_address = address
         self.test_type = test_type
-
         self.test_name = test_name
 
         self.measures = []
         self.instrument_info = ''
         self.data_ready = False
 
-        self.start() # Start thread
+        # Start thread
+        self.start()
 
     def run(self):
         print("\nInit. visa setup\n")
@@ -51,19 +51,17 @@ class Vna_measure(threading.Thread):
 
                 # Read default directory
                 self.vna.write('MMEMory:CDIRectory DEFault') # set to default
-                default_dir = self.vna.query('MMEMory:CDIRectory?') # 'C:\Rohde&schwarz\\Nwa'
+                default_dir = self.vna.query('MMEMory:CDIRectory?') # read dir
                 default_dir = self.clean_string(default_dir, clean_txt = True)
-                print(default_dir)
+                #print(default_dir)
+                pathname = default_dir + '\\Automatic_tests\\'
+                print(pathname)
 
                 try:
-                    pathname = default_dir + '\\Automatic_tests\\'
-                    print(pathname)
-                    typeName = '%s' % (self.test_type)
-
                     if self.test_type > '':
                         global calibration
                         if (calibration != self.test_type):
-                            self.load_instrument_state(pathname + typeName)
+                            self.load_instrument_state(pathname + self.test_type)
                             calibration = self.test_type
 
                         self.auto_scale_screen()
@@ -73,8 +71,6 @@ class Vna_measure(threading.Thread):
 
                 except Exception as e:
                     print(e)
-
-            #self.data_ready = True
 
         except Exception as e:
             print(e)
