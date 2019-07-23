@@ -50,6 +50,7 @@ class Vna_measure(threading.Thread):
                 print(self.instrument_info)
 
                 # Read default directory
+                self.vna.write('MMEMory:CDIRectory DEFault') # set to default
                 default_dir = self.vna.query('MMEMory:CDIRectory?') # 'C:\Rohde&schwarz\\Nwa'
                 default_dir = self.clean_string(default_dir, clean_txt = True)
                 print(default_dir)
@@ -57,7 +58,7 @@ class Vna_measure(threading.Thread):
                 try:
                     pathname = default_dir + '\\Automatic_tests\\'
                     print(pathname)
-                    typeName = '%s.zvx' % (self.test_type)
+                    typeName = '%s' % (self.test_type)
 
                     if self.test_type > '':
                         global calibration
@@ -197,29 +198,34 @@ class Vna_measure(threading.Thread):
             self.wait()
 
         # save all traces
-        self.vna.write("MMEM:STOR:TRAC:CHAN 1, '%s\%s.csv', FORMatted" % (pathname, fileName)) #MMEM:STOR:TRAC:CHAN {}
+        self.vna.write("MMEM:STOR:TRAC:CHAN 1, '%s\\%s.csv', FORMatted" % (pathname, fileName)) #MMEM:STOR:TRAC:CHAN {}
+        print('csv saved')
         self.wait()
-        # read all traces from VNA (.csv file)
-        self.all_traces = self.vna.query_binary_values("MMEM:DATA? '%s\%s.csv' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
-        #print(self.all_traces)
-        self.wait()
-
         # save S-Param
-        self.vna.write("MMEM:STOR:TRAC:PORT 1, '%s\%s.s2p', COMPlex, 1,2" % (pathname, fileName))
+        self.vna.write("MMEM:STOR:TRAC:PORT 1, '%s\\%s.s2p', COMPlex, 1,2" % (pathname, fileName))
+        print('sp saved')
         self.wait()
-        # read S-parameters from VNA (.sp file)
-        self.s_parameters = self.vna.query_binary_values("MMEM:DATA? '%s\%s.s2p' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
-        #print(self.s_parameters)
-        self.wait()
-
         # save png file
         self.vna.write("HCOP:DEV:LANG PNG")
-        self.vna.write("MMEM:NAME '%s\%s.png' " % (pathname, fileName))
+        self.vna.write("MMEM:NAME '%s\\%s.png' " % (pathname, fileName))
         self.vna.write("HCOP:MPAG:WIND ALL")
         self.vna.write("HCOP:DEST 'MMEM'; :HCOP")
+        print('png saved')
+        self.wait()
+
+        # read all traces from VNA (.csv file)
+        self.all_traces = self.vna.query_binary_values("MMEM:DATA? '%s\\%s.csv' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
+        print('csv read')
+        #print(self.all_traces)
+        self.wait()
+        # read S-parameters from VNA (.sp file)
+        self.s_parameters = self.vna.query_binary_values("MMEM:DATA? '%s\\%s.s2p' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
+        print('sp read')
+        #print(self.s_parameters)
         self.wait()
         # read pictures from VNA (.png file)
-        self.picture = self.vna.query_binary_values("MMEM:DATA? '%s\%s.png' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
+        self.picture = self.vna.query_binary_values("MMEM:DATA? '%s\\%s.png' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
+        print('png read')
         #print(self.picture)
         self.wait()
 
