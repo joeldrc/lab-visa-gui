@@ -372,21 +372,36 @@ def update_plot(self):
                 self.plot[i].plot(xValue[i], yValue[i])
 
         for j in range(len(self.xRef)):
-            for i in range(channel_number):
-                self.plot[i].plot(self.xRef[j][i], self.yRef[j][i])
+            if (j == 0) and (self.compareTrace.isChecked()):
+                for i in range(channel_number):
+                    purcentage = self.purcentageReference.value()
+                    self.lower_bound = self.yRef[j][i] - purcentage
+                    self.upper_bound = self.yRef[j][i] + purcentage
+                    self.plot[i].plot(self.xRef[j][i], self.yRef[j][i], lw=2, color='black', ls='--')
+                    self.plot[i].fill_between(self.xRef[j][i], self.lower_bound, self.upper_bound, facecolor='cyan', alpha=0.2)
 
-        # Set names on plot
-        if selected_frame_number < len(settings.plot_names):
-            for i in range(len(settings.plot_names[selected_frame_number])):
-                self.plot[i].set_title(settings.plot_names[selected_frame_number][i][0])
-                self.plot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
-                self.plot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
-                #self.plot[i].grid()
+                    # fill_between errors
+                    self.plot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] > self.upper_bound, facecolor='red', alpha=0.5)
+                    self.plot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] < self.lower_bound, facecolor='lime', alpha=0.5)
+            else:
+                for i in range(channel_number):
+                    self.plot[i].plot(self.xRef[j][i], self.yRef[j][i])
+
+        try:
+            # Set names on plot
+            if selected_frame_number < len(settings.plot_names):
+                for i in range(len(settings.plot_names[selected_frame_number])):
+                    self.plot[i].set_title(settings.plot_names[selected_frame_number][i][0])
+                    self.plot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
+                    self.plot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
+                    #self.plot[i].grid()
+        except Exception as e:
+            print(e)
 
         # autoadapt
-        self.fig.tight_layout()
+        #self.fig.tight_layout()
         # update plot
-        self.fig.canvas.draw()
+        #self.fig.canvas.draw()
 
     except Exception as e:
         print(e)
