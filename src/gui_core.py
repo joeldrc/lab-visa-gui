@@ -372,19 +372,25 @@ def update_plot(self):
                 self.plot[i].plot(xValue[i], yValue[i])
 
         for j in range(len(self.xRef)):
-            if (j == 0) and (self.compareTrace.isChecked()):
-                for i in range(channel_number):
+            for i in range(channel_number):
+
+                if (j == 0) and (self.compareTrace.isChecked()):
                     purcentage = self.purcentageReference.value()
-                    self.lower_bound = self.yRef[j][i] - purcentage
-                    self.upper_bound = self.yRef[j][i] + purcentage
+
+                    import numpy as np
+                    myarray = np.asarray(self.yRef[j][i])
+
+                    purcentage = myarray * purcentage / 100
+                    self.lower_bound = myarray - purcentage
+                    self.upper_bound = myarray + purcentage
+
                     self.plot[i].plot(self.xRef[j][i], self.yRef[j][i], lw=2, color='black', ls='--')
                     self.plot[i].fill_between(self.xRef[j][i], self.lower_bound, self.upper_bound, facecolor='cyan', alpha=0.2)
 
                     # fill_between errors
                     self.plot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] > self.upper_bound, facecolor='red', alpha=0.5)
                     self.plot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] < self.lower_bound, facecolor='lime', alpha=0.5)
-            else:
-                for i in range(channel_number):
+                else:
                     self.plot[i].plot(self.xRef[j][i], self.yRef[j][i])
 
         try:
@@ -399,9 +405,9 @@ def update_plot(self):
             print(e)
 
         # autoadapt
-        #self.fig.tight_layout()
+        self.fig.tight_layout()
         # update plot
-        #self.fig.canvas.draw()
+        self.fig.canvas.draw()
 
     except Exception as e:
         print(e)
