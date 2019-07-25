@@ -174,6 +174,7 @@ def check_input(self):
     self.saveReference.stateChanged.connect(self.save_reference)
     self.addTrace.clicked.connect(self.add_trace)
     self.removeTrace.clicked.connect(self.remove_trace)
+    self.compareTrace.stateChanged.connect(self.save_reference)
 
     for i in range(len(settings.instrument_address)):
         #self.instrumentAddress.setItemText(i, settings.instrument_address[i])
@@ -198,6 +199,10 @@ def start_measure(self):
     self.instrument_refresh()
 
 def save_reference(self):
+    if self.compareTrace.isChecked():
+        print('compare trace')
+        self.saveRef = True
+
     self.update_plot()
 
 def add_trace(self):
@@ -338,10 +343,6 @@ def update_plot(self):
 
         self.create_plot()
 
-        """ to be reviewed """
-        if (self.saveReference.isChecked()):
-            self.saveRef = True
-
         # return wich test you have selected
         selected_frame_number = self.comboBox_test_type.currentIndex() - 1
         channel_number = len(self.measures_stored)
@@ -355,6 +356,9 @@ def update_plot(self):
             yValue.append(y)
             # clean plot line
             self.plot[i].clear()
+
+        if self.saveReference.isChecked():
+            self.saveRef = True
 
         if self.delRef == True:
             if (len(self.xRef) > 0):
