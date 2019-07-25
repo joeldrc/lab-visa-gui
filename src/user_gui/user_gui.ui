@@ -58,15 +58,15 @@
            </size>
           </property>
           <property name="title">
-           <string>OTHER OPTIONS</string>
+           <string>OPTIONS</string>
           </property>
           <widget class="QCheckBox" name="saveReference">
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>60</y>
-             <width>111</width>
-             <height>16</height>
+             <y>20</y>
+             <width>101</width>
+             <height>21</height>
             </rect>
            </property>
            <property name="text">
@@ -76,27 +76,63 @@
           <widget class="QPushButton" name="addTrace">
            <property name="geometry">
             <rect>
-             <x>10</x>
+             <x>140</x>
              <y>20</y>
-             <width>111</width>
+             <width>61</width>
              <height>23</height>
             </rect>
            </property>
            <property name="text">
-            <string>Add trace</string>
+            <string>Add</string>
            </property>
           </widget>
           <widget class="QPushButton" name="removeTrace">
            <property name="geometry">
             <rect>
-             <x>160</x>
+             <x>210</x>
              <y>20</y>
-             <width>111</width>
+             <width>61</width>
              <height>23</height>
             </rect>
            </property>
            <property name="text">
-            <string>Remove trace</string>
+            <string>Remove</string>
+           </property>
+          </widget>
+          <widget class="QCheckBox" name="compareTrace">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>60</y>
+             <width>111</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Compare trace</string>
+           </property>
+          </widget>
+          <widget class="QDoubleSpinBox" name="purcentageReference">
+           <property name="geometry">
+            <rect>
+             <x>140</x>
+             <y>60</y>
+             <width>61</width>
+             <height>21</height>
+            </rect>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_5">
+           <property name="geometry">
+            <rect>
+             <x>210</x>
+             <y>60</y>
+             <width>61</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>% from Ref</string>
            </property>
           </widget>
          </widget>
@@ -246,7 +282,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>Auto save data</string>
+            <string>Auto save files</string>
            </property>
           </widget>
           <widget class="QLabel" name="timeLabel">
