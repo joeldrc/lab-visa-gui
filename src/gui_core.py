@@ -384,7 +384,7 @@ def update_plot(self):
                     import numpy as np
                     myarray = np.asarray(self.yRef[j][i])
 
-                    purcentage = myarray * purcentage / 100
+                    purcentage = abs(myarray * purcentage / 100)
                     self.lower_bound = myarray - purcentage
                     self.upper_bound = myarray + purcentage
 
