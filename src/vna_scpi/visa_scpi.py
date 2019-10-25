@@ -198,7 +198,7 @@ class Vna_measure(threading.Thread):
         print('csv saved')
         self.wait()
         # save S-Param
-        self.vna.write("MMEM:STOR:TRAC:PORT 1, '%s\\%s.s2p', COMPlex, 1,2" % (pathname, fileName))
+        self.vna.write("MMEM:STOR:TRAC:PORT 1, '%s\\%s.s2p', COMPlex, 1,3" % (pathname, fileName))
         print('sp saved')
         self.wait()
         # save png file
