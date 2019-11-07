@@ -81,23 +81,27 @@ def file_save(self):
             # Save all files received from vna
             print("All-parameters")
             try:
-                # export sp file
-                file = open(name + '.s2p',"wb")
-                file.write(self.vna_measure.s_parameters)
-                file.close()
-                print('File saved')
-
-                # export csv file
-                file = open(name + '.csv',"wb")
-                file.write(self.vna_measure.all_traces)
-                file.close()
-                print('File saved')
-
                 # export png files
                 file = open(name + '.png',"wb")
                 file.write(self.vna_measure.picture)
                 file.close()
                 print('File saved')
+
+                # export csv file
+                for i in range(len(self.vna_measure.all_traces)):
+                    # export sp file
+                    file = open(name + str(i) + '.csv',"wb")
+                    file.write(self.vna_measure.all_traces[i])
+                    file.close()
+                    print('File saved ' + str(i))
+
+                # export sp file
+                for i in range(len(self.vna_measure.s_parameters)):
+                    # export sp file
+                    file = open(name + str(i) + '.s2p',"wb")
+                    file.write(self.vna_measure.s_parameters[i])
+                    file.close()
+                    print('File saved ' + str(i))
 
                 QtWidgets.QMessageBox.question(MainWindow, 'Info', 'Files saved!', QtWidgets.QMessageBox.Ok)
             except Exception as e:
@@ -186,16 +190,19 @@ def check_input(self):
 def connect_instrument(self):
     self.vna_measure = Vna_measure(self.instrumentAddress.currentText())
     self.progressBar.setValue(0)
-
     self.instrument_refresh()
 
 def start_measure(self):
-    self.vna_measure = Vna_measure(self.instrumentAddress.currentText(), self.comboBox_test_type.currentText(), test_name = strftime("%d%m%Y_%H%M%S", gmtime()))
+    address = self.instrumentAddress.currentText()
+    test_name = self.comboBox_test_type.currentText()
+    file_name = strftime("%d%m%Y_%H%M%S", gmtime())
+    directory_name = settings.directory_name
+
+    self.vna_measure = Vna_measure(instrument_address = address, test_name = test_name, file_name = file_name, directory_name = directory_name)
     self.progressBar.setValue(0)
 
     counter = self.lcdNumber.value() + 1
     self.lcdNumber.display(counter)
-
     self.instrument_refresh()
 
 def save_reference(self):
