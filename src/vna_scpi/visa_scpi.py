@@ -45,6 +45,10 @@ class Vna_measure(threading.Thread):
                 rm = visa.ResourceManager()
                 self.vna = rm.open_resource(self.instrument_address)
                 self.vna.write_termination = '\n'   # Some instruments require that at the end of each command.
+                #self.vna.read_termination = "\r"
+                self.vna.timeout = 4000
+                self.vna.write('*CLS')  # Clear the Error queue
+
                 #read instrument info
                 self.instrument_info = self.vna.query('*IDN?')  #Query the Identification string
                 self.instrument_info = self.clean_string(self.instrument_info, clean_txt = True)
@@ -66,8 +70,8 @@ class Vna_measure(threading.Thread):
     def default_mode(self):
         if (self.test_name != 'null' and self.directory_name != 'null'):
             # Read default directory
-            self.vna.write('MMEMory:CDIRectory DEFault') # set to default
-            default_dir = self.vna.query('MMEMory:CDIRectory?') # read dir
+            self.vna.write(':MMEMory:CDIRectory DEFault') # set to default
+            default_dir = self.vna.query(':MMEMory:CDIRectory?') # read dir
             default_dir = self.clean_string(default_dir, clean_txt = True)
             pathname = default_dir + '\\' + self.directory_name + '\\'
             print(pathname)
@@ -82,15 +86,15 @@ class Vna_measure(threading.Thread):
 
                 #detect number of channels
                 print('number of channels')
-                channel_number = self.vna.query('CONFigure:CHANnel:CATalog?')
+                channel_number = self.vna.query(':CONFigure:CHANnel:CATalog?')
                 channel_number = self.clean_string(channel_number)
                 #print(channel_number)
                 channel_number = channel_number[0::2]
                 print(channel_number)
 
                 for i in range(len(channel_number)):
-                    self.read_data(i + 1)
-                    self.export_data(pathname + self.test_name, self.test_name + str(i + 1), i + 1)
+                    self.read_data(channel_number[i])
+                    self.export_data(pathname + self.test_name, self.test_name + str(channel_number[i]), channel_number[i])
                 print('End measures')
 
             except Exception as e:
@@ -110,26 +114,21 @@ class Vna_measure(threading.Thread):
 
 
 #==============================================================================#
-    def wait(self, seconds = 0):
+    def wait(self, seconds = 0.5):
         if (seconds > 0):
             time.sleep(seconds)
-
         # Wait until the command is executed
-        msg = self.vna.query('*WAI; *OPC?')
+        #msg = self.vna.query('*WAI; *OPC?')
         #print(msg)
 
 
 #==============================================================================#
     def load_instrument_state(self, pathname):
         self.vna.write('*RST')  # Reset the instrument
-        self.vna.write('*CLS')  # Clear the Error queue
-
         # Set display update ON
-        self.vna.write('SYST:DISP:UPD ON')
-
+        self.vna.write(':SYST:DISP:UPD ON')
         # load instrument state
-        self.vna.write('MMEMory:LOAD:STATe 1,"{}" '.format(pathname)) # Use 'STORe' to save the setup
-
+        self.vna.write(':MMEMory:LOAD:STATe 1,"{}" '.format(pathname)) # Use 'STORe' to save the setup
         global loading_time
         self.wait(loading_time)
 
@@ -137,7 +136,7 @@ class Vna_measure(threading.Thread):
 #==============================================================================#
     def auto_scale_screen(self):
         # read windows number (1, 1, ...)
-        windows_number = self.vna.query("DISPlay:WINDow:CATalog?")
+        windows_number = self.vna.query(":DISPlay:WINDow:CATalog?")
         self.wait()
 
         windows_number = self.clean_string(windows_number)
@@ -147,7 +146,7 @@ class Vna_measure(threading.Thread):
 
         for i in range(len(windows_number)):
             # read trace in window (1,Trc1, ...)
-            trace_number = self.vna.query("DISPlay:WINDow{}:TRACe:CATalog?".format(i + 1))
+            trace_number = self.vna.query(":DISPlay:WINDow{}:TRACe:CATalog?".format(i + 1))
             self.wait()
 
             trace_number = self.clean_string(trace_number)
@@ -156,7 +155,7 @@ class Vna_measure(threading.Thread):
             print(trace_number)
 
             for j in range(len(trace_number)):
-                self.vna.write("DISPlay:WINDow{}:TRACe{}:Y:SCALe:AUTO ONCE".format(i + 1, int(trace_number[j])))
+                self.vna.write(":DISPlay:WINDow{}:TRACe{}:Y:SCALe:AUTO ONCE".format(i + 1, int(trace_number[j])))
                 self.wait()
 
                 print('autoscale window {} and trace {}'.format(i + 1, int(trace_number[j])))
@@ -175,16 +174,16 @@ class Vna_measure(threading.Thread):
 
         for i in range(len(trace_number)):
             #select channel
-            self.vna.write("CALC{}:PAR:SEL 'Trc{}'".format(channel, i + 1))
+            self.vna.write(":CALC{}:PAR:SEL '{}'".format(channel, trace_number[i])) # Trc{}
             self.wait()
 
             # Receive measure
-            yData = self.vna.query('CALC{}:DATA? FDAT'.format(channel))
+            yData = self.vna.query(':CALC{}:DATA? FDAT'.format(channel))
             #print(yData)
             self.wait()
 
             # Receive the number of point measured
-            xData = self.vna.query('CALC{}:DATA:STIM?'.format(channel))
+            xData = self.vna.query(':CALC{}:DATA:STIM?'.format(channel))
             #print(xData)
             self.wait()
 
@@ -199,7 +198,7 @@ class Vna_measure(threading.Thread):
 #==============================================================================#
     def export_data(self, pathname, fileName, channel = 1):
         # check if the current DIR already exist
-        check_folder = self.vna.query("MMEM:CAT? '{}'".format(pathname))
+        check_folder = self.vna.query(":MMEM:CAT? '{}'".format(pathname))
         print(len(check_folder))
         self.wait()
 
@@ -207,39 +206,40 @@ class Vna_measure(threading.Thread):
             self.vna.write('*CLS')  # Clear the Error queue
             # create a new dir in the vna
             print("create a new DIR")
-            self.vna.write("MMEM:MDIR '{}' ".format(pathname))
+            self.vna.write(":MMEM:MDIR '{}' ".format(pathname))
             self.wait()
 
         # save png file
-        self.vna.write("HCOP:DEV:LANG PNG")
-        self.vna.write("MMEM:NAME '{}\\{}.png'".format(pathname, fileName))
-        self.vna.write("HCOP:MPAG:WIND ALL")
-        self.vna.write("HCOP:DEST 'MMEM'; :HCOP")
+        self.vna.write(":HCOP:DEV:LANG PNG")
+        self.vna.write(":MMEM:NAME '{}\\{}.png'".format(pathname, fileName))
+        #self.vna.write(":HCOP:MPAG:WIND ALL")
+        self.vna.write(":HCOP:DEST 'MMEM';")
+        #self.vna.write(":HCOP")
         print('png saved')
         self.wait()
         # read pictures from VNA (.png file)
-        self.picture = self.vna.query_binary_values("MMEM:DATA? '{}\\{}.png'".format(pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
+        self.picture = self.vna.query_binary_values(":MMEM:DATA? '{}\\{}.png'".format(pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
         print('png read')
         #print(self.picture)
         self.wait()
 
         # save all traces
-        self.vna.write("MMEM:STOR:TRAC:CHAN {}, '{}\\{}.csv', FORMatted".format(channel, pathname, fileName)) #MMEM:STOR:TRAC:CHAN
+        self.vna.write(":MMEM:STOR:TRAC:CHAN {}, '{}\\{}.csv', FORMatted".format(channel, pathname, fileName)) #MMEM:STOR:TRAC:CHAN
         print('csv saved')
         self.wait()
         # read all traces from VNA (.csv file)
-        all_traces = self.vna.query_binary_values("MMEM:DATA? '{}\\{}.csv'".format(pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
+        all_traces = self.vna.query_binary_values(":MMEM:DATA? '{}\\{}.csv'".format(pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
         self.all_traces.append(all_traces)
         print('csv read')
         #print(self.all_traces)
         self.wait()
 
         # save S-Param
-        self.vna.write("MMEM:STOR:TRAC:PORT {}, '{}\\{}.s2p', COMPlex, 1,2".format(channel, pathname, fileName))
+        self.vna.write(":MMEM:STOR:TRAC:PORT {}, '{}\\{}.s2p', COMPlex, 1,2".format(channel, pathname, fileName))
         print('sp saved')
         self.wait()
         # read S-parameters from VNA (.sp file)
-        s_parameters = self.vna.query_binary_values("MMEM:DATA? '{}\\{}.s2p'".format(pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
+        s_parameters = self.vna.query_binary_values(":MMEM:DATA? '{}\\{}.s2p'".format(pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
         self.s_parameters.append(s_parameters)
         print('sp read')
         #print(self.s_parameters)
