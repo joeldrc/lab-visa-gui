@@ -14,10 +14,17 @@ plot_names = [ [ ['S21 - delay group', 'GHz', 'nS'],
                  ['S11 - Z(Ω)', 'nS', 'Ω']],
 
                [ ['S21 - TDR', 'nS', 'U'],
-                 ['S11 - TDR', 'nS', 'U']]]
+                 ['S11 - TDR', 'nS', 'U']],
+
+               [ ['S11 - phase', 'GHz', 'deg'],
+                 ['S22 - phase', 'GHz', 'deg'],
+                 ['S21 - dB Mag', 'GHz', 'dB'],
+                 ['S12 - dB Mag', 'GHz', 'dB'],
+                 ['S11 - TDR', 'nS', 'U'],
+                 ['S22 - TDR', 'nS', 'U']]]
 
 instrument_address = ['', 'TCPIP::CFO-MD-BQPVNA1::INSTR', 'TCPIP::VNA-ZNB8-BI-QP::INSTR', 'TCPIP::VNA-ZNB4-BI-QP::INSTR']
 
-test_name = ['Test', 'Feedthrough', 'Pick_up', 'Phase_and_transmission_test']
+test_name = ['Test', 'Feedthrough', 'Pick_up', 'Phase_and_transmission']
 
 directory_name = 'Automatic_tests'
