@@ -83,7 +83,7 @@ def file_save(self):
 
             try:
                 # export png files
-                file = open(name + '_' + '.png',"wb")
+                file = open(name + '.png',"wb")
                 file.write(self.vna_measure.picture)
                 file.close()
                 print('File saved')
