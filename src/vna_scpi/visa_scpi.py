@@ -213,23 +213,6 @@ class Vna_measure(threading.Thread):
             self.wait()
 
         try:
-            # save png file
-            self.vna.write(":HCOP:DEV:LANG PNG")
-            self.vna.write(":MMEM:NAME '{}\\{}.png'".format(pathname, fileName))
-            #self.vna.write(":HCOP:MPAG:WIND ALL")
-            self.vna.write(":HCOP:DEST 'MMEM';")
-            #self.vna.write(":HCOP")
-            print('png saved')
-            self.wait()
-            # read pictures from VNA (.png file)
-            self.picture = self.vna.query_binary_values(":MMEM:DATA? '{}\\{}.png'".format(pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
-            print('png read')
-            #print(self.picture)
-            self.wait()
-        except Exception as e:
-            print(e)
-
-        try:
             # save all traces
             self.vna.write(":MMEM:STOR:TRAC:CHAN {}, '{}\\{}.csv', FORMatted".format(channel, pathname, fileName)) #MMEM:STOR:TRAC:CHAN
             print('csv saved')
@@ -253,6 +236,22 @@ class Vna_measure(threading.Thread):
             self.s_parameters.append(s_parameters)
             print('sp read')
             #print(self.s_parameters)
+            self.wait()
+        except Exception as e:
+            print(e)
+
+        try:
+            # save png file
+            self.vna.write("HCOP:DEV:LANG PNG")
+            self.vna.write("MMEM:NAME '%s\\%s.png' " % (pathname, fileName))
+            self.vna.write("HCOP:MPAG:WIND ALL")
+            self.vna.write("HCOP:DEST 'MMEM'; :HCOP")
+            print('png saved')
+            self.wait()
+            # read pictures from VNA (.png file)
+            self.picture = self.vna.query_binary_values("MMEM:DATA? '%s\\%s.png' " % (pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
+            print('png read')
+            #print(self.picture)
             self.wait()
         except Exception as e:
             print(e)
