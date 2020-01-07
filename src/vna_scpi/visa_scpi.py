@@ -80,10 +80,11 @@ class Vna_measure(threading.Thread):
             try:
                 global calibration
                 global device_address
-                if ((calibration != self.test_name) or (device_address != self.instrument_address)):
-                    self.load_instrument_state(pathname + self.test_name)
-                    calibration = self.test_name
-                    device_address = self.instrument_address
+                if (self.test_name != 'Read_data'):
+                    if ((calibration != self.test_name) or (device_address != self.instrument_address)):
+                        self.load_instrument_state(pathname + self.test_name)
+                        calibration = self.test_name
+                        device_address = self.instrument_address
 
                 self.auto_scale_screen()
 
