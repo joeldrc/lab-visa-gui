@@ -87,8 +87,6 @@ def file_save(self):
                 file.write(self.vna_measure.picture)
                 file.close()
                 print('File saved')
-
-                QtWidgets.QMessageBox.question(MainWindow, 'Info', 'Png files saved!', QtWidgets.QMessageBox.Ok)
             except Exception as e:
                 print(e)
 
@@ -100,8 +98,6 @@ def file_save(self):
                     file.write(self.vna_measure.all_traces[i])
                     file.close()
                     print('File saved ' + str(i))
-
-                QtWidgets.QMessageBox.question(MainWindow, 'Info', 'Csv files saved!', QtWidgets.QMessageBox.Ok)
             except Exception as e:
                 print(e)
 
@@ -113,10 +109,10 @@ def file_save(self):
                     file.write(self.vna_measure.s_parameters[i])
                     file.close()
                     print('File saved ' + str(i))
-
-                QtWidgets.QMessageBox.question(MainWindow, 'Info', 'Sp files saved!', QtWidgets.QMessageBox.Ok)
             except Exception as e:
                 print(e)
+
+            QtWidgets.QMessageBox.question(MainWindow, 'Info', 'Files saved!', QtWidgets.QMessageBox.Ok)
 
             """
             # Save all traces in excell file

@@ -244,7 +244,7 @@ class Vna_measure(threading.Thread):
             # save png file
             self.vna.write("HCOP:DEV:LANG PNG")
             self.vna.write("MMEM:NAME '%s\\%s.png' " % (pathname, fileName))
-            self.vna.write("HCOP:MPAG:WIND ALL")
+            #self.vna.write("HCOP:MPAG:WIND ALL")
             self.vna.write("HCOP:DEST 'MMEM'; :HCOP")
             print('png saved')
             self.wait()
