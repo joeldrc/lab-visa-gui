@@ -83,7 +83,7 @@ def file_save(self):
 
             try:
                 # export png files
-                file = open(name + '.png',"wb")
+                file = open(name + '_' + '.png',"wb")
                 file.write(self.vna_measure.picture)
                 file.close()
                 print('File saved')
@@ -96,7 +96,7 @@ def file_save(self):
                 # export csv file
                 for i in range(len(self.vna_measure.all_traces)):
                     # export sp file
-                    file = open(name + str(i) + '.csv',"wb")
+                    file = open(name + '_' + str(i) + '.csv',"wb")
                     file.write(self.vna_measure.all_traces[i])
                     file.close()
                     print('File saved ' + str(i))
@@ -109,7 +109,7 @@ def file_save(self):
                 # export sp file
                 for i in range(len(self.vna_measure.s_parameters)):
                     # export sp file
-                    file = open(name + str(i) + '.s2p',"wb")
+                    file = open(name + '_' + str(i) + '.s2p',"wb")
                     file.write(self.vna_measure.s_parameters[i])
                     file.close()
                     print('File saved ' + str(i))
