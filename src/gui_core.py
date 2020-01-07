@@ -80,6 +80,7 @@ def file_save(self):
         else:
             # Save all files received from vna
             print("All-parameters")
+
             try:
                 # export png files
                 file = open(name + '.png',"wb")
@@ -87,6 +88,11 @@ def file_save(self):
                 file.close()
                 print('File saved')
 
+                QtWidgets.QMessageBox.question(MainWindow, 'Info', 'Png files saved!', QtWidgets.QMessageBox.Ok)
+            except Exception as e:
+                print(e)
+
+            try:
                 # export csv file
                 for i in range(len(self.vna_measure.all_traces)):
                     # export sp file
@@ -95,6 +101,11 @@ def file_save(self):
                     file.close()
                     print('File saved ' + str(i))
 
+                QtWidgets.QMessageBox.question(MainWindow, 'Info', 'Csv files saved!', QtWidgets.QMessageBox.Ok)
+            except Exception as e:
+                print(e)
+
+            try:
                 # export sp file
                 for i in range(len(self.vna_measure.s_parameters)):
                     # export sp file
@@ -103,7 +114,7 @@ def file_save(self):
                     file.close()
                     print('File saved ' + str(i))
 
-                QtWidgets.QMessageBox.question(MainWindow, 'Info', 'Files saved!', QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.question(MainWindow, 'Info', 'Sp files saved!', QtWidgets.QMessageBox.Ok)
             except Exception as e:
                 print(e)
 
@@ -221,9 +232,8 @@ def remove_trace(self):
     self.update_plot()
 
 def newkeyPressEvent(self, e):
-    if e.key() == QtCore.Qt.Key_Enter:
-        print ("User has pushed Enter")
-
+    if ((e.key() == QtCore.Qt.Key_Enter) or (e.key() == (QtCore.Qt.Key_Enter-1))):
+        print ("User has pushed Enter", e.key())
         self.start_measure()
 
 

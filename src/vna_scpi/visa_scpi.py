@@ -11,6 +11,7 @@ import numpy as np
 
 # Global variables
 calibration = 'none'
+device_address = 'none'
 loading_time = 20 #seconds
 
 
@@ -78,9 +79,11 @@ class Vna_measure(threading.Thread):
 
             try:
                 global calibration
-                if (calibration != self.test_name):
+                global device_address
+                if ((calibration != self.test_name) or (device_address != self.instrument_address)):
                     self.load_instrument_state(pathname + self.test_name)
                     calibration = self.test_name
+                    device_address = self.instrument_address
 
                 self.auto_scale_screen()
 
@@ -94,7 +97,7 @@ class Vna_measure(threading.Thread):
 
                 for i in range(len(channel_number)):
                     self.read_data(channel_number[i])
-                    self.export_data(pathname + self.test_name, self.test_name + str(channel_number[i]), channel_number[i])
+                    self.export_data(pathname + self.test_name, self.file_name + '_' + str(channel_number[i]), channel_number[i])
                 print('End measures')
 
             except Exception as e:
@@ -209,41 +212,50 @@ class Vna_measure(threading.Thread):
             self.vna.write(":MMEM:MDIR '{}' ".format(pathname))
             self.wait()
 
-        # save png file
-        self.vna.write(":HCOP:DEV:LANG PNG")
-        self.vna.write(":MMEM:NAME '{}\\{}.png'".format(pathname, fileName))
-        #self.vna.write(":HCOP:MPAG:WIND ALL")
-        self.vna.write(":HCOP:DEST 'MMEM';")
-        #self.vna.write(":HCOP")
-        print('png saved')
-        self.wait()
-        # read pictures from VNA (.png file)
-        self.picture = self.vna.query_binary_values(":MMEM:DATA? '{}\\{}.png'".format(pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
-        print('png read')
-        #print(self.picture)
-        self.wait()
+        try:
+            # save png file
+            self.vna.write(":HCOP:DEV:LANG PNG")
+            self.vna.write(":MMEM:NAME '{}\\{}.png'".format(pathname, fileName))
+            #self.vna.write(":HCOP:MPAG:WIND ALL")
+            self.vna.write(":HCOP:DEST 'MMEM';")
+            #self.vna.write(":HCOP")
+            print('png saved')
+            self.wait()
+            # read pictures from VNA (.png file)
+            self.picture = self.vna.query_binary_values(":MMEM:DATA? '{}\\{}.png'".format(pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
+            print('png read')
+            #print(self.picture)
+            self.wait()
+        except Exception as e:
+            print(e)
 
-        # save all traces
-        self.vna.write(":MMEM:STOR:TRAC:CHAN {}, '{}\\{}.csv', FORMatted".format(channel, pathname, fileName)) #MMEM:STOR:TRAC:CHAN
-        print('csv saved')
-        self.wait()
-        # read all traces from VNA (.csv file)
-        all_traces = self.vna.query_binary_values(":MMEM:DATA? '{}\\{}.csv'".format(pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
-        self.all_traces.append(all_traces)
-        print('csv read')
-        #print(self.all_traces)
-        self.wait()
+        try:
+            # save all traces
+            self.vna.write(":MMEM:STOR:TRAC:CHAN {}, '{}\\{}.csv', FORMatted".format(channel, pathname, fileName)) #MMEM:STOR:TRAC:CHAN
+            print('csv saved')
+            self.wait()
+            # read all traces from VNA (.csv file)
+            all_traces = self.vna.query_binary_values(":MMEM:DATA? '{}\\{}.csv'".format(pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
+            self.all_traces.append(all_traces)
+            print('csv read')
+            #print(self.all_traces)
+            self.wait()
+        except Exception as e:
+            print(e)
 
-        # save S-Param
-        self.vna.write(":MMEM:STOR:TRAC:PORT {}, '{}\\{}.s2p', COMPlex, 1,2".format(channel, pathname, fileName))
-        print('sp saved')
-        self.wait()
-        # read S-parameters from VNA (.sp file)
-        s_parameters = self.vna.query_binary_values(":MMEM:DATA? '{}\\{}.s2p'".format(pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
-        self.s_parameters.append(s_parameters)
-        print('sp read')
-        #print(self.s_parameters)
-        self.wait()
+        try:
+            # save S-Param
+            self.vna.write(":MMEM:STOR:TRAC:PORT {}, '{}\\{}.s2p', COMPlex, 1,2".format(channel, pathname, fileName))
+            print('sp saved')
+            self.wait()
+            # read S-parameters from VNA (.sp file)
+            s_parameters = self.vna.query_binary_values(":MMEM:DATA? '{}\\{}.s2p'".format(pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
+            self.s_parameters.append(s_parameters)
+            print('sp read')
+            #print(self.s_parameters)
+            self.wait()
+        except Exception as e:
+            print(e)
 
 
 #==============================================================================#
