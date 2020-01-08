@@ -18,52 +18,58 @@ from matplotlib.figure import Figure
 
 #==============================================================================#
 def file_open(self):
-    name, _ = QtWidgets.QFileDialog.getOpenFileName(MainWindow, 'Open File', "", "Text file (*.csv *.txt)")  # Returns a tuple
+    #name, _ = QtWidgets.QFileDialog.getOpenFileName(MainWindow, 'Open File', "", "Text file (*.csv *.txt)")  # Returns a tuple
+    name, _ = QtWidgets.QFileDialog.getOpenFileNames(MainWindow, 'Open File', "", "Text file (*.csv *.txt)")  # Returns a tuple
 
-    try:
-        if self.tabWidget.currentIndex() == 1:
-            with open(name, 'r') as file:
-                text = file.read()
-                self.textEdit.setText(text)
+    for index in range(len(name)):
+        print(name[index])
 
-        # Read file
-        file = open(name, "r")
-        test = []
-        line_cnt = 0
+        try:
+            if self.tabWidget.currentIndex() == 1:
+                with open(name[index], 'r') as file:
+                    text = file.read()
+                    self.textEdit.setText(text)
 
-        #read data
-        for row in file:
-            #start from the line number 3
-            if line_cnt > 2:
-                row = row.replace(";\n", '') #remove last column
-                column = row.split(";")
-                test.append(column)
-            else:
-                line_cnt += 1
-        #print(test[0][:])
-        file.close()
+            # Read file
+            file = open(name[index], "r")
+            test = []
+            line_cnt = 0
 
-        #re-order data
-        measures = []
-        for j in range(len(test[0])):
-            tmp = []
-            for i in range(len(test)):
-                try:
-                    tmp.append(np.float_(test[i][j]))
-                except:
-                    pass
-            measures.append(tmp)
-        #print(measures[1])
-        print(measures)
+            #read data
+            for row in file:
+                #start from the line number 3
+                if line_cnt > 2:
+                    row = row.replace(";\n", '') #remove last column
+                    column = row.split(";")
+                    test.append(column)
+                else:
+                    line_cnt += 1
+            #print(test[0][:])
+            file.close()
 
-        self.measures_stored = []
-        for i in range(1,len(measures)):
-            self.measures_stored.append((measures[0], measures[i]))
+            #re-order data
+            measures = []
+            for j in range(len(test[0])):
+                tmp = []
+                for i in range(len(test)):
+                    try:
+                        tmp.append(np.float_(test[i][j]))
+                    except:
+                        pass
+                measures.append(tmp)
+            #print(measures[1])
+            print(measures)
 
-        self.update_plot()
+            if (index == 0):
+                self.measures_stored = []
 
-    except Exception as e:
-        print(e)
+            for i in range(1,len(measures)):
+                self.measures_stored.append((measures[0], measures[i]))
+
+            self.update_plot()
+
+        except Exception as e:
+            print(e)
 
 def file_save(self):
     title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text()

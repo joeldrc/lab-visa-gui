@@ -5,7 +5,7 @@
 __title__ = 'VNA tester'
 __logo__ = 'JD soft'
 __author__ = 'joel.daricou@cern.ch'
-__version__ = ' 2019 V.1.0'
+__version__ = ' 2020 V.1.0'
 
 plot_names = [ [ ['S21 - delay group', 'GHz', 'nS'],
                  ['S21 - dB Mag', 'GHz', 'dB'],
