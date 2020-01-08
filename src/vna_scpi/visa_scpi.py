@@ -10,13 +10,13 @@ import numpy as np
 
 
 # Global variables
-calibration = 'none'
-device_address = 'none'
+calibration = ''
+device_address = ''
 loading_time = 20 #seconds
 
 
 class Vna_measure(threading.Thread):
-    def __init__(self, instrument_address = 'null', test_name = 'null', file_name = 'null', directory_name = 'null'):
+    def __init__(self, instrument_address = '', test_name = '', file_name = '', directory_name = ''):
         threading.Thread.__init__(self)
 
         self.instrument_address = instrument_address
@@ -69,7 +69,7 @@ class Vna_measure(threading.Thread):
 
 
     def default_mode(self):
-        if (self.test_name != 'null' and self.directory_name != 'null'):
+        if (self.test_name != '' and self.directory_name != ''):
             # Read default directory
             self.vna.write(':MMEMory:CDIRectory DEFault') # set to default
             default_dir = self.vna.query(':MMEMory:CDIRectory?') # read dir
@@ -80,7 +80,7 @@ class Vna_measure(threading.Thread):
             try:
                 global calibration
                 global device_address
-                if (self.test_name != 'Read_data'):
+                if (self.test_name != '_Read_data_'):
                     if ((calibration != self.test_name) or (device_address != self.instrument_address)):
                         self.load_instrument_state(pathname + self.test_name)
                         calibration = self.test_name
@@ -285,7 +285,7 @@ if __name__ == '__main__':
             save_files = 'n'   #default
         print('->', save_files)
 
-        test = Vna_measure(instrument_address = address, test_name = test_name, file_name = 'null', directory_name = 'Automatic_tests')
+        test = Vna_measure(instrument_address = address, test_name = test_name, file_name = '', directory_name = 'Automatic_tests')
 
         i = 0
         while (test.data_ready == False):
