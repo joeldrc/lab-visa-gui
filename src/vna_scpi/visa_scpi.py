@@ -16,13 +16,14 @@ loading_time = 20 #seconds
 
 
 class Vna_measure(threading.Thread):
-    def __init__(self, instrument_address = '', test_name = '', file_name = '', directory_name = ''):
+    def __init__(self, instrument_address = '', test_name = '', file_name = '', directory_name = '', port_number = ''):
         threading.Thread.__init__(self)
 
         self.instrument_address = instrument_address
         self.test_name = test_name
         self.file_name = file_name
         self.directory_name = directory_name
+        self.port_number = port_number
 
         self.measures = []
         self.picture = []
@@ -98,7 +99,7 @@ class Vna_measure(threading.Thread):
 
                 for i in range(len(channel_number)):
                     self.read_data(channel_number[i])
-                    self.export_data(pathname + self.test_name, self.file_name + '_' + str(channel_number[i]), channel_number[i])
+                    self.export_data(pathname + self.test_name, self.file_name + '_' + str(channel_number[i]), channel_number[i], self.port_number)
                 print('End measures')
 
             except Exception as e:
@@ -200,7 +201,7 @@ class Vna_measure(threading.Thread):
 
 
 #==============================================================================#
-    def export_data(self, pathname, fileName, channel = 1):
+    def export_data(self, pathname, fileName, channel, port_number):
         # check if the current DIR already exist
         check_folder = self.vna.query(":MMEM:CAT? '{}'".format(pathname))
         print(len(check_folder))
@@ -229,11 +230,15 @@ class Vna_measure(threading.Thread):
 
         try:
             # save S-Param
-            self.vna.write(":MMEM:STOR:TRAC:PORT {}, '{}\\{}.s2p', COMPlex, 1,2".format(channel, pathname, fileName))
+            val = '' # ",1,2"
+            for i in range(port_number):
+                val += ',' + str(i+1)
+
+            self.vna.write(":MMEM:STOR:TRAC:PORT {}, '{}\\{}.s{}p', COMPlex{}".format(channel, pathname, fileName, port_number, val))
             print('sp saved')
             self.wait()
             # read S-parameters from VNA (.sp file)
-            s_parameters = self.vna.query_binary_values(":MMEM:DATA? '{}\\{}.s2p'".format(pathname, fileName), datatype='B', is_big_endian=False, container=bytearray)
+            s_parameters = self.vna.query_binary_values(":MMEM:DATA? '{}\\{}.s{}p'".format(pathname, fileName, port_number), datatype='B', is_big_endian=False, container=bytearray)
             self.s_parameters.append(s_parameters)
             print('sp read')
             #print(self.s_parameters)
@@ -263,7 +268,7 @@ class Vna_measure(threading.Thread):
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    print("Python test software 2019")
+    print("Python test software 2020")
 
     while(1):
         run_script =  input('Press to enter to Continue: ')
@@ -325,7 +330,7 @@ if __name__ == '__main__':
 
             for i in range(len(test.s_parameters)):
                 # export sp file
-                file = open(name + str(i) + '.s2p',"wb")
+                file = open("{}{}.s{}p".format(name, str(i), self.port_number),"wb")
                 file.write(test.s_parameters[i])
                 file.close()
                 print('File saved' + str(i))
