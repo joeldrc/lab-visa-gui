@@ -29,8 +29,10 @@ plot_names = [ [ ['S21 - delay group', 'GHz', 'nS'],
                  ['S11 - TDR', 'nS', 'U'],
                  ['S22 - TDR', 'nS', 'U']]]
 
-instrument_address = ['', 'TCPIP::CFO-MD-BQPVNA1::INSTR', 'TCPIP::VNA-ZNB8-BI-QP::INSTR', 'TCPIP::VNA-ZNB4-BI-QP::INSTR']
+instrument_address = ['', 'TCPIP::localhost::INSTR', 'TCPIP::VNA-ZNB8-BI-QP::INSTR', 'TCPIP::VNA-ZNB4-BI-QP::INSTR']
 
 test_name = ['_Read_data_', 'Feedthrough', 'Cables', 'Pick_up', 'Phase_and_transmission']
 
 directory_name = 'Automatic_tests'
+
+port_number = 2 # change the number of ports .s[num]p

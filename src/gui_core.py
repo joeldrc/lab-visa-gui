@@ -211,7 +211,7 @@ def start_measure(self):
     file_name = strftime("%d%m%Y_%H%M%S", gmtime())
     directory_name = settings.directory_name
 
-    self.vna_measure = Vna_measure(instrument_address = address, test_name = test_name, file_name = file_name, directory_name = directory_name)
+    self.vna_measure = Vna_measure(instrument_address = address, test_name = test_name, file_name = file_name, directory_name = directory_name, port_number = settings.port_number)
     self.progressBar.setValue(0)
 
     counter = self.lcdNumber.value() + 1
@@ -222,7 +222,6 @@ def save_reference(self):
     if self.compareTrace.isChecked():
         print('compare trace')
         self.saveRef = True
-
     self.update_plot()
 
 def add_trace(self):
@@ -260,6 +259,9 @@ def instrument_refresh(self):
 
             if self.autoSave.isChecked():
                 self.file_save()
+
+            # selecting all the text in the box
+            self.serialNumber.selectAll()
 
     except Exception as e:
         print(e)
@@ -327,7 +329,13 @@ def create_plot(self):
         subplot_number = 1
 
     # auto adapt plot number
-    if subplot_number > 3:
+    if subplot_number > 8:
+        subplot_rows = 2
+        subplot_columns = 5
+    elif subplot_number > 6:
+        subplot_rows = 2
+        subplot_columns = 4
+    elif subplot_number > 3:
         subplot_rows = 2
         subplot_columns = 3
     else:
