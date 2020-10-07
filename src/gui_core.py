@@ -111,7 +111,7 @@ def file_save(self):
                 # export sp file
                 for i in range(len(self.vna_measure.s_parameters)):
                     # export sp file
-                    file = open(name + '_' + str(i) + '.s2p',"wb")
+                    file = open(name + '_' + str(i) + '.s{}p'.format(settings.port_number),"wb")
                     file.write(self.vna_measure.s_parameters[i])
                     file.close()
                     print('File saved ' + str(i))
@@ -330,11 +330,11 @@ def create_plot(self):
 
     # auto adapt plot number
     if subplot_number > 8:
-        subplot_rows = 2
-        subplot_columns = 5
+        subplot_rows = 4
+        subplot_columns = 3
     elif subplot_number > 6:
-        subplot_rows = 2
-        subplot_columns = 4
+        subplot_rows = 4
+        subplot_columns = 2
     elif subplot_number > 3:
         subplot_rows = 2
         subplot_columns = 3
