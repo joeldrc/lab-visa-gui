@@ -29,9 +29,9 @@ plot_names = [ [ ['S21 - delay group', 'GHz', 'nS'],
                  ['S11 - TDR', 'nS', 'U'],
                  ['S22 - TDR', 'nS', 'U']]]
 
-instrument_address = ['', 'TCPIP::localhost::INSTR', 'TCPIP::VNA-ZNB8-BI-QP::INSTR', 'TCPIP::VNA-ZNB4-BI-QP::INSTR']
+instrument_address = ['', 'TCPIP::localhost::INSTR', 'TCPIP::VNA-ZNB8-BI-QP::INSTR', 'TCPIP::VNA-ZNB4-BI-QP::INSTR', 'TCPIP::AGILENTE5071C::INSTR']
 
-test_name = ['_Read_data_', 'Feedthrough', 'Cables', 'Pick_up', 'Phase_and_transmission']
+test_name = ['_Read_data_', 'Feedthrough', 'Cables', 'Pick_up', 'Phase_and_transmission', 'Collimators_commissioning']
 
 directory_name = 'Automatic_tests'
 
