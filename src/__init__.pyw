@@ -17,7 +17,7 @@ class App():
         self.parent = parent
         self.parent.configure(bg='White')
 
-        self.canvas = tkinter.Canvas(parent, width=300, height=200)
+        self.canvas = tkinter.Canvas(parent, width=300, height=200, bd=-2)
         self.canvas.pack()
 
         self.labelIntro = tkinter.Label(self.parent, text = settings.__title__, bg='White', font='Calibri 20 bold')
