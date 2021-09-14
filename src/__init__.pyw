@@ -16,16 +16,19 @@ class App():
 
         self.parent = parent
         self.parent.configure(bg='White')
-        self.canvas = tkinter.Canvas(parent, width=400, height=400)
+
+        self.canvas = tkinter.Canvas(parent, width=300, height=200)
         self.canvas.pack()
 
-        self.details = settings.__author__ + ' - ' + settings.__version__
+        self.labelIntro = tkinter.Label(self.parent, text = settings.__title__, bg='White', font='Calibri 20 bold')
+        self.labelIntro.pack()
 
+        self.details = settings.__author__ + ' - ' + settings.__version__
         self.label = tkinter.Label(self.parent, text = self.details, bg='White')
         self.label.pack()
 
         self.sequence = [ImageTk.PhotoImage(img)for img in ImageSequence.Iterator(Image.open(r'images\loading.gif'))]
-        self.image = self.canvas.create_image(200,200, image=self.sequence[0])
+        self.image = self.canvas.create_image(150,100, image=self.sequence[0])
 
         self.parent.overrideredirect(True)
         self.parent.eval('tk::PlaceWindow . center')
