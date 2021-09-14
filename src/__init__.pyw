@@ -37,14 +37,17 @@ class App():
 
     def animate(self, counter):
         self.canvas.itemconfig(self.image, image=self.sequence[counter])
-        self.parent.after(20, lambda: self.animate((counter+1) % len(self.sequence)))
+        self.parent.after(10, lambda: self.animate((counter+1) % len(self.sequence)))
 
 
 import subprocess
 import sys
+import time
+
 
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
 
 def installPakages():
     install("numpy")
@@ -52,18 +55,26 @@ def installPakages():
     install("pyvisa")
     install("PyQt5")
     install("matplotlib")
+
+    mainThread = threading.Thread(target=bootApp)
+    mainThread.start()
+
+    time.sleep(15)
     root.destroy()
+
+
+def bootApp():
+    if (python_version == '64bit'):
+        print(python_version)
+        import gui_core
+    else:
+        print('Error, the code cannot be executed in this %s python version.' % python_version)
+        print('Please install the 64bit python version.')
 
 
 root = tkinter.Tk()
 app = App(root)
 thread = threading.Thread(target=installPakages)
 thread.start()
-root.mainloop()
 
-if (python_version == '64bit'):
-    print(python_version)
-    import gui_core
-else:
-    print('Error, the code cannot be executed in this %s python version.' % python_version)
-    print('Please install the 64bit python version.')
+root.mainloop()
