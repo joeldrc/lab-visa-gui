@@ -2,14 +2,24 @@
 # -*- coding: utf-8 -*-
 
 
-import settings
+import subprocess
+import sys
 
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+install("Pillow")
+
+    
+import settings
 import platform
 python_version, system_version = platform.architecture()
 import tkinter
 from PIL import Image, ImageTk, ImageSequence
 
 import threading
+import time
 
 class App():
     def __init__(self, parent):
@@ -35,18 +45,10 @@ class App():
 
         self.animate(1)
 
+
     def animate(self, counter):
         self.canvas.itemconfig(self.image, image=self.sequence[counter])
         self.parent.after(10, lambda: self.animate((counter+1) % len(self.sequence)))
-
-
-import subprocess
-import sys
-import time
-
-
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
 
 def installPakages():
