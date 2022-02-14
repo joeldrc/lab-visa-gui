@@ -7,6 +7,8 @@ __logo__ = 'JD soft'
 __author__ = 'joel.daricou@cern.ch'
 __version__ = ' 2020 V.1.0'
 
+SYS_READY = False
+
 plot_names = [ [ ['S21 - delay group', 'GHz', 'nS'],
                  ['S21 - dB Mag', 'GHz', 'dB'],
                  ['S11 - SWR', 'GHz', 'mU'],

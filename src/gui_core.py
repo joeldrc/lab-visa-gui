@@ -38,7 +38,13 @@ def file_open(self):
             #read data
             for row in file:
                 #start from the line number 3
-                if line_cnt > 2:
+                if line_cnt == 2:
+                    row = row.replace(";\n", '') #remove last column
+                    self.plot_titles = row.split(";")
+                    print(self.plot_titles)
+                    line_cnt += 1
+
+                elif line_cnt > 2:
                     row = row.replace(";\n", '') #remove last column
                     column = row.split(";")
                     test.append(column)
@@ -58,7 +64,7 @@ def file_open(self):
                         pass
                 measures.append(tmp)
             #print(measures[1])
-            print(measures)
+            #print(measures)
 
             if (index == 0):
                 self.measures_stored = []
@@ -424,6 +430,7 @@ def update_plot(self):
                 else:
                     self.plot[i].plot(self.xRef[j][i], self.yRef[j][i])
 
+        """
         try:
             # Set names on plot
             if selected_frame_number < len(settings.plot_names):
@@ -432,6 +439,19 @@ def update_plot(self):
                     self.plot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
                     self.plot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
                     #self.plot[i].grid()
+        except Exception as e:
+            print(e)
+        """
+
+        try:
+            # Set names on plot
+            for i in range(len(self.plot_titles)):
+                self.plot[i].set_title(self.plot_titles[i+1])
+                self.plot[i].set_xlabel(self.plot_titles[0])
+
+                val = self.plot_titles[i+1]
+                self.plot[i].set_ylabel(val[val.find('[') + 1: val.find(']')])
+                #self.plot[i].grid()
         except Exception as e:
             print(e)
 
@@ -496,4 +516,8 @@ ui.create_canvas()
 ui.create_plot()
 MainWindow.keyPressEvent = ui.newkeyPressEvent
 MainWindow.show()
+
+#GUI ready
+settings.SYS_READY = True
+
 sys.exit(app.exec_())
