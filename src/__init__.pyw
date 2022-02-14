@@ -11,7 +11,7 @@ def install(package):
 
 install("Pillow")
 
-    
+
 import settings
 import platform
 python_version, system_version = platform.architecture()
@@ -61,7 +61,8 @@ def installPakages():
     mainThread = threading.Thread(target=bootApp)
     mainThread.start()
 
-    time.sleep(15)
+    while(settings.SYS_READY == False):
+        time.sleep(1)
     root.destroy()
 
 

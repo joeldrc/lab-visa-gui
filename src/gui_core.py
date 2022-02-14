@@ -516,4 +516,8 @@ ui.create_canvas()
 ui.create_plot()
 MainWindow.keyPressEvent = ui.newkeyPressEvent
 MainWindow.show()
+
+#GUI ready
+settings.SYS_READY = True
+
 sys.exit(app.exec_())
