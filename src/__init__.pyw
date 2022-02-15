@@ -52,12 +52,12 @@ class App():
 
 
 def installPakages():
+    install("matplotlib")
     install("numpy")
     install("visa")
     install("pyvisa")
     install("PyQt5")
-    install("matplotlib")
-
+    
     #wait utill the installation is done
     time.sleep(2)
 
