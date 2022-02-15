@@ -7,7 +7,7 @@ import sys
 
 
 def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    subprocess.run([sys.executable, "-m", "pip", "install", package])
 
 install("Pillow")
 
@@ -52,11 +52,14 @@ class App():
 
 
 def installPakages():
+    install("matplotlib")
     install("numpy")
     install("visa")
     install("pyvisa")
     install("PyQt5")
-    install("matplotlib")
+    
+    #wait utill the installation is done
+    time.sleep(2)
 
     mainThread = threading.Thread(target=bootApp)
     mainThread.start()

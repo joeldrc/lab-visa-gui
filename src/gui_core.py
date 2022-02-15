@@ -7,11 +7,14 @@ from vna_scpi import *
 
 import os
 #from openpyxl import *
+
 import time
 from time import gmtime, strftime
+
 import numpy as np
+
 import matplotlib.pyplot as plt
-from matplotlib.backends.qt_compat import QtCore, QtWidgets, is_pyqt5
+from matplotlib.backends.qt_compat import QtCore, QtWidgets
 from matplotlib.backends.backend_qt5agg import (FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 from matplotlib.figure import Figure
 
