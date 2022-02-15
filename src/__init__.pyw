@@ -5,13 +5,6 @@
 import subprocess
 import sys
 
-
-def install(package):
-    subprocess.run([sys.executable, "-m", "pip", "install", package])
-
-install("Pillow")
-
-
 import settings
 import platform
 python_version, system_version = platform.architecture()
@@ -20,6 +13,7 @@ from PIL import Image, ImageTk, ImageSequence
 
 import threading
 import time
+
 
 class App():
     def __init__(self, parent):
@@ -51,24 +45,6 @@ class App():
         self.parent.after(10, lambda: self.animate((counter+1) % len(self.sequence)))
 
 
-def installPakages():
-    install("matplotlib")
-    install("numpy")
-    install("visa")
-    install("pyvisa")
-    install("PyQt5")
-    
-    #wait utill the installation is done
-    time.sleep(2)
-
-    mainThread = threading.Thread(target=bootApp)
-    mainThread.start()
-
-    while(settings.SYS_READY == False):
-        time.sleep(1)
-    root.destroy()
-
-
 def bootApp():
     if (python_version == '64bit'):
         print(python_version)
@@ -78,9 +54,21 @@ def bootApp():
         print('Please install the 64bit python version.')
 
 
+def main():
+    time.sleep(4)
+    
+    mainThread = threading.Thread(target=bootApp)
+    mainThread.start()
+
+    cnt = 0
+    while((settings.SYS_READY == False) or (cnt >= 30)):
+        time.sleep(1)
+    root.destroy()
+
+
 root = tkinter.Tk()
 app = App(root)
-thread = threading.Thread(target=installPakages)
+thread = threading.Thread(target=main)
 thread.start()
 
 root.mainloop()
