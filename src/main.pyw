@@ -2,11 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import platform
-python_version, system_version = platform.architecture()
-
-from loading import*
-from gui_core import*
+from loading import *
+from gui_core import *
 
 
 if __name__ == "__main__":
