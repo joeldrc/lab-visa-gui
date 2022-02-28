@@ -3,9 +3,9 @@
 
 
 __title__ = 'VNA tester'
-__logo__ = 'JD soft'
+__logo__ = 'JD'
 __author__ = 'joel.daricou@cern.ch'
-__version__ = ' 2022 V.1.0'
+__version__ = '03.2022 V.1.0'
 
 SYS_READY = False
 
