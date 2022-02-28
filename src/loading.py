@@ -3,31 +3,40 @@
 
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QMovie
 from PyQt5.QtCore import Qt
 
 class LoadingGui:
     def __init__(self):
         self.MainWindow = QtWidgets.QMainWindow()
-        self.MainWindow.setWindowTitle('Loading')
 
         # Create window
-        self.MainWindow.resize(600, 600)
+        self.MainWindow.resize(300, 300)
+        self.MainWindow.setWindowTitle('Loading')
         self.MainWindow.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.MainWindow.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.centralwidget = QtWidgets.QWidget(self.MainWindow)
+        centralwidget = QtWidgets.QWidget(self.MainWindow)
 
         # Label Create
-        self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setAlignment(QtCore.Qt.AlignCenter)
-        self.MainWindow.setCentralWidget(self.centralwidget)
+        label1 = QLabel(centralwidget)
+        label2 = QLabel(self.MainWindow)
+        label2.setText("Loading...")
+        font = label2.font()
+        font.setPointSize(30)
+        label2.setFont(font)
+        label2.adjustSize()
+        label2.move(70, 0)
+
+        self.MainWindow.setCentralWidget(centralwidget)
 
         # Loading the GIF
         self.movie = QMovie("images/loading.gif")
-        self.label.setMovie(self.movie)
+        label1.setMovie(self.movie)
         self.startAnimation()
 
         # Show the window
+        self.MainWindow.move(QDesktopWidget().availableGeometry().center() - self.MainWindow.frameGeometry().center())
         self.MainWindow.show()
 
     # Start Animation
@@ -39,7 +48,7 @@ class LoadingGui:
         self.timer.timeout.connect(self.stopAnimation)
         self.timer.start(5000)
 
-    # Stop Animation(According to need)
+    # Stop Animation
     def stopAnimation(self):
         self.movie.stop()
         self.MainWindow.close()
