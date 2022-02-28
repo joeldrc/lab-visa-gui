@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
+
 import settings
 from user_gui import *
 from vna_scpi import *
@@ -468,6 +470,8 @@ def update_plot(self):
 
 
 #==============================================================================#
+
+        
 Ui_MainWindow.check_input = check_input
 Ui_MainWindow.file_open = file_open
 Ui_MainWindow.file_save = file_save
@@ -477,28 +481,21 @@ Ui_MainWindow.edit_color = edit_color
 Ui_MainWindow.file_info = file_info
 
 Ui_MainWindow.connect_instrument = connect_instrument
-
 Ui_MainWindow.start_measure = start_measure
-
 Ui_MainWindow.save_reference = save_reference
 Ui_MainWindow.add_trace = add_trace
 Ui_MainWindow.remove_trace = remove_trace
-
 Ui_MainWindow.save_s_parameters = file_save
-
 Ui_MainWindow.instrument_refresh = instrument_refresh
 Ui_MainWindow.update_time = update_time
-
 Ui_MainWindow.create_canvas = create_canvas
 Ui_MainWindow.update_canvas = update_canvas
-
 Ui_MainWindow.create_plot = create_plot
 Ui_MainWindow.update_plot = update_plot
 
 Ui_MainWindow.newkeyPressEvent = newkeyPressEvent
 
 
-#==============================================================================#
 Ui_MainWindow.xRef = []
 Ui_MainWindow.yRef = []
 Ui_MainWindow.saveRef = False
@@ -506,21 +503,19 @@ Ui_MainWindow.delRef = False
 Ui_MainWindow.measures_stored = []
 
 
-#==============================================================================#
-#if __name__ == "__main__":
-import sys
-app = QtWidgets.QApplication(sys.argv)
-MainWindow = QtWidgets.QMainWindow()
-ui = Ui_MainWindow()
-ui.setupUi(MainWindow)
-ui.update_time()
-ui.check_input()
-ui.create_canvas()
-ui.create_plot()
-MainWindow.keyPressEvent = ui.newkeyPressEvent
-MainWindow.show()
+if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    ui.update_time()
+    ui.check_input()
+    ui.create_canvas()
+    ui.create_plot()
+    MainWindow.keyPressEvent = ui.newkeyPressEvent
+    MainWindow.show()
 
-#GUI ready
-settings.SYS_READY = True
+    #GUI ready
+    settings.SYS_READY = True
 
-sys.exit(app.exec_())
+    sys.exit(app.exec_())
