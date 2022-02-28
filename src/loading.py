@@ -9,6 +9,7 @@ from PyQt5.QtCore import Qt
 class LoadingGui:
     def __init__(self):
         self.MainWindow = QtWidgets.QMainWindow()
+        self.MainWindow.setWindowTitle('Loading')
 
         # Create window
         self.MainWindow.resize(600, 600)
@@ -41,7 +42,7 @@ class LoadingGui:
     # Stop Animation(According to need)
     def stopAnimation(self):
         self.movie.stop()
-        self.FrontWindow.close()
+        self.MainWindow.close()
 
 
 if __name__ == "__main__":
