@@ -2,11 +2,13 @@
 
 # Form implementation generated from reading ui file 'user_gui.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -123,13 +125,29 @@ class Ui_MainWindow(object):
         self.tabWidget.setMinimumSize(QtCore.QSize(0, 0))
         self.tabWidget.setMovable(False)
         self.tabWidget.setObjectName("tabWidget")
+        self.tab_0 = QtWidgets.QWidget()
+        self.tab_0.setObjectName("tab_0")
+        self.gridLayout_3 = QtWidgets.QGridLayout(self.tab_0)
+        self.gridLayout_3.setObjectName("gridLayout_3")
+        self.plot_0 = QtWidgets.QVBoxLayout()
+        self.plot_0.setObjectName("plot_0")
+        self.gridLayout_3.addLayout(self.plot_0, 0, 0, 1, 1)
+        self.tabWidget.addTab(self.tab_0, "")
+        self.tab_1 = QtWidgets.QWidget()
+        self.tab_1.setObjectName("tab_1")
+        self.gridLayout_4 = QtWidgets.QGridLayout(self.tab_1)
+        self.gridLayout_4.setObjectName("gridLayout_4")
+        self.plot_1 = QtWidgets.QVBoxLayout()
+        self.plot_1.setObjectName("plot_1")
+        self.gridLayout_4.addLayout(self.plot_1, 0, 0, 1, 1)
+        self.tabWidget.addTab(self.tab_1, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
-        self.gridLayout_3 = QtWidgets.QGridLayout(self.tab_2)
-        self.gridLayout_3.setObjectName("gridLayout_3")
-        self.plotTest_2 = QtWidgets.QVBoxLayout()
-        self.plotTest_2.setObjectName("plotTest_2")
-        self.gridLayout_3.addLayout(self.plotTest_2, 0, 0, 1, 1)
+        self.gridLayout_2 = QtWidgets.QGridLayout(self.tab_2)
+        self.gridLayout_2.setObjectName("gridLayout_2")
+        self.plot_2 = QtWidgets.QVBoxLayout()
+        self.plot_2.setObjectName("plot_2")
+        self.gridLayout_2.addLayout(self.plot_2, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab_2, "")
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
@@ -139,14 +157,6 @@ class Ui_MainWindow(object):
         self.textEdit.setObjectName("textEdit")
         self.gridLayout_5.addWidget(self.textEdit, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab_3, "")
-        self.tab = QtWidgets.QWidget()
-        self.tab.setObjectName("tab")
-        self.gridLayout_2 = QtWidgets.QGridLayout(self.tab)
-        self.gridLayout_2.setObjectName("gridLayout_2")
-        self.plotTest = QtWidgets.QVBoxLayout()
-        self.plotTest.setObjectName("plotTest")
-        self.gridLayout_2.addLayout(self.plotTest, 0, 0, 1, 1)
-        self.tabWidget.addTab(self.tab, "")
         self.gridLayout_6.addWidget(self.tabWidget, 0, 0, 1, 1)
         self.gridLayout.addWidget(self.mainFrame, 0, 1, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -208,9 +218,10 @@ class Ui_MainWindow(object):
         self.remoteConnectionLabel.setText(_translate("MainWindow", "NO DEVICE CONNECTED"))
         self.connectButton.setText(_translate("MainWindow", "CONNECT"))
         self.groupBox.setTitle(_translate("MainWindow", "TEST TYPE"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Test mode"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_0), _translate("MainWindow", "Test page 1"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_1), _translate("MainWindow", "Test page 2"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Demo"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "Notes"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Demo"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuEdit.setTitle(_translate("MainWindow", "Edit"))
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
@@ -231,4 +242,3 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-

@@ -26,6 +26,8 @@ class GuiCore(Ui_MainWindow):
     measures_stored = []
 
     def __init__(self):
+        super().__init__()
+
         self.MainWindow = QtWidgets.QMainWindow()
         self.setupUi(self.MainWindow)
         self.update_time()
@@ -70,7 +72,7 @@ class GuiCore(Ui_MainWindow):
             print(name[index])
 
             try:
-                if self.tabWidget.currentIndex() == 1:
+                if self.tabWidget.currentIndex() == 3:
                     with open(name[index], 'r') as file:
                         text = file.read()
                         self.textEdit.setText(text)
@@ -128,7 +130,7 @@ class GuiCore(Ui_MainWindow):
         name, _ = QtWidgets.QFileDialog.getSaveFileName(self.MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), "all traces file (*)")  # Returns a tuple
 
         if name != "":
-            if self.tabWidget.currentIndex() == 1:
+            if self.tabWidget.currentIndex() == 3:
                 if len(name) > 0:
                     with open(name + '.txt', 'a') as file:
                         text = self.textEdit.toPlainText()  # Plain text without formatting
@@ -330,8 +332,8 @@ class GuiCore(Ui_MainWindow):
         self.demo_fig = Figure(figsize=(5, 3))
 
         dynamic_canvas = FigureCanvas(self.demo_fig)
-        self.plotTest.addWidget(dynamic_canvas)
-        self.plotTest.addWidget(NavigationToolbar(dynamic_canvas, self.MainWindow))
+        self.plot_2.addWidget(dynamic_canvas)
+        self.plot_2.addWidget(NavigationToolbar(dynamic_canvas, self.MainWindow))
 
         self._dynamic_ax = dynamic_canvas.figure.subplots()
 
@@ -390,21 +392,21 @@ class GuiCore(Ui_MainWindow):
 
         # Canvas & toolbar
         self.thisFigure = FigureCanvas(self.fig)
-        self.plotTest_2.addWidget(self.thisFigure)
+        self.plot_0.addWidget(self.thisFigure)
 
         self.thisToolbar = NavigationToolbar(self.thisFigure, self.MainWindow)
-        self.plotTest_2.addWidget(self.thisToolbar)
+        self.plot_0.addWidget(self.thisToolbar)
 
 
     def update_plot(self):
         try:
             # delete old fig
-            self.plotTest_2.removeWidget(self.thisFigure)
+            self.plot_0.removeWidget(self.thisFigure)
             self.thisFigure.deleteLater()
             self.thisFigure = None
 
             # delete old toolbar
-            self.plotTest_2.removeWidget(self.thisToolbar)
+            self.plot_0.removeWidget(self.thisToolbar)
             self.thisToolbar.deleteLater()
             self.thisToolbar = None
 

@@ -415,13 +415,33 @@
          <property name="movable">
           <bool>false</bool>
          </property>
-         <widget class="QWidget" name="tab_2">
+         <widget class="QWidget" name="tab_0">
           <attribute name="title">
-           <string>Test mode</string>
+           <string>Test page 1</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_3">
            <item row="0" column="0">
-            <layout class="QVBoxLayout" name="plotTest_2"/>
+            <layout class="QVBoxLayout" name="plot_0"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_1">
+          <attribute name="title">
+           <string>Test page 2</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout_4">
+           <item row="0" column="0">
+            <layout class="QVBoxLayout" name="plot_1"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_2">
+          <attribute name="title">
+           <string>Demo</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="0" column="0">
+            <layout class="QVBoxLayout" name="plot_2"/>
            </item>
           </layout>
          </widget>
@@ -432,16 +452,6 @@
           <layout class="QGridLayout" name="gridLayout_5">
            <item row="0" column="0">
             <widget class="QTextEdit" name="textEdit"/>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="tab">
-          <attribute name="title">
-           <string>Demo</string>
-          </attribute>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0">
-            <layout class="QVBoxLayout" name="plotTest"/>
            </item>
           </layout>
          </widget>
