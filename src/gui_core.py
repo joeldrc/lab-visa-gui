@@ -53,7 +53,7 @@ class GuiCore(Ui_MainWindow):
         self.removeTrace.clicked.connect(self.remove_trace)
         self.compareTrace.stateChanged.connect(self.compare_trace)
 
-        self.instrumentAddress.addItem('')
+        self.instrumentAddress.addItem(' ')
         try:
             config_file = open("config/instrument_address.txt", "r")
             content_list = config_file.readlines()
@@ -67,7 +67,7 @@ class GuiCore(Ui_MainWindow):
         except Exception as e:
             print(e)
 
-        self.comboBox_test_type.addItem('')
+        self.comboBox_test_type.addItem(' ')
         try:
             config_file = open("config/measure_type.txt", "r")
             content_list = config_file.readlines()
@@ -234,20 +234,17 @@ class GuiCore(Ui_MainWindow):
         if decision == QtWidgets.QMessageBox.Yes:
             sys.exit()
 
-
     def edit_font(self):  # Applies on all text
         font = self.textEdit.font()  # Get the currently used font
         newfont, valid = QtWidgets.QFontDialog.getFont(font)
         if valid:
             self.textEdit.setFont(newfont)
 
-
     def edit_color(self):  # Applies on selected text only
         color = self.textEdit.textColor()
         newcolor = QtWidgets.QColorDialog.getColor(color)
         if newcolor.isValid():
             self.textEdit.setTextColor(newcolor)
-
 
     def file_info(self):
         QtWidgets.QMessageBox.question(self.MainWindow, 'Info', settings.__author__ + '\n' + settings.__version__, QtWidgets.QMessageBox.Ok)
@@ -259,16 +256,15 @@ class GuiCore(Ui_MainWindow):
         self.progressBar.setValue(0)
         self.instrument_refresh()
 
-
     def start_measure(self):
-        address = self.instrumentAddress.currentText()
-        test_name = self.comboBox_test_type.currentText()
-        file_name = strftime("%d%m%Y_%H%M%S", gmtime())
-        directory_name = settings.directory_name
+        if (self.tabWidget.currentIndex() < 2):
+            address = self.instrumentAddress.currentText()
+            test_name = self.comboBox_test_type.currentText()
+            file_name = strftime("%d%m%Y_%H%M%S", gmtime())
+            directory_name = settings.directory_name
+            self.vna_measure = Vna_measure(instrument_address = address, test_name = test_name, file_name = file_name, directory_name = directory_name, port_number = settings.port_number)
 
-        self.vna_measure = Vna_measure(instrument_address = address, test_name = test_name, file_name = file_name, directory_name = directory_name, port_number = settings.port_number)
         self.progressBar.setValue(0)
-
         counter = self.lcdNumber.value() + 1
         self.lcdNumber.display(counter)
         self.instrument_refresh()
@@ -368,88 +364,84 @@ class GuiCore(Ui_MainWindow):
     def update_plot(self):
         #self.values = values
 
-        try:
-            if (self.tabWidget.currentIndex() == 0):
-                # clearing old figure
-                self.fig_0.clear()
+        if (self.tabWidget.currentIndex() == 0):
+            # clearing old figure
+            self.fig_0.clear()
 
-                xValue = []
-                yValue = []
-                xyVal = []
+            xValue = []
+            yValue = []
+            xyVal = []
 
-                # add plot 1
-                subplots = len(self.measures_stored)
-                if subplots < 1:
-                    subplots = 1
+            # add plot 1
+            subplots = len(self.measures_stored)
+            if subplots < 1:
+                subplots = 1
 
-                if subplots > 8:
-                    rows = 4
-                    columns = 3
-                elif subplots > 6:
-                    rows = 4
-                    columns = 2
-                elif subplots > 3:
-                    rows = 2
-                    columns = 3
-                else:
-                    rows = 1
-                    columns = subplots
+            if subplots > 8:
+                rows = 4
+                columns = 3
+            elif subplots > 6:
+                rows = 4
+                columns = 2
+            elif subplots > 3:
+                rows = 2
+                columns = 3
+            else:
+                rows = 1
+                columns = subplots
 
-                self.subplot = []
+            self.subplot = []
+            for i in range(subplots):
+                self.subplot.append(self.fig_0.add_subplot(rows, columns, i + 1))
+                #self.subplot[i].clear()
+                x, y = self.measures_stored[i]
+                xValue.append(x)
+                yValue.append(y)
+                # plot
+                self.subplot[i].plot(xValue[i], yValue[i])
+
+            if self.delRef == True:
+                self.delRef = False
+                try:
+                    del(self.xRef[-1])
+                    del(self.yRef[-1])
+                except:
+                    pass
+            elif (self.saveReference.isChecked() or self.addRef):
+                    self.addRef = False
+                    self.xRef.append(xValue)
+                    self.yRef.append(yValue)
+
+            for j in range(len(self.xRef)):
                 for i in range(subplots):
-                    self.subplot.append(self.fig_0.add_subplot(rows, columns, i + 1))
-                    #self.subplot[i].clear()
-                    x, y = self.measures_stored[i]
-                    xValue.append(x)
-                    yValue.append(y)
-                    # plot
-                    self.subplot[i].plot(xValue[i], yValue[i])
+                    if (j == 0) and (self.compareTrace.isChecked()):
+                        purcentage = self.purcentageReference.value()
 
-                if self.delRef == True:
-                    self.delRef = False
-                    try:
-                        del(self.xRef[-1])
-                        del(self.yRef[-1])
-                    except:
-                        pass
-                elif (self.saveReference.isChecked() or self.addRef):
-                        self.addRef = False
-                        self.xRef.append(xValue)
-                        self.yRef.append(yValue)
+                        import numpy as np
+                        myarray = np.asarray(self.yRef[j][i])
 
-                for j in range(len(self.xRef)):
-                    for i in range(subplots):
-                        if (j == 0) and (self.compareTrace.isChecked()):
-                            purcentage = self.purcentageReference.value()
+                        purcentage = abs(myarray * purcentage / 100)
+                        self.lower_bound = myarray - purcentage
+                        self.upper_bound = myarray + purcentage
 
-                            import numpy as np
-                            myarray = np.asarray(self.yRef[j][i])
+                        self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i], lw=2, color='black', ls='--')
+                        self.subplot[i].fill_between(self.xRef[j][i], self.lower_bound, self.upper_bound, facecolor='cyan', alpha=0.2)
 
-                            purcentage = abs(myarray * purcentage / 100)
-                            self.lower_bound = myarray - purcentage
-                            self.upper_bound = myarray + purcentage
+                        # fill_between errors
+                        self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] > self.upper_bound, facecolor='red', alpha=0.5)
+                        self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] < self.lower_bound, facecolor='lime', alpha=0.5)
+                    else:
+                        self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i])
 
-                            self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i], lw=2, color='black', ls='--')
-                            self.subplot[i].fill_between(self.xRef[j][i], self.lower_bound, self.upper_bound, facecolor='cyan', alpha=0.2)
-
-                            # fill_between errors
-                            self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] > self.upper_bound, facecolor='red', alpha=0.5)
-                            self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] < self.lower_bound, facecolor='lime', alpha=0.5)
-                        else:
-                            self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i])
-
-                """
-                # Set names on plot
-                selected_frame_number = 0
-                for i in range(len(settings.plot_names[selected_frame_number])):
-                    self.subplot[i].set_title(settings.plot_names[selected_frame_number][i][0])
-                    self.subplot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
-                    self.subplot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
-                    #self.plot[i].grid()
-                """
-
-        except Exception as e:
-            print(e)
+            """
+            # Set names on plot
+            selected_frame_number = 0
+            for i in range(len(settings.plot_names[selected_frame_number])):
+                self.subplot[i].set_title(settings.plot_names[selected_frame_number][i][0])
+                self.subplot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
+                self.subplot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
+                #self.plot[i].grid()
+            """
 
         if (self.tabWidget.currentIndex() == 2):
             # clearing old figure
