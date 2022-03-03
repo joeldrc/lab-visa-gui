@@ -52,7 +52,7 @@ class GuiCore(Ui_MainWindow):
         self.saveReference.stateChanged.connect(self.save_reference)
         self.addTrace.clicked.connect(self.add_trace)
         self.removeTrace.clicked.connect(self.remove_trace)
-        self.compareTrace.stateChanged.connect(self.save_reference)
+        self.compareTrace.stateChanged.connect(self.compare_trace)
 
         self.instrumentAddress.addItem('')
         try:
@@ -274,10 +274,12 @@ class GuiCore(Ui_MainWindow):
         self.lcdNumber.display(counter)
         self.instrument_refresh()
 
+    def compare_trace(self):
+        self.addRef = True
+        self.update_plot()
 
     def save_reference(self):
-        if self.compareTrace.isChecked():
-            print('compare trace')
+        self.addRef = True
         self.update_plot()
 
     def add_trace(self):
@@ -410,9 +412,7 @@ class GuiCore(Ui_MainWindow):
                     del(self.yRef[-1])
                 except:
                     pass
-
-            else:
-                if (self.saveReference.isChecked() or self.addRef):
+            elif self.addRef:
                     self.addRef = False
                     self.xRef.append(xValue)
                     self.yRef.append(yValue)
