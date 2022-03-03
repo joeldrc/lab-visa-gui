@@ -8,7 +8,6 @@ import settings
 import time
 from time import gmtime, strftime
 
-import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.qt_compat import QtCore, QtWidgets
 from matplotlib.backends.backend_qt5agg import (FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
@@ -413,7 +412,7 @@ class GuiCore(Ui_MainWindow):
                         del(self.yRef[-1])
                     except:
                         pass
-                elif self.addRef:
+                elif (self.saveReference.isChecked() or self.addRef):
                         self.addRef = False
                         self.xRef.append(xValue)
                         self.yRef.append(yValue)
@@ -440,40 +439,38 @@ class GuiCore(Ui_MainWindow):
                             self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i])
 
                 """
-                try:
-                    # Set names on plot
-                    selected_frame_number = 0
-                    for i in range(len(settings.plot_names[selected_frame_number])):
-                        self.subplot[i].set_title(settings.plot_names[selected_frame_number][i][0])
-                        self.subplot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
-                        self.subplot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
-                        #self.plot[i].grid()
-                except Exception as e:
-                    print(e)
+                # Set names on plot
+                selected_frame_number = 0
+                for i in range(len(settings.plot_names[selected_frame_number])):
+                    self.subplot[i].set_title(settings.plot_names[selected_frame_number][i][0])
+                    self.subplot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
+                    self.subplot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
+                    #self.plot[i].grid()
                 """
 
-            if (self.tabWidget.currentIndex() == 2):
-                # clearing old figure
-                self.fig_2.clear()
-
-                self.demoValues_ax = self.figCanvas_2.figure.subplots()
-
-                t = np.linspace(0, 10, 101)
-                self.demoValues_ax.plot(t, np.sin(t + time.time()))
-
-                self.plot_timer.start(100)
-            else:
-                self.plot_timer.stop()
-
-            # auto adj
-            self.fig_0.tight_layout()
-            self.fig_2.tight_layout()
-
-            self.fig_0.canvas.draw()
-            self.fig_2.canvas.draw()
-            
         except Exception as e:
             print(e)
+
+        if (self.tabWidget.currentIndex() == 2):
+            # clearing old figure
+            self.fig_2.clear()
+
+            self.demoValues_ax = self.figCanvas_2.figure.subplots()
+
+            import numpy as np
+            t = np.linspace(0, 10, 101)
+            self.demoValues_ax.plot(t, np.sin(t + time.time()))
+
+            self.plot_timer.start(100)
+        else:
+            self.plot_timer.stop()
+
+        # auto adj
+        self.fig_0.tight_layout()
+        self.fig_2.tight_layout()
+
+        self.fig_0.canvas.draw()
+        self.fig_2.canvas.draw()
 
 #------------------------------------------------------------------------------#
 
