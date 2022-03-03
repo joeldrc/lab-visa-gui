@@ -369,107 +369,111 @@ class GuiCore(Ui_MainWindow):
     def update_plot(self):
         #self.values = values
 
-        if (self.tabWidget.currentIndex() == 0):
-            # clearing old figure
-            self.fig_0.clear()
+        try:
+            if (self.tabWidget.currentIndex() == 0):
+                # clearing old figure
+                self.fig_0.clear()
 
-            xValue = []
-            yValue = []
-            xyVal = []
+                xValue = []
+                yValue = []
+                xyVal = []
 
-            # add plot 1
-            subplots = len(self.measures_stored)
-            if subplots < 1:
-                subplots = 1
+                # add plot 1
+                subplots = len(self.measures_stored)
+                if subplots < 1:
+                    subplots = 1
 
-            if subplots > 8:
-                rows = 4
-                columns = 3
-            elif subplots > 6:
-                rows = 4
-                columns = 2
-            elif subplots > 3:
-                rows = 2
-                columns = 3
-            else:
-                rows = 1
-                columns = subplots
+                if subplots > 8:
+                    rows = 4
+                    columns = 3
+                elif subplots > 6:
+                    rows = 4
+                    columns = 2
+                elif subplots > 3:
+                    rows = 2
+                    columns = 3
+                else:
+                    rows = 1
+                    columns = subplots
 
-            self.subplot = []
-            for i in range(subplots):
-                self.subplot.append(self.fig_0.add_subplot(rows, columns, i + 1))
-                #self.subplot[i].clear()
-                x, y = self.measures_stored[i]
-                xValue.append(x)
-                yValue.append(y)
-                # plot
-                self.subplot[i].plot(xValue[i], yValue[i])
-
-            if self.delRef == True:
-                self.delRef = False
-                try:
-                    del(self.xRef[-1])
-                    del(self.yRef[-1])
-                except:
-                    pass
-            elif self.addRef:
-                    self.addRef = False
-                    self.xRef.append(xValue)
-                    self.yRef.append(yValue)
-
-            for j in range(len(self.xRef)):
+                self.subplot = []
                 for i in range(subplots):
-                    if (j == 0) and (self.compareTrace.isChecked()):
-                        purcentage = self.purcentageReference.value()
+                    self.subplot.append(self.fig_0.add_subplot(rows, columns, i + 1))
+                    #self.subplot[i].clear()
+                    x, y = self.measures_stored[i]
+                    xValue.append(x)
+                    yValue.append(y)
+                    # plot
+                    self.subplot[i].plot(xValue[i], yValue[i])
 
-                        import numpy as np
-                        myarray = np.asarray(self.yRef[j][i])
+                if self.delRef == True:
+                    self.delRef = False
+                    try:
+                        del(self.xRef[-1])
+                        del(self.yRef[-1])
+                    except:
+                        pass
+                elif self.addRef:
+                        self.addRef = False
+                        self.xRef.append(xValue)
+                        self.yRef.append(yValue)
 
-                        purcentage = abs(myarray * purcentage / 100)
-                        self.lower_bound = myarray - purcentage
-                        self.upper_bound = myarray + purcentage
+                for j in range(len(self.xRef)):
+                    for i in range(subplots):
+                        if (j == 0) and (self.compareTrace.isChecked()):
+                            purcentage = self.purcentageReference.value()
 
-                        self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i], lw=2, color='black', ls='--')
-                        self.subplot[i].fill_between(self.xRef[j][i], self.lower_bound, self.upper_bound, facecolor='cyan', alpha=0.2)
+                            import numpy as np
+                            myarray = np.asarray(self.yRef[j][i])
 
-                        # fill_between errors
-                        self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] > self.upper_bound, facecolor='red', alpha=0.5)
-                        self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] < self.lower_bound, facecolor='lime', alpha=0.5)
-                    else:
-                        self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i])
+                            purcentage = abs(myarray * purcentage / 100)
+                            self.lower_bound = myarray - purcentage
+                            self.upper_bound = myarray + purcentage
 
-            """
-            try:
-                # Set names on plot
-                selected_frame_number = 0
-                for i in range(len(settings.plot_names[selected_frame_number])):
-                    self.subplot[i].set_title(settings.plot_names[selected_frame_number][i][0])
-                    self.subplot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
-                    self.subplot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
-                    #self.plot[i].grid()
-            except Exception as e:
-                print(e)
-            """
+                            self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i], lw=2, color='black', ls='--')
+                            self.subplot[i].fill_between(self.xRef[j][i], self.lower_bound, self.upper_bound, facecolor='cyan', alpha=0.2)
 
-        if (self.tabWidget.currentIndex() == 2):
-            # clearing old figure
-            self.fig_2.clear()
+                            # fill_between errors
+                            self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] > self.upper_bound, facecolor='red', alpha=0.5)
+                            self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] < self.lower_bound, facecolor='lime', alpha=0.5)
+                        else:
+                            self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i])
 
-            self.demoValues_ax = self.figCanvas_2.figure.subplots()
+                """
+                try:
+                    # Set names on plot
+                    selected_frame_number = 0
+                    for i in range(len(settings.plot_names[selected_frame_number])):
+                        self.subplot[i].set_title(settings.plot_names[selected_frame_number][i][0])
+                        self.subplot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
+                        self.subplot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
+                        #self.plot[i].grid()
+                except Exception as e:
+                    print(e)
+                """
 
-            t = np.linspace(0, 10, 101)
-            self.demoValues_ax.plot(t, np.sin(t + time.time()))
+            if (self.tabWidget.currentIndex() == 2):
+                # clearing old figure
+                self.fig_2.clear()
 
-            self.plot_timer.start(100)
-        else:
-            self.plot_timer.stop()
+                self.demoValues_ax = self.figCanvas_2.figure.subplots()
 
-        # auto adj
-        self.fig_0.tight_layout()
-        self.fig_2.tight_layout()
+                t = np.linspace(0, 10, 101)
+                self.demoValues_ax.plot(t, np.sin(t + time.time()))
 
-        self.fig_0.canvas.draw()
-        self.fig_2.canvas.draw()
+                self.plot_timer.start(100)
+            else:
+                self.plot_timer.stop()
+
+            # auto adj
+            self.fig_0.tight_layout()
+            self.fig_2.tight_layout()
+
+            self.fig_0.canvas.draw()
+            self.fig_2.canvas.draw()
+            
+        except Exception as e:
+            print(e)
 
 #------------------------------------------------------------------------------#
 
