@@ -3,7 +3,6 @@
 
 import time
 from time import gmtime, strftime
-import visa
 import pyvisa as visa
 import threading
 import numpy as np
@@ -45,6 +44,8 @@ class Vna_measure(threading.Thread):
         else:
             try:
                 rm = visa.ResourceManager()
+                print(rm.list_resources())
+
                 self.vna = rm.open_resource(self.instrument_address)
                 self.vna.write_termination = '\n'   # Some instruments require that at the end of each command.
                 #self.vna.read_termination = "\r"
@@ -81,7 +82,7 @@ class Vna_measure(threading.Thread):
             try:
                 global calibration
                 global device_address
-                if (self.test_name != '_Read_data_'):
+                if (self.test_name != ''):
                     if ((calibration != self.test_name) or (device_address != self.instrument_address)):
                         self.load_instrument_state(pathname + self.test_name)
                         calibration = self.test_name

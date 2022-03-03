@@ -32,7 +32,6 @@ class GuiCore(Ui_MainWindow):
         self.setupUi(self.MainWindow)
         self.update_time()
         self.check_input()
-        self.create_canvas()
         self.create_plot()
 
         self.MainWindow.keyPressEvent = self.newkeyPressEvent
@@ -55,12 +54,33 @@ class GuiCore(Ui_MainWindow):
         self.removeTrace.clicked.connect(self.remove_trace)
         self.compareTrace.stateChanged.connect(self.save_reference)
 
-        for i in range(len(settings.instrument_address)):
-            #self.instrumentAddress.setItemText(i, settings.instrument_address[i])
-            self.instrumentAddress.addItem(settings.instrument_address[i])
+        self.instrumentAddress.addItem('')
+        try:
+            config_file = open("config/instrument_address.txt", "r")
+            content_list = config_file.readlines()
 
-        for i in range(len(settings.test_name)):
-            self.comboBox_test_type.addItem(settings.test_name[i])
+            for value in content_list:
+                # remove '\n'
+                value = value.strip()
+
+                if (value[0] != '#'):
+                    self.instrumentAddress.addItem(value)
+        except Exception as e:
+            print(e)
+
+        self.comboBox_test_type.addItem('')
+        try:
+            config_file = open("config/measure_type.txt", "r")
+            content_list = config_file.readlines()
+
+            for value in content_list:
+                # remove '\n'
+                value = value.strip()
+
+                if (value[0] != '#'):
+                    self.comboBox_test_type.addItem(value)
+        except Exception as e:
+            print(e)
 
 #------------------------------------------------------------------------------#
 
@@ -316,115 +336,76 @@ class GuiCore(Ui_MainWindow):
         self.timer.timeout.connect(self.update_time)
         self.timer.start(1000)
 
-#------------------------------------------------------------------------------#
-
-    def create_canvas(self):
-        """
-        static_canvas = FigureCanvas(Figure(figsize=(5, 3)))
-        self.plotTest.addWidget(static_canvas)
-        MainWindow.addToolBar(NavigationToolbar(static_canvas, MainWindow))
-
-        self._static_ax = static_canvas.figure.subplots()
-        t = np.linspace(0, 10, 501)
-        self._static_ax.plot(t, np.tan(t), ".")
-        """
-
-        self.demo_fig = Figure(figsize=(5, 3))
-
-        dynamic_canvas = FigureCanvas(self.demo_fig)
-        self.plot_2.addWidget(dynamic_canvas)
-        self.plot_2.addWidget(NavigationToolbar(dynamic_canvas, self.MainWindow))
-
-        self._dynamic_ax = dynamic_canvas.figure.subplots()
-
-        self._timer = dynamic_canvas.new_timer(100, [(self.update_canvas, (), {})])
-        self._timer.start()
-
-
-    def update_canvas(self):
-        if self.tabWidget.currentIndex() == 2:
-            self._dynamic_ax.clear()
-            t = np.linspace(0, 10, 101)
-            # Shift the sinusoid as a function of time.
-            self._dynamic_ax.plot(t, np.sin(t + time.time()))
-            self._dynamic_ax.figure.canvas.draw()
-
-            # auto adj
-            self.demo_fig.tight_layout()
-
-#------------------------------------------------------------------------------#
+    #--------------------------------------------------------------------------#
 
     def create_plot(self):
         plt.style.use('seaborn-whitegrid')
 
-        self.plot = []
         self.fig = []
         self.toolbar = []
 
         # initialize fig
-        self.fig = Figure(figsize=(12,7))
+        self.fig_0 = Figure(figsize=(12,7))
+        self.fig_2 = Figure(figsize=(12,7))
 
-        # Figures
-        subplot_number = len(self.measures_stored)
-        if subplot_number < 1:
-            subplot_number = 1
+        # add canvas
+        self.figCanvas_0 = FigureCanvas(self.fig_0)
+        self.figCanvas_2 = FigureCanvas(self.fig_2)
 
-        # auto adapt plot number
-        if subplot_number > 8:
-            subplot_rows = 4
-            subplot_columns = 3
-        elif subplot_number > 6:
-            subplot_rows = 4
-            subplot_columns = 2
-        elif subplot_number > 3:
-            subplot_rows = 2
-            subplot_columns = 3
-        else:
-            subplot_rows = 1
-            subplot_columns = subplot_number
+        self.plot_0.addWidget(self.figCanvas_0)
+        self.plot_2.addWidget(self.figCanvas_2)
 
-        for i in range(subplot_number):
-            subplot = self.fig.add_subplot(subplot_rows, subplot_columns, i + 1)
-            self.plot.append(subplot)
+        # add toolbar
+        self.navToolbar_0 = NavigationToolbar(self.figCanvas_0, self.MainWindow)
+        self.navToolbar_2 = NavigationToolbar(self.figCanvas_2, self.MainWindow)
 
-        # auto adj
-        self.fig.tight_layout()
+        self.plot_0.addWidget(self.navToolbar_0)
+        self.plot_2.addWidget(self.navToolbar_2)
 
-        # Canvas & toolbar
-        self.thisFigure = FigureCanvas(self.fig)
-        self.plot_0.addWidget(self.thisFigure)
+        # dynamic plot refresh
+        self.plot_timer = QtCore.QTimer()
+        self.plot_timer.timeout.connect(self.update_plot)
 
-        self.thisToolbar = NavigationToolbar(self.thisFigure, self.MainWindow)
-        self.plot_0.addWidget(self.thisToolbar)
-
+    #--------------------------------------------------------------------------#
 
     def update_plot(self):
-        try:
-            # delete old fig
-            self.plot_0.removeWidget(self.thisFigure)
-            self.thisFigure.deleteLater()
-            self.thisFigure = None
+        #self.values = values
 
-            # delete old toolbar
-            self.plot_0.removeWidget(self.thisToolbar)
-            self.thisToolbar.deleteLater()
-            self.thisToolbar = None
-
-            self.create_plot()
-
-            # return wich test you have selected
-            selected_frame_number = self.comboBox_test_type.currentIndex() - 1
-            channel_number = len(self.measures_stored)
+        if (self.tabWidget.currentIndex() == 0):
+            # clearing old figure
+            self.fig_0.clear()
 
             xValue = []
             yValue = []
+            xyVal = []
 
-            for i in range(channel_number):
+            # add plot 1
+            subplots = len(self.measures_stored)
+            if subplots < 1:
+                subplots = 1
+
+            if subplots > 8:
+                rows = 4
+                columns = 3
+            elif subplots > 6:
+                rows = 4
+                columns = 2
+            elif subplots > 3:
+                rows = 2
+                columns = 3
+            else:
+                rows = 1
+                columns = subplots
+
+            self.subplot = []
+            for i in range(subplots):
+                self.subplot.append(self.fig_0.add_subplot(rows, columns, i + 1))
+                #self.subplot[i].clear()
+
                 x, y = self.measures_stored[i]
                 xValue.append(x)
                 yValue.append(y)
-                # clean plot line
-                self.plot[i].clear()
+
 
             if self.saveReference.isChecked():
                 self.saveRef = True
@@ -440,12 +421,12 @@ class GuiCore(Ui_MainWindow):
                     self.yRef.append(yValue)
                     self.saveRef = False
 
-                for i in range(channel_number):
-                    # set data on plot
-                    self.plot[i].plot(xValue[i], yValue[i])
+                for i in range(subplots):
+                    self.subplot[i].plot(xValue[i], yValue[i])
+
 
             for j in range(len(self.xRef)):
-                for i in range(channel_number):
+                for i in range(subplots):
 
                     if (j == 0) and (self.compareTrace.isChecked()):
                         purcentage = self.purcentageReference.value()
@@ -469,6 +450,8 @@ class GuiCore(Ui_MainWindow):
             """
             try:
                 # Set names on plot
+                # return wich test you have selected
+                selected_frame_number = self.comboBox_test_type.currentIndex() - 1
                 if selected_frame_number < len(settings.plot_names):
                     for i in range(len(settings.plot_names[selected_frame_number])):
                         self.plot[i].set_title(settings.plot_names[selected_frame_number][i][0])
@@ -491,13 +474,26 @@ class GuiCore(Ui_MainWindow):
             except Exception as e:
                 print(e)
 
-            # autoadapt
-            self.fig.tight_layout()
-            # update plot
-            self.fig.canvas.draw()
 
-        except Exception as e:
-            print(e)
+        if (self.tabWidget.currentIndex() == 2):
+            # clearing old figure
+            self.fig_2.clear()
+
+            self.demoValues_ax = self.figCanvas_2.figure.subplots()
+
+            t = np.linspace(0, 10, 101)
+            self.demoValues_ax.plot(t, np.sin(t + time.time()))
+
+            self.plot_timer.start(100)
+        else:
+            self.plot_timer.stop()
+
+        # auto adj
+        self.fig_0.tight_layout()
+        self.fig_2.tight_layout()
+
+        self.fig_0.canvas.draw()
+        self.fig_2.canvas.draw()
 
 #------------------------------------------------------------------------------#
 

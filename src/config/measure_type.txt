@@ -1,0 +1,6 @@
+# Insert measure type:
+Feedthrough
+Cables
+Pick_up
+Phase_and_transmission
+Collimators_commissioning
