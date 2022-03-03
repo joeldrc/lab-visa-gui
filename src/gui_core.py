@@ -21,8 +21,8 @@ from visa_scpi import *
 class GuiCore(Ui_MainWindow):
     xRef = []
     yRef = []
-    saveRef = False
     delRef = False
+    addRef = False
     measures_stored = []
 
     def __init__(self):
@@ -278,19 +278,15 @@ class GuiCore(Ui_MainWindow):
     def save_reference(self):
         if self.compareTrace.isChecked():
             print('compare trace')
-            self.saveRef = True
         self.update_plot()
-
 
     def add_trace(self):
-        self.saveRef = True
+        self.addRef = True
         self.update_plot()
-
 
     def remove_trace(self):
         self.delRef = True
         self.update_plot()
-
 
     def newkeyPressEvent(self, e):
         if ((e.key() == QtCore.Qt.Key_Enter) or (e.key() == (QtCore.Qt.Key_Enter-1))):
@@ -401,33 +397,28 @@ class GuiCore(Ui_MainWindow):
             for i in range(subplots):
                 self.subplot.append(self.fig_0.add_subplot(rows, columns, i + 1))
                 #self.subplot[i].clear()
-
                 x, y = self.measures_stored[i]
                 xValue.append(x)
                 yValue.append(y)
-
-
-            if self.saveReference.isChecked():
-                self.saveRef = True
+                # plot
+                self.subplot[i].plot(xValue[i], yValue[i])
 
             if self.delRef == True:
-                if (len(self.xRef) > 0):
+                self.delRef = False
+                try:
                     del(self.xRef[-1])
                     del(self.yRef[-1])
-                self.delRef = False
+                except:
+                    pass
+
             else:
-                if self.saveRef == True:
+                if (self.saveReference.isChecked() or self.addRef):
+                    self.addRef = False
                     self.xRef.append(xValue)
                     self.yRef.append(yValue)
-                    self.saveRef = False
-
-                for i in range(subplots):
-                    self.subplot[i].plot(xValue[i], yValue[i])
-
 
             for j in range(len(self.xRef)):
                 for i in range(subplots):
-
                     if (j == 0) and (self.compareTrace.isChecked()):
                         purcentage = self.purcentageReference.value()
 
@@ -438,42 +429,27 @@ class GuiCore(Ui_MainWindow):
                         self.lower_bound = myarray - purcentage
                         self.upper_bound = myarray + purcentage
 
-                        self.plot[i].plot(self.xRef[j][i], self.yRef[j][i], lw=2, color='black', ls='--')
-                        self.plot[i].fill_between(self.xRef[j][i], self.lower_bound, self.upper_bound, facecolor='cyan', alpha=0.2)
+                        self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i], lw=2, color='black', ls='--')
+                        self.subplot[i].fill_between(self.xRef[j][i], self.lower_bound, self.upper_bound, facecolor='cyan', alpha=0.2)
 
                         # fill_between errors
-                        self.plot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] > self.upper_bound, facecolor='red', alpha=0.5)
-                        self.plot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] < self.lower_bound, facecolor='lime', alpha=0.5)
+                        self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] > self.upper_bound, facecolor='red', alpha=0.5)
+                        self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] < self.lower_bound, facecolor='lime', alpha=0.5)
                     else:
-                        self.plot[i].plot(self.xRef[j][i], self.yRef[j][i])
+                        self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i])
 
             """
             try:
                 # Set names on plot
-                # return wich test you have selected
-                selected_frame_number = self.comboBox_test_type.currentIndex() - 1
-                if selected_frame_number < len(settings.plot_names):
-                    for i in range(len(settings.plot_names[selected_frame_number])):
-                        self.plot[i].set_title(settings.plot_names[selected_frame_number][i][0])
-                        self.plot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
-                        self.plot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
-                        #self.plot[i].grid()
-            except Exception as e:
-                print(e)
-            """
-
-            try:
-                # Set names on plot
-                for i in range(len(self.plot_titles)):
-                    self.plot[i].set_title(self.plot_titles[i+1])
-                    self.plot[i].set_xlabel(self.plot_titles[0])
-
-                    val = self.plot_titles[i+1]
-                    self.plot[i].set_ylabel(val[val.find('[') + 1: val.find(']')])
+                selected_frame_number = 0
+                for i in range(len(settings.plot_names[selected_frame_number])):
+                    self.subplot[i].set_title(settings.plot_names[selected_frame_number][i][0])
+                    self.subplot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
+                    self.subplot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
                     #self.plot[i].grid()
             except Exception as e:
                 print(e)
-
+            """
 
         if (self.tabWidget.currentIndex() == 2):
             # clearing old figure
