@@ -37,7 +37,7 @@ class Vna_measure(threading.Thread):
 
     def run(self):
         print("Init. visa setup")
-        if (self.instrument_address == ' '):
+        if (self.instrument_address == '_'):
             self.instrument_info = 'TEST MODE'
             print(self.instrument_info)
             self.test_mode()

@@ -53,7 +53,7 @@ class GuiCore(Ui_MainWindow):
         self.removeTrace.clicked.connect(self.remove_trace)
         self.compareTrace.stateChanged.connect(self.compare_trace)
 
-        self.instrumentAddress.addItem(' ')
+        self.instrumentAddress.addItem('_')
         try:
             config_file = open("config/instrument_address.txt", "r")
             content_list = config_file.readlines()
@@ -67,7 +67,7 @@ class GuiCore(Ui_MainWindow):
         except Exception as e:
             print(e)
 
-        self.comboBox_test_type.addItem(' ')
+        self.comboBox_test_type.addItem('_')
         try:
             config_file = open("config/measure_type.txt", "r")
             content_list = config_file.readlines()
