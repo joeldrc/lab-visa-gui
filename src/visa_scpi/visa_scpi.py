@@ -37,7 +37,7 @@ class Vna_measure(threading.Thread):
 
     def run(self):
         print("Init. visa setup")
-        if (self.instrument_address == ''):
+        if (self.instrument_address == ' '):
             self.instrument_info = 'TEST MODE'
             print(self.instrument_info)
             self.test_mode()
@@ -82,7 +82,7 @@ class Vna_measure(threading.Thread):
             try:
                 global calibration
                 global device_address
-                if (self.test_name != ' '):
+                if (self.test_name != ''):
                     if ((calibration != self.test_name) or (device_address != self.instrument_address)):
                         self.load_instrument_state(pathname + self.test_name)
                         calibration = self.test_name
@@ -275,7 +275,7 @@ if __name__ == '__main__':
         run_script =  input('Press to enter to Continue: ')
 
         address = input('Enter address (enter to default): ')
-        if address == '':
+        if address == ' ':
             print('-> TEST MODE ON')
         else:
             print('->', address)
