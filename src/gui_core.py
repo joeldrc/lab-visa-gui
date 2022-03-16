@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# Joel Daricou 03/2022
 
 import os
 import sys
@@ -13,6 +14,8 @@ from matplotlib.backends.qt_compat import QtCore, QtWidgets
 from matplotlib.backends.backend_qt5agg import (FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 from matplotlib.figure import Figure
 
+from PyQt5.QtCore import QRunnable, Qt, QThreadPool
+
 from user_gui import *
 from visa_scpi import *
 
@@ -23,20 +26,26 @@ class GuiCore(Ui_MainWindow):
     delRef = False
     addRef = False
     measures_stored = []
+    tab = ''
 
     def __init__(self):
         super().__init__()
-
         self.MainWindow = QtWidgets.QMainWindow()
         self.setupUi(self.MainWindow)
-        self.update_time()
+        self.set_timers()
         self.check_input()
         self.create_plot()
-
         self.MainWindow.keyPressEvent = self.newkeyPressEvent
         self.MainWindow.show()
 
+    def set_timers(self):
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.update_time)
+        self.timer.start(1000)
 
+    def update_time(self):
+        self.time.setText(strftime("%d %b %Y %H:%M:%S", gmtime()))
+       
     def check_input(self):
         self.actionOpen.triggered.connect(self.file_open)
         self.actionSave.triggered.connect(self.file_save)
@@ -45,41 +54,216 @@ class GuiCore(Ui_MainWindow):
         self.actionColor.triggered.connect(self.edit_color)
         self.actionAbout.triggered.connect(self.file_info)
 
-        self.connectButton.clicked.connect(self.connect_instrument)
-        self.startMeasure.clicked.connect(self.start_measure)
-
-        self.saveReference.stateChanged.connect(self.save_reference)
+        self.connect_btn.clicked.connect(self.measure)
+        self.start_measure.clicked.connect(self.measure)      
         self.addTrace.clicked.connect(self.add_trace)
         self.removeTrace.clicked.connect(self.remove_trace)
-        self.compareTrace.stateChanged.connect(self.compare_trace)
 
-        self.instrumentAddress.addItem('_')
+        self.save_ref.stateChanged.connect(self.save_reference)
+        self.comp_trace.stateChanged.connect(self.compare_trace)
+
+        self.read_comboBox("config/instrument_address.txt", self.instrument_address)
+        self.read_comboBox("config/measure_type.txt", self.comboBox_test_type)        
+        
+    def read_comboBox(self, path, comboBox):
+        comboBox.addItem('_')
         try:
-            config_file = open("config/instrument_address.txt", "r")
+            config_file = open(path, "r")
             content_list = config_file.readlines()
-
             for value in content_list:
                 # remove '\n'
                 value = value.strip()
-
                 if (value[0] != '#'):
-                    self.instrumentAddress.addItem(value)
+                    comboBox.addItem(value)
         except Exception as e:
             print(e)
 
-        self.comboBox_test_type.addItem('_')
-        try:
-            config_file = open("config/measure_type.txt", "r")
-            content_list = config_file.readlines()
+    def create_plot(self):
+        plt.style.use('seaborn-whitegrid')
 
-            for value in content_list:
-                # remove '\n'
-                value = value.strip()
+        # initialize fig
+        self.fig_0 = Figure(figsize=(12,7))
+        self.fig_1 = Figure(figsize=(12,7))
+        self.fig_2 = Figure(figsize=(12,7))
 
-                if (value[0] != '#'):
-                    self.comboBox_test_type.addItem(value)
-        except Exception as e:
-            print(e)
+        # add canvas
+        self.figCanvas_0 = FigureCanvas(self.fig_0)
+        self.figCanvas_1 = FigureCanvas(self.fig_1)
+        self.figCanvas_2 = FigureCanvas(self.fig_2)
+
+        # add widget
+        self.vna_plot.addWidget(self.figCanvas_0)
+        self.osc_plot.addWidget(self.figCanvas_1)
+        self.demo_plot.addWidget(self.figCanvas_2)
+
+        # add toolbar
+        self.navToolbar_0 = NavigationToolbar(self.figCanvas_0, self.MainWindow)
+        self.navToolbar_1 = NavigationToolbar(self.figCanvas_1, self.MainWindow)
+        self.navToolbar_2 = NavigationToolbar(self.figCanvas_2, self.MainWindow)
+        self.vna_plot.addWidget(self.navToolbar_0)
+        self.osc_plot.addWidget(self.navToolbar_1)
+        self.demo_plot.addWidget(self.navToolbar_2)
+
+    def measure(self):
+        self.measure_bar.setValue(0)
+        counter = self.lcd_num.value() 
+        self.tab = self.tabWidget.tabText(self.tabWidget.currentIndex())
+
+        if (self.tab == "VNA"):       
+            counter += 1
+        elif (self.tab == "OSC"):
+            pass       
+        elif (self.tab == "Notes"):
+            pass   
+        elif (self.tab == "Demo"):
+            pass     
+        elif (self.tab == "VISA"):
+            pass
+        else:
+            pass
+        
+        self.lcd_num.display(counter) 
+
+        # multi thread
+        pool = QThreadPool.globalInstance()   
+        # max thread to 1, if busy wait
+        pool.setMaxThreadCount(1)
+        #print("Thread count: ", pool.maxThreadCount())
+        self.instrument = VISA_Instrument()
+
+        # class setup    
+        self.instrument.type = self.tab
+        self.instrument.address = self.instrument_address.currentText()
+        self.instrument.test_name = self.serial_name.text() + self.serial_number.text()
+        self.instrument.file_name = ''
+        self.instrument.directory_name = ''
+
+        # start thread
+        pool.start(self.instrument)
+
+        # timer refresher        
+        self.timer_refsher = QtCore.QTimer()
+        self.timer_refsher.timeout.connect(self.instrument_refresh)
+        self.timer_refsher.start(500)
+
+    def instrument_refresh(self):          
+        self.remote_connection.setText(self.instrument.info)  
+
+        bar_value = self.measure_bar.value()
+        if (bar_value < 100):
+            bar_value += 2
+            self.measure_bar.setValue(bar_value)
+
+        if (self.instrument.data_ready == True):
+            self.instrument.data_ready = False
+            # copy array
+            self.measures_stored = self.instrument.measures
+            self.update_plot()
+            self.measure_bar.setValue(100)
+
+            if self.auto_save.isChecked():
+                self.file_save()
+        
+        self.tab = self.tabWidget.tabText(self.tabWidget.currentIndex())
+        if (self.tab == "Demo"):     
+            self.measure()
+
+#------------------------------------------------------------------------------#   
+   
+    def update_plot(self):       
+        if (self.tab == "VNA"):
+            xValue = []
+            yValue = []
+
+            # clearing old figure
+            self.fig_0.clear()
+
+            # add plot 1
+            subplots = len(self.measures_stored)
+            if subplots < 1:
+                subplots = 1
+
+            if subplots > 8:
+                rows = 4
+                columns = 3
+            elif subplots > 6:
+                rows = 4
+                columns = 2
+            elif subplots > 3:
+                rows = 2
+                columns = 3
+            else:
+                rows = 1
+                columns = subplots
+
+            self.subplot = []
+            for i in range(subplots):
+                self.subplot.append(self.fig_0.add_subplot(rows, columns, i + 1))
+                #self.subplot[i].clear()
+                x, y = self.measures_stored[i]
+                xValue.append(x)
+                yValue.append(y)
+                # plot
+                self.subplot[i].plot(xValue[i], yValue[i])
+
+            if self.delRef == True:
+                self.delRef = False
+                try:
+                    del(self.xRef[-1])
+                    del(self.yRef[-1])
+                except:
+                    pass
+
+            elif (self.save_ref.isChecked() or self.addRef):
+                    self.addRef = False
+                    self.xRef.append(xValue)
+                    self.yRef.append(yValue)
+
+            for j in range(len(self.xRef)):
+                for i in range(subplots):
+                    if (j == 0) and (self.compareTrace.isChecked()):
+                        purcentage = self.purcentageReference.value()
+
+                        import numpy as np
+                        myarray = np.asarray(self.yRef[j][i])
+                        #purcentage = abs(myarray * purcentage / 100)
+                        self.lower_bound = myarray - purcentage
+                        self.upper_bound = myarray + purcentage
+
+                        self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i], lw=2, color='black', ls='--')
+                        self.subplot[i].fill_between(self.xRef[j][i], self.lower_bound, self.upper_bound, facecolor='cyan', alpha=0.2)
+
+                        # fill_between errors
+                        self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] > self.upper_bound, facecolor='red', alpha=0.5)
+                        self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] < self.lower_bound, facecolor='lime', alpha=0.5)
+                    else:
+                        self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i])
+
+            """
+            # Set names on plot
+            selected_frame_number = 0
+            for i in range(len(settings.plot_names[selected_frame_number])):
+                self.subplot[i].set_title(settings.plot_names[selected_frame_number][i][0])
+                self.subplot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
+                self.subplot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
+                #self.plot[i].grid()
+            """
+
+            # auto adj
+            self.fig_0.tight_layout()
+            self.fig_0.canvas.draw()
+
+        elif (self.tab == "Demo"):       
+            # clearing old figure
+            self.fig_2.clear()
+            self.demoValues = self.figCanvas_2.figure.subplots()
+            x, y = self.measures_stored[0]
+            self.demoValues.plot(x, y)
+            self.fig_2.tight_layout()
+            self.fig_2.canvas.draw()
+        else:
+            pass
+
 
 #------------------------------------------------------------------------------#
 
@@ -142,7 +326,6 @@ class GuiCore(Ui_MainWindow):
 
             except Exception as e:
                 print(e)
-
 
     def file_save(self):
         title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text()
@@ -226,11 +409,10 @@ class GuiCore(Ui_MainWindow):
                     print(e)
                 """
 
-
     def file_quit(self):
         decision = QtWidgets.QMessageBox.question(self.MainWindow, 'Question',
-                       'Sure to quit?',
-                       QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                        'Sure to quit?',
+                        QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if decision == QtWidgets.QMessageBox.Yes:
             sys.exit()
 
@@ -248,29 +430,6 @@ class GuiCore(Ui_MainWindow):
 
     def file_info(self):
         QtWidgets.QMessageBox.question(self.MainWindow, 'Info', settings.__author__ + '\n' + settings.__version__, QtWidgets.QMessageBox.Ok)
-
-#------------------------------------------------------------------------------#
-
-    def connect_instrument(self):
-        self.vna_measure = Vna_measure(self.instrumentAddress.currentText())
-        self.progressBar.setValue(0)
-        self.instrument_refresh()
-
-    def start_measure(self):
-        if (self.tabWidget.currentIndex() < 2):
-            address = self.instrumentAddress.currentText()
-            test_name = self.comboBox_test_type.currentText()
-            file_name = strftime("%d%m%Y_%H%M%S", gmtime())
-            directory_name = settings.directory_name
-            self.vna_measure = Vna_measure(instrument_address = address, test_name = test_name, file_name = file_name, directory_name = directory_name, port_number = settings.port_number)
-        else:
-            self.connect_instrument
-            self.vna_measure = Vna_measure(' ')
-
-        self.progressBar.setValue(0)
-        counter = self.lcdNumber.value() + 1
-        self.lcdNumber.display(counter)
-        self.instrument_refresh()
 
     def compare_trace(self):
         self.addRef = True
@@ -293,185 +452,8 @@ class GuiCore(Ui_MainWindow):
             print ("User has pushed Enter", e.key())
             self.start_measure()
 
-    #--------------------------------------------------------------------------#
-
-    def instrument_refresh(self):
-        try:
-            self.remoteConnectionLabel.setText(self.vna_measure.instrument_info)
-
-            bar_value = self.progressBar.value()
-            if bar_value < 100:
-                bar_value += 2
-                self.progressBar.setValue(bar_value)
-
-            if self.vna_measure.data_ready == True:
-                self.vna_measure.data_ready = False
-
-                # copy array
-                self.measures_stored = self.vna_measure.measures
-
-                self.update_plot()
-                self.progressBar.setValue(100)
-
-                if self.autoSave.isChecked():
-                    self.file_save()
-
-                # selecting all the text in the box
-                self.serialNumber.selectAll()
-
-        except Exception as e:
-            print(e)
-
-        self.instrument_timer = QtCore.QTimer()
-        self.instrument_timer.timeout.connect(self.instrument_refresh)
-        self.instrument_timer.start(1000)
-
-    def update_time(self):
-        self.timeLabel.setText(strftime("%d %b %Y %H:%M:%S", gmtime()))
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.update_time)
-        self.timer.start(1000)
-
-    #--------------------------------------------------------------------------#
-
-    def create_plot(self):
-        plt.style.use('seaborn-whitegrid')
-
-        self.fig = []
-        self.toolbar = []
-
-        # initialize fig
-        self.fig_0 = Figure(figsize=(12,7))
-        self.fig_2 = Figure(figsize=(12,7))
-
-        # add canvas
-        self.figCanvas_0 = FigureCanvas(self.fig_0)
-        self.figCanvas_2 = FigureCanvas(self.fig_2)
-
-        self.plot_0.addWidget(self.figCanvas_0)
-        self.plot_2.addWidget(self.figCanvas_2)
-
-        # add toolbar
-        self.navToolbar_0 = NavigationToolbar(self.figCanvas_0, self.MainWindow)
-        self.navToolbar_2 = NavigationToolbar(self.figCanvas_2, self.MainWindow)
-
-        self.plot_0.addWidget(self.navToolbar_0)
-        self.plot_2.addWidget(self.navToolbar_2)
-
-        # dynamic plot refresh
-        self.plot_timer = QtCore.QTimer()
-        self.plot_timer.timeout.connect(self.update_plot)
-
-    #--------------------------------------------------------------------------#
-
-    def update_plot(self):
-        #self.values = values
-
-        try:
-            if (self.tabWidget.currentIndex() == 0):
-                # clearing old figure
-                self.fig_0.clear()
-
-                xValue = []
-                yValue = []
-                xyVal = []
-
-                # add plot 1
-                subplots = len(self.measures_stored)
-                if subplots < 1:
-                    subplots = 1
-
-                if subplots > 8:
-                    rows = 4
-                    columns = 3
-                elif subplots > 6:
-                    rows = 4
-                    columns = 2
-                elif subplots > 3:
-                    rows = 2
-                    columns = 3
-                else:
-                    rows = 1
-                    columns = subplots
-
-                self.subplot = []
-                for i in range(subplots):
-                    self.subplot.append(self.fig_0.add_subplot(rows, columns, i + 1))
-                    #self.subplot[i].clear()
-                    x, y = self.measures_stored[i]
-                    xValue.append(x)
-                    yValue.append(y)
-                    # plot
-                    self.subplot[i].plot(xValue[i], yValue[i])
-
-                if self.delRef == True:
-                    self.delRef = False
-                    try:
-                        del(self.xRef[-1])
-                        del(self.yRef[-1])
-                    except:
-                        pass
-                elif (self.saveReference.isChecked() or self.addRef):
-                        self.addRef = False
-                        self.xRef.append(xValue)
-                        self.yRef.append(yValue)
-
-                for j in range(len(self.xRef)):
-                    for i in range(subplots):
-                        if (j == 0) and (self.compareTrace.isChecked()):
-                            purcentage = self.purcentageReference.value()
-
-                            import numpy as np
-                            myarray = np.asarray(self.yRef[j][i])
-                            #purcentage = abs(myarray * purcentage / 100)
-                            self.lower_bound = myarray - purcentage
-                            self.upper_bound = myarray + purcentage
-
-                            self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i], lw=2, color='black', ls='--')
-                            self.subplot[i].fill_between(self.xRef[j][i], self.lower_bound, self.upper_bound, facecolor='cyan', alpha=0.2)
-
-                            # fill_between errors
-                            self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] > self.upper_bound, facecolor='red', alpha=0.5)
-                            self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] < self.lower_bound, facecolor='lime', alpha=0.5)
-                        else:
-                            self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i])
-
-                """
-                # Set names on plot
-                selected_frame_number = 0
-                for i in range(len(settings.plot_names[selected_frame_number])):
-                    self.subplot[i].set_title(settings.plot_names[selected_frame_number][i][0])
-                    self.subplot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
-                    self.subplot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
-                    #self.plot[i].grid()
-                """
-
-            if (self.tabWidget.currentIndex() == 2):
-                # clearing old figure
-                self.fig_2.clear()
-
-                self.demoValues_ax = self.figCanvas_2.figure.subplots()
-
-                import numpy as np
-                t = np.linspace(0, 10, 101)
-                self.demoValues_ax.plot(t, np.sin(t + time.time()))
-
-                self.plot_timer.start(100)
-            else:
-                self.plot_timer.stop()
-
-            # auto adj
-            self.fig_0.tight_layout()
-            self.fig_2.tight_layout()
-
-            self.fig_0.canvas.draw()
-            self.fig_2.canvas.draw()
-
-        except Exception as e:
-            print(e)
-
 #------------------------------------------------------------------------------#
-
+   
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     gui = GuiCore()

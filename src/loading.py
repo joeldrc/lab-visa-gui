@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# Joel Daricou 03/2022
 
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets

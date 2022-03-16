@@ -46,7 +46,7 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>470</y>
+            <y>430</y>
             <width>280</width>
             <height>101</height>
            </rect>
@@ -58,9 +58,9 @@
            </size>
           </property>
           <property name="title">
-           <string>OPTIONS</string>
+           <string>PLOT CONFIG</string>
           </property>
-          <widget class="QCheckBox" name="saveReference">
+          <widget class="QCheckBox" name="save_ref">
            <property name="geometry">
             <rect>
              <x>10</x>
@@ -99,7 +99,7 @@
             <string>Remove</string>
            </property>
           </widget>
-          <widget class="QCheckBox" name="compareTrace">
+          <widget class="QCheckBox" name="comp_trace">
            <property name="geometry">
             <rect>
              <x>10</x>
@@ -112,7 +112,7 @@
             <string>Compare trace</string>
            </property>
           </widget>
-          <widget class="QDoubleSpinBox" name="purcentageReference">
+          <widget class="QDoubleSpinBox" name="purcentage_ref">
            <property name="geometry">
             <rect>
              <x>140</x>
@@ -140,9 +140,9 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>180</y>
-            <width>280</width>
-            <height>271</height>
+            <y>280</y>
+            <width>281</width>
+            <height>141</height>
            </rect>
           </property>
           <property name="minimumSize">
@@ -152,21 +152,8 @@
            </size>
           </property>
           <property name="title">
-           <string>USER DATA</string>
+           <string>FILE</string>
           </property>
-          <widget class="QLabel" name="label">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>20</y>
-             <width>71</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Name (User):</string>
-           </property>
-          </widget>
           <widget class="QLabel" name="label_2">
            <property name="geometry">
             <rect>
@@ -177,7 +164,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>Serial name:</string>
+            <string>Serial num:</string>
            </property>
           </widget>
           <widget class="QLabel" name="label_3">
@@ -190,125 +177,95 @@
             </rect>
            </property>
            <property name="text">
-            <string>Serial number:</string>
+            <string>File name:</string>
            </property>
           </widget>
-          <widget class="QLabel" name="label_4">
+          <widget class="QLineEdit" name="serial_name">
            <property name="geometry">
             <rect>
-             <x>10</x>
-             <y>110</y>
-             <width>71</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Add details:</string>
-           </property>
-          </widget>
-          <widget class="QLineEdit" name="userName">
-           <property name="geometry">
-            <rect>
-             <x>130</x>
-             <y>20</y>
-             <width>141</width>
-             <height>20</height>
-            </rect>
-           </property>
-          </widget>
-          <widget class="QLineEdit" name="serialName">
-           <property name="geometry">
-            <rect>
-             <x>130</x>
+             <x>70</x>
              <y>50</y>
-             <width>141</width>
+             <width>201</width>
              <height>20</height>
             </rect>
            </property>
           </widget>
-          <widget class="QLineEdit" name="serialNumber">
+          <widget class="QLineEdit" name="serial_number">
            <property name="geometry">
             <rect>
-             <x>130</x>
+             <x>70</x>
              <y>80</y>
-             <width>141</width>
+             <width>201</width>
              <height>20</height>
             </rect>
            </property>
           </widget>
-          <widget class="QLineEdit" name="addDetails">
+          <widget class="QCheckBox" name="auto_save">
            <property name="geometry">
             <rect>
-             <x>130</x>
+             <x>10</x>
              <y>110</y>
-             <width>141</width>
-             <height>20</height>
-            </rect>
-           </property>
-          </widget>
-          <widget class="QProgressBar" name="progressBar">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>149</y>
-             <width>261</width>
-             <height>21</height>
-            </rect>
-           </property>
-           <property name="value">
-            <number>0</number>
-           </property>
-           <property name="textVisible">
-            <bool>false</bool>
-           </property>
-          </widget>
-          <widget class="QLCDNumber" name="lcdNumber">
-           <property name="geometry">
-            <rect>
-             <x>160</x>
-             <y>190</y>
-             <width>111</width>
-             <height>21</height>
-            </rect>
-           </property>
-          </widget>
-          <widget class="QCheckBox" name="autoSave">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>190</y>
-             <width>101</width>
+             <width>171</width>
              <height>16</height>
             </rect>
            </property>
            <property name="text">
-            <string>Auto save files</string>
+            <string>Auto save after measure</string>
            </property>
           </widget>
-          <widget class="QLabel" name="timeLabel">
+          <widget class="QCheckBox" name="cal_file">
            <property name="geometry">
             <rect>
-             <x>10</x>
-             <y>230</y>
-             <width>141</width>
-             <height>20</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>time...</string>
-           </property>
-          </widget>
-          <widget class="QPushButton" name="startMeasure">
-           <property name="geometry">
-            <rect>
-             <x>160</x>
-             <y>230</y>
-             <width>111</width>
+             <x>220</x>
+             <y>20</y>
+             <width>61</width>
              <height>21</height>
             </rect>
            </property>
            <property name="text">
-            <string>START MEASURE</string>
+            <string>CAL file</string>
+           </property>
+          </widget>
+          <widget class="QCheckBox" name="snp_file">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>20</y>
+             <width>101</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>SNP file</string>
+           </property>
+          </widget>
+          <widget class="QCheckBox" name="csv_file">
+           <property name="geometry">
+            <rect>
+             <x>150</x>
+             <y>20</y>
+             <width>61</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>CSV file</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="QCheckBox" name="png_file">
+           <property name="geometry">
+            <rect>
+             <x>80</x>
+             <y>20</y>
+             <width>61</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>PNG file</string>
            </property>
           </widget>
          </widget>
@@ -328,9 +285,9 @@
            </size>
           </property>
           <property name="title">
-           <string>REMOTE CONNECTION</string>
+           <string>INSTRUMENT ADDRESS</string>
           </property>
-          <widget class="QLabel" name="remoteConnectionLabel">
+          <widget class="QLabel" name="remote_connection">
            <property name="geometry">
             <rect>
              <x>10</x>
@@ -343,7 +300,7 @@
             <string>NO DEVICE CONNECTED</string>
            </property>
           </widget>
-          <widget class="QPushButton" name="connectButton">
+          <widget class="QPushButton" name="connect_btn">
            <property name="geometry">
             <rect>
              <x>210</x>
@@ -356,7 +313,7 @@
             <string>CONNECT</string>
            </property>
           </widget>
-          <widget class="QComboBox" name="instrumentAddress">
+          <widget class="QComboBox" name="instrument_address">
            <property name="geometry">
             <rect>
              <x>10</x>
@@ -374,13 +331,13 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>100</y>
+            <y>90</y>
             <width>281</width>
             <height>61</height>
            </rect>
           </property>
           <property name="title">
-           <string>TEST TYPE</string>
+           <string>SETUP TYPE</string>
           </property>
           <widget class="QComboBox" name="comboBox_test_type">
            <property name="geometry">
@@ -399,6 +356,77 @@
            </property>
           </widget>
          </widget>
+         <widget class="QGroupBox" name="otherOptionsBox_2">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>160</y>
+            <width>280</width>
+            <height>111</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>280</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>MEASURE</string>
+          </property>
+          <widget class="QLCDNumber" name="lcd_num">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>50</y>
+             <width>111</width>
+             <height>21</height>
+            </rect>
+           </property>
+          </widget>
+          <widget class="QProgressBar" name="measure_bar">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>19</y>
+             <width>261</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="value">
+            <number>0</number>
+           </property>
+           <property name="textVisible">
+            <bool>false</bool>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="start_measure">
+           <property name="geometry">
+            <rect>
+             <x>160</x>
+             <y>50</y>
+             <width>111</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>START MEASURE</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="time">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>80</y>
+             <width>141</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>time...</string>
+           </property>
+          </widget>
+         </widget>
         </widget>
        </item>
        <item row="0" column="0">
@@ -412,46 +440,98 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
-         <property name="movable">
+         <property name="documentMode">
           <bool>false</bool>
          </property>
-         <widget class="QWidget" name="tab_0">
+         <property name="tabsClosable">
+          <bool>false</bool>
+         </property>
+         <property name="movable">
+          <bool>true</bool>
+         </property>
+         <property name="tabBarAutoHide">
+          <bool>false</bool>
+         </property>
+         <widget class="QWidget" name="vna">
           <attribute name="title">
-           <string>Test page 1</string>
+           <string>VNA</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_3">
            <item row="0" column="0">
-            <layout class="QVBoxLayout" name="plot_0"/>
+            <layout class="QVBoxLayout" name="vna_plot"/>
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="tab_1">
+         <widget class="QWidget" name="osc">
           <attribute name="title">
-           <string>Test page 2</string>
+           <string>OSC</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_4">
            <item row="0" column="0">
-            <layout class="QVBoxLayout" name="plot_1"/>
+            <layout class="QVBoxLayout" name="osc_plot"/>
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="tab_2">
+         <widget class="QWidget" name="demo">
           <attribute name="title">
            <string>Demo</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_2">
            <item row="0" column="0">
-            <layout class="QVBoxLayout" name="plot_2"/>
+            <layout class="QVBoxLayout" name="demo_plot"/>
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="tab_3">
+         <widget class="QWidget" name="notes">
           <attribute name="title">
            <string>Notes</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_5">
            <item row="0" column="0">
             <widget class="QTextEdit" name="textEdit"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="visa">
+          <attribute name="title">
+           <string>VISA</string>
+          </attribute>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QGroupBox" name="otherOptionsBox_4">
+             <property name="minimumSize">
+              <size>
+               <width>280</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="title">
+              <string>SEND</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <widget class="QTextEdit" name="textEdit_4"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="otherOptionsBox_3">
+             <property name="minimumSize">
+              <size>
+               <width>280</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="title">
+              <string>RECEIVE</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+               <widget class="QTextEdit" name="visa_send"/>
+              </item>
+             </layout>
+            </widget>
            </item>
           </layout>
          </widget>

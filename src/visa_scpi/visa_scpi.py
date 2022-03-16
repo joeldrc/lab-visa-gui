@@ -4,71 +4,65 @@
 import time
 from time import gmtime, strftime
 import pyvisa as visa
-import threading
+from PyQt5.QtCore import QRunnable, Qt, QThreadPool
 import numpy as np
 
 
-# Global variables
-calibration = ''
-device_address = ''
-loading_time = 20 #seconds
-
-
-class Vna_measure(threading.Thread):
-    def __init__(self, instrument_address = '', test_name = '', file_name = '', directory_name = '', port_number = ''):
-        threading.Thread.__init__(self)
-
-        self.instrument_address = instrument_address
-        self.test_name = test_name
-        self.file_name = file_name
-        self.directory_name = directory_name
-        self.port_number = port_number
-
+class VISA_Instrument(QRunnable):
+    def __init__(self):
+        super().__init__()
+        self.address = ''
+        self.calibration_name = ''
+        self.test_name = ''
+        self.file_name = ''
+        self.directory_name = '' 
+        self.data_ready = None
+        self.info = 'NOT CONNECTED'
+        self.type = ''
         self.measures = []
-        self.picture = []
-        self.all_traces = []
-        self.s_parameters = []
+        self.png_file = []
+        self.csv_file = []
+        self.snp_file = []
+        
+    def run(self):                     
+        print("VISA start")
+        self.measures.clear()
 
-        self.instrument_info = 'NOT CONNECTED'
-        self.data_ready = False
+        if (self.type == 'Demo'):
+            self.info = self.type         
+            x = np.linspace(0, 10, 101)
+            y = np.sin(x + time.time())
+            self.measures.append((x, y))
 
-        # Start thread
-        self.start()
-
-    def run(self):
-        print("Init. visa setup")
-        if (self.instrument_address == '_'):
-            self.instrument_info = 'TEST MODE'
-            print(self.instrument_info)
-            self.test_mode()
+        elif (self.address == '_' or self.type == 'Demo'):
+            self.info = 'TEST MODE'
+            x = np.linspace(1, 301)
+            y = np.sin(x) + np.random.normal(scale=0.1, size = len(x))
+            self.measures.append((x, y))
+      
         else:
             try:
                 rm = visa.ResourceManager()
                 print(rm.list_resources())
 
-                self.vna = rm.open_resource(self.instrument_address)
-                self.vna.write_termination = '\n'   # Some instruments require that at the end of each command.
+                self.vna = rm.open_resource(self.address)
+                # Some instruments require that at the end of each command.
+                self.vna.write_termination = '\n'
                 #self.vna.read_termination = "\r"
                 self.vna.timeout = 4000
-                self.vna.write('*CLS')  # Clear the Error queue
-
+                
                 #read instrument info
-                self.instrument_info = self.vna.query('*IDN?')  #Query the Identification string
-                self.instrument_info = self.clean_string(self.instrument_info, clean_txt = True)
-                print(self.instrument_info)
-                self.default_mode()
+                self.info = self.vna.query('*IDN?')  #Query the Identification string
+                self.info = self.clean_string(self.info, clean_txt = True)
+                print(self.info)
+                #self.default_mode()
             except Exception as e:
                 print(e)
 
         self.data_ready = True
+        print('End run')
 
-
-    def test_mode(self):
-        # random measures
-        x = np.linspace(1, 301)
-        y = np.sin(x) + np.random.normal(scale=0.1, size = len(x))
-        self.measures.append((x, y))
-
+        
 
     def default_mode(self):
         if (self.test_name != '' and self.directory_name != ''):
@@ -262,76 +256,3 @@ class Vna_measure(threading.Thread):
             self.wait()
         except Exception as e:
             print(e)
-
-
-#==============================================================================#
-# if is used like a main
-if __name__ == '__main__':
-    import matplotlib.pyplot as plt
-
-    print("Python test software 2020")
-
-    while(1):
-        run_script =  input('Press to enter to Continue: ')
-
-        address = input('Enter address (enter to default): ')
-        if address == ' ':
-            print('-> TEST MODE ON')
-        else:
-            print('->', address)
-
-        test_name = input('Enter test name (enter to default): ')
-        if test_name == '':
-            print('-> DEMO')
-        else:
-            print('->', test_name)
-
-        save_files = input('Save files [y/n]: ')
-        if save_files == '':
-            save_files = 'n'   #default
-        print('->', save_files)
-
-        test = Vna_measure(instrument_address = address, test_name = test_name, file_name = '', directory_name = 'Automatic_tests')
-
-        i = 0
-        while (test.data_ready == False):
-            s = str(i) + '%'    # string for output
-            print('wait: ' + s, end='')    # just print and flush
-            # back to the beginning of line
-            print('\r', end='') # use '\r' to go back
-            time.sleep(0.5)
-            i += 1
-
-        for i in range(len(test.measures)):
-            x, y = test.measures[i]
-            plt.title ("test")
-            plt.xlabel("x")
-            plt.ylabel("y")
-            plt.plot(x, y)
-            plt.show()
-
-        if (save_files == 'y'):
-            name = strftime("%d%m%Y_%H%M%S", gmtime())
-
-            # Save all files received from vna
-            print("Saving files")
-
-            # export png files
-            file = open(name + '.png',"wb")
-            file.write(test.picture)
-            file.close()
-            print('File saved')
-
-            for i in range(len(test.all_traces)):
-                # export csv file
-                file = open(name + str(i) + '.csv',"wb")
-                file.write(test.all_traces[i])
-                file.close()
-                print('File saved' + str(i))
-
-            for i in range(len(test.s_parameters)):
-                # export sp file
-                file = open("{}{}.s{}p".format(name, str(i), self.port_number),"wb")
-                file.write(test.s_parameters[i])
-                file.close()
-                print('File saved' + str(i))
