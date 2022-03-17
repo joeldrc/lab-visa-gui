@@ -9,23 +9,25 @@ import settings
 import time
 from time import gmtime, strftime
 
+from PyQt5.QtCore import QRunnable, Qt, QThreadPool
+
 import matplotlib.pyplot as plt
 from matplotlib.backends.qt_compat import QtCore, QtWidgets
 from matplotlib.backends.backend_qt5agg import (FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 from matplotlib.figure import Figure
-
-from PyQt5.QtCore import QRunnable, Qt, QThreadPool
 
 from user_gui import *
 from visa_scpi import *
 
 
 class GuiCore(Ui_MainWindow):
-    xRef = []
-    yRef = []
+    all_traces = {}
+    all_traces['VNA'] = []
+    all_traces['OSC'] = []
+    all_traces['Demo'] = []
+
     delRef = False
     addRef = False
-    measures_stored = []
     tab = ''
 
     def __init__(self):
@@ -156,9 +158,8 @@ class GuiCore(Ui_MainWindow):
 
         if (self.instrument.data_ready == True):
             self.instrument.data_ready = False
-            # copy array
-            self.measures_stored = self.instrument.measures
-            self.update_plot()
+
+            self.update_plot(self.instrument.measures)
             self.measure_bar.setValue(100)
 
             if self.auto_save.isChecked():
@@ -170,100 +171,112 @@ class GuiCore(Ui_MainWindow):
 
 #------------------------------------------------------------------------------#   
    
-    def update_plot(self):       
-        if (self.tab == "VNA"):
-            xValue = []
-            yValue = []
+    def update_plot(self, measures = None): 
+        self.subplot = []
 
-            # clearing old figure
+        if (measures != None):
+            self.all_traces[self.tab].append(measures)
+
+        if (self.tab == "VNA"):
+            # clear old figure
             self.fig_0.clear()
 
-            # add plot 1
-            subplots = len(self.measures_stored)
-            if subplots < 1:
-                subplots = 1
-
-            if subplots > 8:
-                rows = 4
-                columns = 3
-            elif subplots > 6:
-                rows = 4
-                columns = 2
-            elif subplots > 3:
-                rows = 2
-                columns = 3
-            else:
-                rows = 1
-                columns = subplots
-
-            self.subplot = []
-            for i in range(subplots):
-                self.subplot.append(self.fig_0.add_subplot(rows, columns, i + 1))
-                #self.subplot[i].clear()
-                x, y = self.measures_stored[i]
-                xValue.append(x)
-                yValue.append(y)
-                # plot
-                self.subplot[i].plot(xValue[i], yValue[i])
+            # add plot
+            num_traces = len(self.all_traces[self.tab][-1])
+            if(num_traces > 0):
+                if num_traces > 8:
+                    rows = 4
+                    columns = 3
+                elif num_traces > 6:
+                    rows = 4
+                    columns = 2
+                elif num_traces > 3:
+                    rows = 2
+                    columns = 3
+                else:
+                    rows = 1
+                    columns = num_traces
+                    
+            # list with all the measurements
+            meas = self.all_traces[self.tab]
 
             if self.delRef == True:
                 self.delRef = False
-                try:
-                    del(self.xRef[-1])
-                    del(self.yRef[-1])
-                except:
-                    pass
+                if (len(meas) > 1):
+                    del(meas[-1])
 
             elif (self.save_ref.isChecked() or self.addRef):
-                    self.addRef = False
-                    self.xRef.append(xValue)
-                    self.yRef.append(yValue)
+                self.addRef = False
+                if (len(meas) > 0):
+                    meas.append(meas[-1])
+            else:
+                del(meas[:-1])
 
-            for j in range(len(self.xRef)):
-                for i in range(subplots):
-                    if (j == 0) and (self.compareTrace.isChecked()):
-                        purcentage = self.purcentageReference.value()
+            for measure in meas:
+                # list of traces in a measure
+                traces = len(measure)
 
-                        import numpy as np
-                        myarray = np.asarray(self.yRef[j][i])
-                        #purcentage = abs(myarray * purcentage / 100)
-                        self.lower_bound = myarray - purcentage
-                        self.upper_bound = myarray + purcentage
-
-                        self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i], lw=2, color='black', ls='--')
-                        self.subplot[i].fill_between(self.xRef[j][i], self.lower_bound, self.upper_bound, facecolor='cyan', alpha=0.2)
-
-                        # fill_between errors
-                        self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] > self.upper_bound, facecolor='red', alpha=0.5)
-                        self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] < self.lower_bound, facecolor='lime', alpha=0.5)
-                    else:
-                        self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i])
+                for i in range(traces):
+                    x, y = measure[i]
+                    self.subplot.append(self.fig_0.add_subplot(rows, columns, i + 1))                 
+                    self.subplot[i].plot(x, y)
 
             """
-            # Set names on plot
-            selected_frame_number = 0
-            for i in range(len(settings.plot_names[selected_frame_number])):
-                self.subplot[i].set_title(settings.plot_names[selected_frame_number][i][0])
-                self.subplot[i].set_xlabel(settings.plot_names[selected_frame_number][i][1])
-                self.subplot[i].set_ylabel(settings.plot_names[selected_frame_number][i][2])
-                #self.plot[i].grid()
+            for i in range(num_traces):
+                if (j == 0) and (self.compareTrace.isChecked()):
+                    purcentage = self.purcentageReference.value()
+
+                    import numpy as np
+                    myarray = np.asarray(self.yRef[j][i])
+                    #purcentage = abs(myarray * purcentage / 100)
+                    self.lower_bound = myarray - purcentage
+                    self.upper_bound = myarray + purcentage
+
+                    self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i], lw=2, color='black', ls='--')
+                    self.subplot[i].fill_between(self.xRef[j][i], self.lower_bound, self.upper_bound, facecolor='cyan', alpha=0.2)
+
+                    # fill_between errors
+                    self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] > self.upper_bound, facecolor='red', alpha=0.5)
+                    self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] < self.lower_bound, facecolor='lime', alpha=0.5)
+
             """
 
             # auto adj
             self.fig_0.tight_layout()
             self.fig_0.canvas.draw()
 
-        elif (self.tab == "Demo"):       
+        elif (self.tab == "Demo"):  
             # clearing old figure
             self.fig_2.clear()
             self.demoValues = self.figCanvas_2.figure.subplots()
-            x, y = self.measures_stored[0]
+            del(self.all_traces[self.tab][:-1])
+            x, y = self.all_traces[self.tab][-1][0]
             self.demoValues.plot(x, y)
             self.fig_2.tight_layout()
             self.fig_2.canvas.draw()
         else:
             pass
 
+    def compare_trace(self):
+        self.addRef = True
+        self.update_plot()
+
+    def save_reference(self):
+        self.addRef = True
+        self.update_plot()
+
+    def add_trace(self):
+        self.addRef = True
+        self.update_plot()
+
+    def remove_trace(self):
+        self.delRef = True
+        self.update_plot()
+
+    def newkeyPressEvent(self, e):
+        if ((e.key() == QtCore.Qt.Key_Enter) or (e.key() == (QtCore.Qt.Key_Enter-1))):
+            print ("User has pushed Enter", e.key())
+            self.start_measure()
 
 #------------------------------------------------------------------------------#
 
@@ -429,28 +442,7 @@ class GuiCore(Ui_MainWindow):
             self.textEdit.setTextColor(newcolor)
 
     def file_info(self):
-        QtWidgets.QMessageBox.question(self.MainWindow, 'Info', settings.__author__ + '\n' + settings.__version__, QtWidgets.QMessageBox.Ok)
-
-    def compare_trace(self):
-        self.addRef = True
-        self.update_plot()
-
-    def save_reference(self):
-        self.addRef = True
-        self.update_plot()
-
-    def add_trace(self):
-        self.addRef = True
-        self.update_plot()
-
-    def remove_trace(self):
-        self.delRef = True
-        self.update_plot()
-
-    def newkeyPressEvent(self, e):
-        if ((e.key() == QtCore.Qt.Key_Enter) or (e.key() == (QtCore.Qt.Key_Enter-1))):
-            print ("User has pushed Enter", e.key())
-            self.start_measure()
+        QtWidgets.QMessageBox.question(self.MainWindow, 'Info', settings.__author__ + '\n' + settings.__version__, QtWidgets.QMessageBox.Ok)  
 
 #------------------------------------------------------------------------------#
    
