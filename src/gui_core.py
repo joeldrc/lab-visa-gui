@@ -26,8 +26,11 @@ class GuiCore(Ui_MainWindow):
     all_traces['OSC'] = []
     all_traces['Demo'] = []
 
+    mem_ref = False
     delRef = False
     addRef = False
+    xRef = []
+    yRef = []
     tab = ''
 
     def __init__(self):
@@ -219,27 +222,25 @@ class GuiCore(Ui_MainWindow):
                 for i in range(traces):
                     x, y = measure[i]
                     self.subplot.append(self.fig_0.add_subplot(rows, columns, i + 1))                 
+                    
+                    if (i == 0) and (self.comp_trace.isChecked()):
+                        if (self.mem_ref == True):
+                            self.mem_ref = False
+                            self.xRef, self.yRef = measure[i]
+                        
+                        purcentage = self.purcentage_ref.value()
+                        myarray = np.asarray(self.yRef)
+                        lower_bound = myarray - purcentage
+                        upper_bound = myarray + purcentage
+
+                        self.subplot[i].plot(self.xRef, self.yRef, lw=2, color='black', ls='--')
+                        self.subplot[i].fill_between(self.xRef, lower_bound, upper_bound, facecolor='lime', alpha=0.2)
+
+                        # fill_between errors
+                        self.subplot[i].fill_between(x, self.yRef, y, where = y > upper_bound, facecolor='red', alpha=0.6)
+                        self.subplot[i].fill_between(x, self.yRef, y, where = y < lower_bound, facecolor='red', alpha=0.6)                       
+
                     self.subplot[i].plot(x, y)
-
-            """
-            for i in range(num_traces):
-                if (j == 0) and (self.compareTrace.isChecked()):
-                    purcentage = self.purcentageReference.value()
-
-                    import numpy as np
-                    myarray = np.asarray(self.yRef[j][i])
-                    #purcentage = abs(myarray * purcentage / 100)
-                    self.lower_bound = myarray - purcentage
-                    self.upper_bound = myarray + purcentage
-
-                    self.subplot[i].plot(self.xRef[j][i], self.yRef[j][i], lw=2, color='black', ls='--')
-                    self.subplot[i].fill_between(self.xRef[j][i], self.lower_bound, self.upper_bound, facecolor='cyan', alpha=0.2)
-
-                    # fill_between errors
-                    self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] > self.upper_bound, facecolor='red', alpha=0.5)
-                    self.subplot[i].fill_between(xValue[i], self.yRef[j][i], yValue[i], where = yValue[i] < self.lower_bound, facecolor='lime', alpha=0.5)
-
-            """
 
             # auto adj
             self.fig_0.tight_layout()
@@ -259,10 +260,12 @@ class GuiCore(Ui_MainWindow):
 
     def compare_trace(self):
         self.addRef = True
+        self.mem_ref = True
         self.update_plot()
 
     def save_reference(self):
-        self.addRef = True
+        if(self.save_ref.isChecked()):
+            self.addRef = True
         self.update_plot()
 
     def add_trace(self):
@@ -276,7 +279,7 @@ class GuiCore(Ui_MainWindow):
     def newkeyPressEvent(self, e):
         if ((e.key() == QtCore.Qt.Key_Enter) or (e.key() == (QtCore.Qt.Key_Enter-1))):
             print ("User has pushed Enter", e.key())
-            self.start_measure()
+            self.measure()
 
 #------------------------------------------------------------------------------#
 
