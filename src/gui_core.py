@@ -167,47 +167,48 @@ class GuiCore(Ui_MainWindow):
 
             if self.auto_save.isChecked():
                 self.file_save()
-        
+
+        # demo plot
         self.tab = self.tabWidget.tabText(self.tabWidget.currentIndex())
         if (self.tab == "Demo"):     
             self.measure()
-
-#------------------------------------------------------------------------------#   
-   
+ 
     def update_plot(self, measures = None): 
         self.subplot = []
-
+        self.tab = self.tabWidget.tabText(self.tabWidget.currentIndex()) 
+        
         if (measures != None):
             self.all_traces[self.tab].append(measures)
 
+        # select the type of plot
         if (self.tab == "VNA"):
             # clear old figure
             self.fig_0.clear()
 
-            # add plot
-            num_traces = len(self.all_traces[self.tab][-1])
-            if(num_traces > 0):
-                if num_traces > 8:
-                    rows = 4
-                    columns = 3
-                elif num_traces > 6:
-                    rows = 4
-                    columns = 2
-                elif num_traces > 3:
-                    rows = 2
-                    columns = 3
-                else:
-                    rows = 1
-                    columns = num_traces
-                    
             # list with all the measurements
             meas = self.all_traces[self.tab]
 
+            # add plot
+            if (len(meas) > 0):
+                num_traces = len(meas[-1])
+                if(num_traces > 0):
+                    if num_traces > 8:
+                        rows = 4
+                        columns = 3
+                    elif num_traces > 6:
+                        rows = 4
+                        columns = 2
+                    elif num_traces > 3:
+                        rows = 2
+                        columns = 3
+                    else:
+                        rows = 1
+                        columns = num_traces
+                    
             if self.delRef == True:
                 self.delRef = False
-                if (len(meas) > 1):
+                if (len(meas) > 0):
                     del(meas[-1])
-
             elif (self.save_ref.isChecked() or self.addRef):
                 self.addRef = False
                 if (len(meas) > 0):
@@ -281,67 +282,55 @@ class GuiCore(Ui_MainWindow):
             print ("User has pushed Enter", e.key())
             self.measure()
 
-#------------------------------------------------------------------------------#
-
     def file_open(self):
-        #name, _ = QtWidgets.QFileDialog.getOpenFileName(MainWindow, 'Open File', "", "Text file (*.csv *.txt)")  # Returns a tuple
         name, _ = QtWidgets.QFileDialog.getOpenFileNames(self.MainWindow, 'Open File', "", "Text file (*.csv *.txt)")  # Returns a tuple
-
-        for index in range(len(name)):
-            print(name[index])
-
-            try:
-                if self.tabWidget.currentIndex() == 3:
-                    with open(name[index], 'r') as file:
-                        text = file.read()
-                        self.textEdit.setText(text)
-
-                # Read file
-                file = open(name[index], "r")
-                test = []
+        try:
+            for index in range(len(name)):
+                print(name[index])
+                text = []
                 line_cnt = 0
 
-                #read data
-                for row in file:
-                    #start from the line number 3
-                    if line_cnt == 2:
-                        row = row.replace(";\n", '') #remove last column
-                        self.plot_titles = row.split(";")
-                        print(self.plot_titles)
-                        line_cnt += 1
+                # read file
+                file = open(name[index], "r")
 
-                    elif line_cnt > 2:
-                        row = row.replace(";\n", '') #remove last column
-                        column = row.split(";")
-                        test.append(column)
-                    else:
+                # read data
+                for row in file:
+                    # start from the line number 3  
+                    if line_cnt == 2:
+                        # remove last column
+                        row = row.replace("\n", '')       
+                        row = row.replace(";", ',')
+                        plot_titles = row.split(",")                       
                         line_cnt += 1
-                #print(test[0][:])
+                    elif line_cnt > 2:
+                        # remove last column
+                        row = row.replace("\n", '') 
+                        row = row.replace(";", ',') 
+                        column = row.split(",")
+                        text.append(column)
+                    else:
+                        line_cnt += 1   
                 file.close()
 
-                #re-order data
-                measures = []
-                for j in range(len(test[0])):
-                    tmp = []
-                    for i in range(len(test)):
-                        try:
-                            tmp.append(np.float_(test[i][j]))
-                        except:
-                            pass
-                    measures.append(tmp)
-                #print(measures[1])
-                #print(measures)
+                # convert to float excluding the first row
+                data = []
+                for j in range(len(text[0])):
+                    row = []
+                    for i in range(len(text)):
+                        row.append(np.float_(text[i][j]))
+                    data.append(row)
+                
+                # re-order data
+                measure = []
+                for i in range(1,len(data)):
+                    measure.append((data[0], data[i]))
 
-                if (index == 0):
-                    self.measures_stored = []
+                self.update_plot(measure)
 
-                for i in range(1,len(measures)):
-                    self.measures_stored.append((measures[0], measures[i]))
+        except Exception as e:
+            print(e)
 
-                self.update_plot()
-
-            except Exception as e:
-                print(e)
+# -------- #
 
     def file_save(self):
         title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text()
@@ -424,6 +413,7 @@ class GuiCore(Ui_MainWindow):
                 except Exception as e:
                     print(e)
                 """
+#------------------------------------------------------------------------------#
 
     def file_quit(self):
         decision = QtWidgets.QMessageBox.question(self.MainWindow, 'Question',
@@ -447,7 +437,6 @@ class GuiCore(Ui_MainWindow):
     def file_info(self):
         QtWidgets.QMessageBox.question(self.MainWindow, 'Info', settings.__author__ + '\n' + settings.__version__, QtWidgets.QMessageBox.Ok)  
 
-#------------------------------------------------------------------------------#
    
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
