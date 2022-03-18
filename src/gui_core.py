@@ -330,90 +330,67 @@ class GuiCore(Ui_MainWindow):
         except Exception as e:
             print(e)
 
-# -------- #
+#------------------------------------------------------------------------------#
 
     def file_save(self):
-        title = self.serialName.text() + self.serialNumber.text() + self.addDetails.text()
+        title = self.serial_name.text() + self.serial_number.text()
         name, _ = QtWidgets.QFileDialog.getSaveFileName(self.MainWindow, 'Save file', os.path.join(str(os.getenv('HOME')), title), "all traces file (*)")  # Returns a tuple
 
         if name != "":
-            if self.tabWidget.currentIndex() == 3:
+            if (self.tabWidget.tabText(self.tabWidget.currentIndex()) == 'Notes'):
                 if len(name) > 0:
                     with open(name + '.txt', 'a') as file:
                         text = self.textEdit.toPlainText()  # Plain text without formatting
                         #text = self.textEdit.toHtml()  # Rich text with formatting (font, color, etc.)
                         file.write(text)
                         file.close()
+                print('Notes saved')
             else:
                 # Save all files received from vna
-                print("All-parameters")
+                print("Save files")
 
-                try:
-                    # export png files
-                    file = open(name + '.png',"wb")
-                    file.write(self.vna_measure.picture)
-                    file.close()
-                    print('File saved')
-                except Exception as e:
-                    print(e)
-
-                try:
-                    # export csv file
-                    for i in range(len(self.vna_measure.all_traces)):
-                        # export sp file
-                        file = open(name + '_' + str(i) + '.csv',"wb")
-                        file.write(self.vna_measure.all_traces[i])
+                if (self.png_file.isChecked()):
+                    try:
+                        # export png files
+                        file = open(name + '.png',"wb")
+                        file.write(self.instrument.png_file)
                         file.close()
-                        print('File saved ' + str(i))
-                except Exception as e:
-                    print(e)
+                        print('png file saved')
+                    except Exception as e:
+                        print(e, 'No png file')
 
-                try:
-                    # export sp file
-                    for i in range(len(self.vna_measure.s_parameters)):
+                if (self.csv_file.isChecked()):
+                    try:
+                        # export csv file
+                        cnt = 0
+                        for csv_file in self.instrument.csv_file:
+                            # export sp file
+                            file = open(name + '_' + str(cnt) + '.csv',"wb")
+                            file.write(csv_file)
+                            file.close()
+                            print('csv file saved ' + str(cnt))
+                            cnt += 1
+                    except Exception as e:
+                        print(e, 'No csv file')
+
+                if (self.snp_file.isChecked()):
+                    try:
+                        cnt = 0
                         # export sp file
-                        file = open(name + '_' + str(i) + '.s{}p'.format(settings.port_number),"wb")
-                        file.write(self.vna_measure.s_parameters[i])
-                        file.close()
-                        print('File saved ' + str(i))
-                except Exception as e:
-                    print(e)
+                        for snp_file in self.instrument.snp_file:
+                            # export sp file
+                            file = open(name + '_' + str(cnt) + '.s{}p'.format(2),"wb")
+                            file.write(snp_file)
+                            file.close()
+                            print('File saved ' + str(cnt))
+                            cnt += 1
+                    except Exception as e:
+                        print(e, 'No snp file')
+                
+                if (self.cal_file.isChecked()):
+                    print('No cal file')
 
                 QtWidgets.QMessageBox.question(self.MainWindow, 'Info', 'Files saved!', QtWidgets.QMessageBox.Ok)
-
-                """
-                # Save all traces in excell file
-                try:
-                    xValue = []
-                    yValue = []
-                    measures = self.measures_stored
-
-                    self.wb = Workbook()
-                    self.sheet = self.wb.active
-
-                    for i in range(len(measures)):
-                        x, y = measures[i]
-                        xValue.append(x)
-                        yValue.append(y)
-
-                    # Create sheet
-                    self.sheet.cell(row=1, column=1).value = "test"
-                    self.sheet.cell(row=1, column=2).value = "test 2"
-
-                    for i in range(0, len(xValue), 1):
-                        self.sheet.cell(row=2, column= (i * 2) + 1).value = 'data: ' + str(i + 1)
-                        self.sheet.cell(row=3, column= (i * 2) + 1).value = 'x'
-                        self.sheet.cell(row=3, column= (i * 2) + 2).value = 'y'
-                        for j in range(0, len(xValue[0]), 1):
-                            self.sheet.cell(row=j + 4, column= (i * 2) + 1).value = xValue[i][j]
-                            self.sheet.cell(row=j + 4, column= (i * 2) + 2).value = yValue[i][j]
-
-                    self.wb.save(name + '.xlsx')
-                    print('File saved')
-                except Exception as e:
-                    print(e)
-                """
-#------------------------------------------------------------------------------#
 
     def file_quit(self):
         decision = QtWidgets.QMessageBox.question(self.MainWindow, 'Question',
