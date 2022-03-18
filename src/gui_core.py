@@ -26,12 +26,17 @@ class GuiCore(Ui_MainWindow):
     all_traces['OSC'] = []
     all_traces['Demo'] = []
 
+    all_files = {}
+    all_files['png'] = []
+    all_files['csv'] = []
+    all_files['snp'] = []
+    all_files['cal'] = []
+
     mem_ref = False
     delRef = False
     addRef = False
     xRef = []
     yRef = []
-    tab = ''
 
     def __init__(self):
         super().__init__()
@@ -47,6 +52,10 @@ class GuiCore(Ui_MainWindow):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_time)
         self.timer.start(1000)
+        # timer refresher        
+        self.timer_refsher = QtCore.QTimer()
+        self.timer_refsher.timeout.connect(self.instrument_refresh)
+        self.timer_refsher.start(500)
 
     def update_time(self):
         self.time.setText(strftime("%d %b %Y %H:%M:%S", gmtime()))
@@ -60,7 +69,7 @@ class GuiCore(Ui_MainWindow):
         self.actionAbout.triggered.connect(self.file_info)
 
         self.connect_btn.clicked.connect(self.measure)
-        self.start_measure.clicked.connect(self.measure)      
+        self.start_measure.clicked.connect(self.measure)    
         self.addTrace.clicked.connect(self.add_trace)
         self.removeTrace.clicked.connect(self.remove_trace)
 
@@ -68,7 +77,10 @@ class GuiCore(Ui_MainWindow):
         self.comp_trace.stateChanged.connect(self.compare_trace)
 
         self.read_comboBox("config/instrument_address.txt", self.instrument_address)
-        self.read_comboBox("config/measure_type.txt", self.comboBox_test_type)        
+        self.read_comboBox("config/measure_type.txt", self.comboBox_test_type)  
+
+    def check_tab(self):
+        return self.tabWidget.tabText(self.tabWidget.currentIndex())      
         
     def read_comboBox(self, path, comboBox):
         comboBox.addItem('_')
@@ -109,26 +121,27 @@ class GuiCore(Ui_MainWindow):
         self.osc_plot.addWidget(self.navToolbar_1)
         self.demo_plot.addWidget(self.navToolbar_2)
 
-    def measure(self):
-        self.measure_bar.setValue(0)
+    def launch_measure(self, tab = None):
+        if (tab == None):
+            tab = self.check_tab()
+         
         counter = self.lcd_num.value() 
-        self.tab = self.tabWidget.tabText(self.tabWidget.currentIndex())
-
-        if (self.tab == "VNA"):       
+        if (tab == "VNA"):       
             counter += 1
-        elif (self.tab == "OSC"):
+        elif (tab == "OSC"):
             pass       
-        elif (self.tab == "Notes"):
+        elif (tab == "Notes"):
             pass   
-        elif (self.tab == "Demo"):
+        elif (tab == "Demo"):
             pass     
-        elif (self.tab == "VISA"):
+        elif (tab == "VISA"):
             pass
         else:
             pass
-        
-        self.lcd_num.display(counter) 
 
+        self.lcd_num.display(counter) 
+        self.measure_bar.setValue(0)      
+    
         # multi thread
         pool = QThreadPool.globalInstance()   
         # max thread to 1, if busy wait
@@ -137,7 +150,7 @@ class GuiCore(Ui_MainWindow):
         self.instrument = VISA_Instrument()
 
         # class setup    
-        self.instrument.type = self.tab
+        self.instrument.type = tab
         self.instrument.address = self.instrument_address.currentText()
         self.instrument.test_name = self.serial_name.text() + self.serial_number.text()
         self.instrument.file_name = ''
@@ -146,47 +159,47 @@ class GuiCore(Ui_MainWindow):
         # start thread
         pool.start(self.instrument)
 
-        # timer refresher        
-        self.timer_refsher = QtCore.QTimer()
-        self.timer_refsher.timeout.connect(self.instrument_refresh)
-        self.timer_refsher.start(500)
+        # set tab value
+        self.tab = tab
 
-    def instrument_refresh(self):          
-        self.remote_connection.setText(self.instrument.info)  
+    def instrument_refresh(self):
+        try:
+            self.remote_connection.setText(self.instrument.info) 
+            
+            bar_value = self.measure_bar.value()
+            if (bar_value < 100):
+                bar_value += 2
+                self.measure_bar.setValue(bar_value)
+            
+            if (self.instrument.data_ready == True):
+                self.instrument.data_ready = False
+                self.update_plot(self.instrument.measures)
+                self.measure_bar.setValue(100)
 
-        bar_value = self.measure_bar.value()
-        if (bar_value < 100):
-            bar_value += 2
-            self.measure_bar.setValue(bar_value)
+                if self.auto_save.isChecked():
+                    self.file_save()
 
-        if (self.instrument.data_ready == True):
-            self.instrument.data_ready = False
+                # demo plot
+                self.tab = self.check_tab()
+                if (self.tab == "Demo"):
+                    self.launch_measure("Demo")
+        except:
+            pass
 
-            self.update_plot(self.instrument.measures)
-            self.measure_bar.setValue(100)
-
-            if self.auto_save.isChecked():
-                self.file_save()
-
-        # demo plot
-        self.tab = self.tabWidget.tabText(self.tabWidget.currentIndex())
-        if (self.tab == "Demo"):     
-            self.measure()
- 
-    def update_plot(self, measures = None): 
+    def update_plot(self, measures = None):
         self.subplot = []
-        self.tab = self.tabWidget.tabText(self.tabWidget.currentIndex()) 
+        tab = self.tab
         
-        if (measures != None):
-            self.all_traces[self.tab].append(measures)
+        if(measures != None):
+            self.all_traces[tab].append(measures)
 
         # select the type of plot
-        if (self.tab == "VNA"):
+        if (tab == "VNA"):
             # clear old figure
             self.fig_0.clear()
 
             # list with all the measurements
-            meas = self.all_traces[self.tab]
+            meas = self.all_traces[tab]
 
             # add plot
             if (len(meas) > 0):
@@ -209,10 +222,12 @@ class GuiCore(Ui_MainWindow):
                 self.delRef = False
                 if (len(meas) > 0):
                     del(meas[-1])
+
             elif (self.save_ref.isChecked() or self.addRef):
                 self.addRef = False
                 if (len(meas) > 0):
                     meas.append(meas[-1])
+
             else:
                 del(meas[:-1])
 
@@ -247,12 +262,12 @@ class GuiCore(Ui_MainWindow):
             self.fig_0.tight_layout()
             self.fig_0.canvas.draw()
 
-        elif (self.tab == "Demo"):  
+        elif (tab == "Demo"):  
             # clearing old figure
             self.fig_2.clear()
             self.demoValues = self.figCanvas_2.figure.subplots()
-            del(self.all_traces[self.tab][:-1])
-            x, y = self.all_traces[self.tab][-1][0]
+            del(self.all_traces[tab][:-1])
+            x, y = self.all_traces[tab][-1][0]
             self.demoValues.plot(x, y)
             self.fig_2.tight_layout()
             self.fig_2.canvas.draw()
@@ -276,6 +291,9 @@ class GuiCore(Ui_MainWindow):
     def remove_trace(self):
         self.delRef = True
         self.update_plot()
+
+    def measure(self):
+        self.launch_measure()
 
     def newkeyPressEvent(self, e):
         if ((e.key() == QtCore.Qt.Key_Enter) or (e.key() == (QtCore.Qt.Key_Enter-1))):
@@ -325,12 +343,11 @@ class GuiCore(Ui_MainWindow):
                 for i in range(1,len(data)):
                     measure.append((data[0], data[i]))
 
+                self.tab = self.check_tab()
                 self.update_plot(measure)
 
         except Exception as e:
             print(e)
-
-#------------------------------------------------------------------------------#
 
     def file_save(self):
         title = self.serial_name.text() + self.serial_number.text()
@@ -353,7 +370,7 @@ class GuiCore(Ui_MainWindow):
                     try:
                         # export png files
                         file = open(name + '.png',"wb")
-                        file.write(self.instrument.png_file)
+                        file.write(self.all_files['png'])
                         file.close()
                         print('png file saved')
                     except Exception as e:
@@ -363,7 +380,7 @@ class GuiCore(Ui_MainWindow):
                     try:
                         # export csv file
                         cnt = 0
-                        for csv_file in self.instrument.csv_file:
+                        for csv_file in self.all_files['csv']:
                             # export sp file
                             file = open(name + '_' + str(cnt) + '.csv',"wb")
                             file.write(csv_file)
@@ -377,7 +394,7 @@ class GuiCore(Ui_MainWindow):
                     try:
                         cnt = 0
                         # export sp file
-                        for snp_file in self.instrument.snp_file:
+                        for snp_file in self.all_files['snp']:
                             # export sp file
                             file = open(name + '_' + str(cnt) + '.s{}p'.format(2),"wb")
                             file.write(snp_file)
