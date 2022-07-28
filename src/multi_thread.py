@@ -29,7 +29,7 @@ class MeasureSignals(QObject):
         int indicating % progress
 
     '''
-    finished = pyqtSignal()
+    finished = pyqtSignal(object)
     error = pyqtSignal(tuple)
     result = pyqtSignal(object)
     progress = pyqtSignal(int)
@@ -80,7 +80,7 @@ class Measure(QRunnable):
         else:
             self.signals.result.emit(result)  # Return the result of the processing
         finally:
-            self.signals.finished.emit()  # Done
+            self.signals.finished.emit(result)  # Done
 
 
 if __name__ == "__main__": 
@@ -118,8 +118,9 @@ if __name__ == "__main__":
         def print_output(self, s):
             print(s)
 
-        def thread_complete(self):
+        def thread_complete(self, s):
             print("THREAD COMPLETE!")
+            print(s)
 
         def thread(self):
             # Pass the function to execute

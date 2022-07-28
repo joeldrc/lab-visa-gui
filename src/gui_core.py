@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Joel Daricou 03/2022
+# Joel Daricou 07/2022
 
 import os
 import sys
 import settings
 
-import time
 from time import gmtime, strftime
 
-from PyQt5.QtCore import QRunnable, Qt, QThreadPool
+from PyQt5.QtCore import QThreadPool
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.qt_compat import QtCore, QtWidgets
@@ -17,6 +16,7 @@ from matplotlib.backends.backend_qt5agg import (FigureCanvas, NavigationToolbar2
 from matplotlib.figure import Figure
 
 from user_gui import *
+from multi_thread import *
 from visa_scpi import *
 
 
@@ -25,12 +25,15 @@ class GuiCore(Ui_MainWindow):
     all_traces['VNA'] = []
     all_traces['OSC'] = []
     all_traces['Demo'] = []
+    all_traces['VISA'] = []
 
     all_files = {}
-    all_files['png'] = []
-    all_files['csv'] = []
-    all_files['snp'] = []
-    all_files['cal'] = []
+    all_files['instr_info'] = None
+    all_files['form_data'] = []
+    all_files['png_file'] = []
+    all_files['csv_file'] = []
+    all_files['snp_file'] = []
+    all_files['cal_file'] = []
 
     mem_ref = False
     delRef = False
@@ -55,7 +58,7 @@ class GuiCore(Ui_MainWindow):
         # timer refresher        
         self.timer_refsher = QtCore.QTimer()
         self.timer_refsher.timeout.connect(self.instrument_refresh)
-        self.timer_refsher.start(500)
+        self.timer_refsher.start(1000)
 
     def update_time(self):
         self.time.setText(strftime("%d %b %Y %H:%M:%S", gmtime()))
@@ -67,15 +70,12 @@ class GuiCore(Ui_MainWindow):
         self.actionFont.triggered.connect(self.edit_font)
         self.actionColor.triggered.connect(self.edit_color)
         self.actionAbout.triggered.connect(self.file_info)
-
         self.connect_btn.clicked.connect(self.measure)
         self.start_measure.clicked.connect(self.measure)    
         self.addTrace.clicked.connect(self.add_trace)
         self.removeTrace.clicked.connect(self.remove_trace)
-
         self.save_ref.stateChanged.connect(self.save_reference)
         self.comp_trace.stateChanged.connect(self.compare_trace)
-
         self.read_comboBox("config/instrument_address.txt", self.instrument_address)
         self.read_comboBox("config/measure_type.txt", self.comboBox_test_type)  
 
@@ -133,6 +133,7 @@ class GuiCore(Ui_MainWindow):
         elif (tab == "Notes"):
             pass   
         elif (tab == "Demo"):
+            self.instrument_address.setCurrentText("Demo")
             pass     
         elif (tab == "VISA"):
             pass
@@ -141,51 +142,54 @@ class GuiCore(Ui_MainWindow):
 
         self.lcd_num.display(counter) 
         self.measure_bar.setValue(0)      
-    
-        # multi thread
-        pool = QThreadPool.globalInstance()   
-        # max thread to 1, if busy wait
-        pool.setMaxThreadCount(1)
-        #print("Thread count: ", pool.maxThreadCount())
-        self.instrument = VISA_Instrument()
 
-        # class setup    
-        self.instrument.type = tab
-        self.instrument.address = self.instrument_address.currentText()
-        self.instrument.test_name = self.serial_name.text() + self.serial_number.text()
-        self.instrument.file_name = ''
-        self.instrument.directory_name = ''
-
-        # start thread
-        pool.start(self.instrument)
+        # Pass the function to execute
+        instr = Measure(self.thread) # Any other args, kwargs are passed to the run function
+        instr.signals.result.connect(self.print_output)
+        instr.signals.finished.connect(self.thread_complete)
+        # Execute
+        instr.threadpool.start(instr)
 
         # set tab value
         self.tab = tab
 
+    def thread(self, progress_callback):
+        address = self.instrument_address.currentText()
+        setup = self.serial_name.text() + self.serial_number.text()
+        vna = Instrument_VISA(address, setup)
+        return vna.run()
+
+    def print_output(self, s):
+        #print(s)
+        pass
+
+    def thread_complete(self, result):
+        print("Thread finished")
+
+        self.all_files = result
+        self.update_plot(self.all_files['form_data'])
+        self.measure_bar.setValue(100)
+
+        if self.auto_save.isChecked():
+            self.file_save()
+
+        # demo plot
+        self.tab = self.check_tab()
+        if (self.tab == "Demo"):                
+            self.launch_measure()
+
     def instrument_refresh(self):
         try:
             self.remote_connection.setText(self.instrument.info) 
-            
+                      
             bar_value = self.measure_bar.value()
             if (bar_value < 100):
                 bar_value += 2
                 self.measure_bar.setValue(bar_value)
-            
-            if (self.instrument.data_ready == True):
-                self.instrument.data_ready = False
-                self.update_plot(self.instrument.measures)
-                self.measure_bar.setValue(100)
-
-                if self.auto_save.isChecked():
-                    self.file_save()
-
-                # demo plot
-                self.tab = self.check_tab()
-                if (self.tab == "Demo"):
-                    self.launch_measure("Demo")
         except:
             pass
 
+    """
     def update_plot(self, measures = None):
         self.subplot = []
         tab = self.tab
@@ -273,6 +277,79 @@ class GuiCore(Ui_MainWindow):
             self.fig_2.canvas.draw()
         else:
             pass
+    """
+
+    def update_plot(self, measures = None):
+        self.subplot = []
+        tab = self.tab
+        
+        if(measures != None):
+            self.all_traces[tab].append(measures)
+
+        # list with all the measurements
+        measures = self.all_traces[tab]
+
+        # select the type of plot
+        if (tab == "VNA"):
+            # clear old figure
+            self.fig_0.clear()
+
+            # add plot
+            if (len(measures) > 0):
+                num_traces = len(measures[-1])
+                if(num_traces > 0):
+                    if num_traces > 8:
+                        rows = 4
+                        columns = 3
+                    elif num_traces > 6:
+                        rows = 4
+                        columns = 2
+                    elif num_traces > 3:
+                        rows = 2
+                        columns = 3
+                    else:
+                        rows = 1
+                        columns = num_traces
+
+            """    
+            if self.delRef == True:
+                self.delRef = False
+                del(measures[:-1])
+
+            elif (self.save_ref.isChecked() or self.addRef):
+                self.addRef = False
+                if (len(measures) > 0):
+                    measures.append(measures[-1])
+            else:
+                del(measures[:-1])
+            """
+           
+            # list of traces in a measure
+            for traces in measures:
+                plt_num = 1
+                # single trace in list of traces
+                for trace in traces:
+                    x, y = trace
+                    subplot = self.fig_0.add_subplot(rows, columns, plt_num)
+                    subplot.plot(x, y)
+                    plt_num +=1
+
+            # auto adj
+            self.fig_0.tight_layout()
+            self.fig_0.canvas.draw()
+        
+        if (tab == "Demo"):
+            # clearing old figure
+            self.fig_2.clear()
+            self.demoValues = self.figCanvas_2.figure.subplots()
+            del(measures[:-1])
+            for traces in measures:
+                for trace in traces:
+                    x, y = trace
+                    self.demoValues.plot(x, y)
+
+            self.fig_2.tight_layout()
+            self.fig_2.canvas.draw()
 
     def compare_trace(self):
         self.addRef = True
@@ -318,13 +395,15 @@ class GuiCore(Ui_MainWindow):
                         # remove last column
                         row = row.replace("\n", '')       
                         row = row.replace(";", ',')
-                        plot_titles = row.split(",")                       
+                        plot_titles = row.split(",")
+                        plot_titles.remove('')                     
                         line_cnt += 1
                     elif line_cnt > 2:
                         # remove last column
                         row = row.replace("\n", '') 
                         row = row.replace(";", ',') 
                         column = row.split(",")
+                        column.remove('') 
                         text.append(column)
                     else:
                         line_cnt += 1   
@@ -341,7 +420,7 @@ class GuiCore(Ui_MainWindow):
                 # re-order data
                 measure = []
                 for i in range(1,len(data)):
-                    measure.append((data[0], data[i]))
+                    measure.append([data[0], data[i]])
 
                 self.tab = self.check_tab()
                 self.update_plot(measure)
