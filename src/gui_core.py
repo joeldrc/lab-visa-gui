@@ -279,77 +279,73 @@ class GuiCore(Ui_MainWindow):
             pass
     """
 
-    def update_plot(self, measures = None):
-        self.subplot = []
-        tab = self.tab
-        
-        if(measures != None):
-            self.all_traces[tab].append(measures)
+    def update_plot(self, meas = None):  
+        tab = self.check_tab()
 
-        # list with all the measurements
-        measures = self.all_traces[tab]
+        # clear old figure
+        self.fig_0.clear()
+        self.fig_1.clear()
+        self.fig_2.clear()
 
-        # select the type of plot
-        if (tab == "VNA"):
-            # clear old figure
-            self.fig_0.clear()
+        if(meas != None):
+            measures = [meas]
+        else:
+          #measures = [[[[0,],[0,]]]]
+          pass
 
-            # add plot
-            if (len(measures) > 0):
-                num_traces = len(measures[-1])
-                if(num_traces > 0):
-                    if num_traces > 8:
-                        rows = 4
-                        columns = 3
-                    elif num_traces > 6:
-                        rows = 4
-                        columns = 2
-                    elif num_traces > 3:
-                        rows = 2
-                        columns = 3
-                    else:
-                        rows = 1
-                        columns = num_traces
+        # add plot
+        if (len(measures) > 0):
+            num_traces = len(measures[-1])
+            if(num_traces > 0):
+                if num_traces > 8:
+                    rows = 4
+                    columns = 3
+                elif num_traces > 6:
+                    rows = 4
+                    columns = 2
+                elif num_traces > 3:
+                    rows = 2
+                    columns = 3
+                else:
+                    rows = 1
+                    columns = num_traces
+                    
+            self.subplot = [0]*num_traces
+            for i in range(num_traces):
+                if (tab == "VNA"): 
+                    self.subplot[i] = self.fig_0.add_subplot(rows, columns, i + 1)
+                elif (tab == "Demo"):
+                    self.subplot[i] = self.fig_2.add_subplot(rows, columns, i + 1)
 
-            """    
-            if self.delRef == True:
-                self.delRef = False
-                del(measures[:-1])
-
-            elif (self.save_ref.isChecked() or self.addRef):
-                self.addRef = False
-                if (len(measures) > 0):
-                    measures.append(measures[-1])
-            else:
-                del(measures[:-1])
             """
-           
-            # list of traces in a measure
-            for traces in measures:
-                plt_num = 1
-                # single trace in list of traces
-                for trace in traces:
-                    x, y = trace
-                    subplot = self.fig_0.add_subplot(rows, columns, plt_num)
-                    subplot.plot(x, y)
-                    plt_num +=1
+            if (tab == "VNA"): 
+                if self.delRef == True:
+                    self.delRef = False
+                    del(measures[-1])
 
-            # auto adj
-            self.fig_0.tight_layout()
-            self.fig_0.canvas.draw()
-        
-        if (tab == "Demo"):
-            # clearing old figure
-            self.fig_2.clear()
-            self.demoValues = self.figCanvas_2.figure.subplots()
-            del(measures[:-1])
-            for traces in measures:
-                for trace in traces:
-                    x, y = trace
-                    self.demoValues.plot(x, y)
-
-            self.fig_2.tight_layout()
-            self.fig_2.canvas.draw()
+                elif (self.save_ref.isChecked() or self.addRef):
+                    self.addRef = False
+                    measures.append(measures[-1])
+                else: 
+                    measures = [measures[-1]]
+            """
+          
+        # list of traces in a measure         
+        for traces in measures: 
+            # single trace in list of traces
+            plt_num = 0
+            for trace in traces:
+                x, y = trace
+                self.subplot[plt_num].plot(x, y)
+                plt_num +=1
+                    
+        # auto adj
+        self.fig_0.tight_layout()
+        self.fig_0.canvas.draw()
+        self.fig_1.tight_layout()
+        self.fig_1.canvas.draw()
+        self.fig_2.tight_layout()
+        self.fig_2.canvas.draw()
 
     def compare_trace(self):
         self.addRef = True
