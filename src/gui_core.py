@@ -33,7 +33,7 @@ class GuiCore(Ui_MainWindow):
     all_files['png_file'] = []
     all_files['csv_file'] = []
     all_files['snp_file'] = []
-    all_files['cal_file'] = []
+    #all_files['cal_file'] = []
 
     mem_ref = False
     delRef = False
@@ -58,8 +58,7 @@ class GuiCore(Ui_MainWindow):
         # timer refresher        
         self.timer_refsher = QtCore.QTimer()
         self.timer_refsher.timeout.connect(self.instrument_refresh)
-        self.timer_refsher.start(1000)
-
+        
     def update_time(self):
         self.time.setText(strftime("%d %b %Y %H:%M:%S", gmtime()))
        
@@ -141,7 +140,8 @@ class GuiCore(Ui_MainWindow):
             pass
 
         self.lcd_num.display(counter) 
-        self.measure_bar.setValue(0)      
+        self.measure_bar.setValue(0)  
+        self.timer_refsher.start(200)
 
         # Pass the function to execute
         instr = Measure(self.thread) # Any other args, kwargs are passed to the run function
@@ -155,11 +155,13 @@ class GuiCore(Ui_MainWindow):
 
     def thread(self, progress_callback):
         address = self.instrument_address.currentText()
-        setup = self.serial_name.text() + self.serial_number.text()
+        setup = self.comboBox_test_type.currentText()
+        #test_name = self.serial_name.text() + self.serial_number.text()
         vna = Instrument_VISA(address, setup)
         return vna.run()
 
     def print_output(self, s):
+        #debug
         #print(s)
         pass
 
@@ -167,7 +169,11 @@ class GuiCore(Ui_MainWindow):
         print("Thread finished")
 
         self.all_files = result
+        self.remote_connection.setText(self.all_files['instr_info'])
         self.update_plot(self.all_files['form_data'])
+
+        # timer refresher
+        self.timer_refsher.stop()
         self.measure_bar.setValue(100)
 
         if self.auto_save.isChecked():
@@ -178,16 +184,11 @@ class GuiCore(Ui_MainWindow):
         if (self.tab == "Demo"):                
             self.launch_measure()
 
-    def instrument_refresh(self):
-        try:
-            self.remote_connection.setText(self.instrument.info) 
-                      
-            bar_value = self.measure_bar.value()
-            if (bar_value < 100):
-                bar_value += 2
-                self.measure_bar.setValue(bar_value)
-        except:
-            pass
+    def instrument_refresh(self):             
+        bar_value = self.measure_bar.value()
+        if (bar_value < 100):
+            bar_value += 1
+            self.measure_bar.setValue(bar_value)
 
     """
     def update_plot(self, measures = None):
@@ -287,35 +288,48 @@ class GuiCore(Ui_MainWindow):
         self.fig_1.clear()
         self.fig_2.clear()
 
+        measures = self.all_traces['VNA']
+        #measures = [[[[0,],[0,]]]]
+
+        if(meas != None):
+            if (self.save_ref.isChecked()):
+                measures.append([meas])
+            else:
+                measures = [[meas]]
+
+        """
+        measures = []
         if(meas != None):
             measures = [meas]
         else:
           #measures = [[[[0,],[0,]]]]
           pass
-
-        # add plot
-        if (len(measures) > 0):
-            num_traces = len(measures[-1])
-            if(num_traces > 0):
-                if num_traces > 8:
-                    rows = 4
-                    columns = 3
-                elif num_traces > 6:
-                    rows = 4
-                    columns = 2
-                elif num_traces > 3:
-                    rows = 2
-                    columns = 3
-                else:
-                    rows = 1
-                    columns = num_traces
-                    
-            self.subplot = [0]*num_traces
-            for i in range(num_traces):
-                if (tab == "VNA"): 
-                    self.subplot[i] = self.fig_0.add_subplot(rows, columns, i + 1)
-                elif (tab == "Demo"):
-                    self.subplot[i] = self.fig_2.add_subplot(rows, columns, i + 1)
+        """
+        
+        for measure in measures:
+            # add plot
+            if (len(measure) > 0):
+                num_traces = len(measure[-1])
+                if(num_traces > 0):
+                    if num_traces > 8:
+                        rows = 4
+                        columns = 3
+                    elif num_traces > 6:
+                        rows = 4
+                        columns = 2
+                    elif num_traces > 3:
+                        rows = 2
+                        columns = 3
+                    else:
+                        rows = 1
+                        columns = num_traces
+                        
+                self.subplot = [0]*num_traces
+                for i in range(num_traces):
+                    if (tab == "VNA"): 
+                        self.subplot[i] = self.fig_0.add_subplot(rows, columns, i + 1)
+                    elif (tab == "Demo"):
+                        self.subplot[i] = self.fig_2.add_subplot(rows, columns, i + 1)
 
             """
             if (tab == "VNA"): 
@@ -329,15 +343,16 @@ class GuiCore(Ui_MainWindow):
                 else: 
                     measures = [measures[-1]]
             """
-          
-        # list of traces in a measure         
-        for traces in measures: 
-            # single trace in list of traces
-            plt_num = 0
-            for trace in traces:
-                x, y = trace
-                self.subplot[plt_num].plot(x, y)
-                plt_num +=1
+
+            # list of traces in a measure         
+            for traces in measure: 
+                # single trace in list of traces
+                plt_num = 0
+                for trace in traces:
+                    #print(trace)
+                    x, y = trace
+                    self.subplot[plt_num].plot(x, y)
+                    plt_num +=1
                     
         # auto adj
         self.fig_0.tight_layout()
@@ -375,54 +390,83 @@ class GuiCore(Ui_MainWindow):
 
     def file_open(self):
         name, _ = QtWidgets.QFileDialog.getOpenFileNames(self.MainWindow, 'Open File', "", "Text file (*.csv *.txt)")  # Returns a tuple
-        try:
-            for index in range(len(name)):
-                print(name[index])
-                text = []
-                line_cnt = 0
 
-                # read file
-                file = open(name[index], "r")
+        for index in range(len(name)):
+            print(name[index])
+            
+            # read file
+            file = open(name[index], "r")
 
-                # read data
-                for row in file:
-                    # start from the line number 3  
-                    if line_cnt == 2:
-                        # remove last column
-                        row = row.replace("\n", '')       
-                        row = row.replace(";", ',')
-                        plot_titles = row.split(",")
-                        plot_titles.remove('')                     
-                        line_cnt += 1
-                    elif line_cnt > 2:
-                        # remove last column
-                        row = row.replace("\n", '') 
-                        row = row.replace(";", ',') 
-                        column = row.split(",")
-                        column.remove('') 
-                        text.append(column)
-                    else:
-                        line_cnt += 1   
-                file.close()
+            # read data
+            values = []
+            for row in file:
+                row = row.replace("\n", '')
+                values.append(row)
+            file.close()
 
-                # convert to float excluding the first row
-                data = []
-                for j in range(len(text[0])):
-                    row = []
-                    for i in range(len(text)):
-                        row.append(np.float_(text[i][j]))
-                    data.append(row)
-                
-                # re-order data
-                measure = []
-                for i in range(1,len(data)):
-                    measure.append([data[0], data[i]])
+            #extract data
+            begin = []
+            end = []
+            for i in range(len(values)):
+                if values[i].find('BEGIN') == 0:
+                    begin.append(i+2) #skip the first two rows
+                elif values[i].find('END') == 0:
+                    end.append(i-1) #skip the first row
 
-                self.tab = self.check_tab()
-                self.update_plot(measure)
+            data = []
+            for b, e in zip(begin, end):
+                val_x = []
+                val_y = []
+                for row in values[b:e]:                
+                    x, y = row.split(",")    
+                    val_x.append(np.float_(x))
+                    val_y.append(np.float_(y))
+                    
+                data.append([val_x, val_y])
 
-        except Exception as e:
-            print(e)
+            self.tab = self.check_tab()
+            self.update_plot(data)
+
+            """
+            text = []
+            line_cnt = 0
+            # read data R&S
+            for row in file:
+                # start from the line number 3  
+                if line_cnt == 2:
+                    # remove last column
+                    row = row.replace("\n", '')       
+                    row = row.replace(";", ',')
+                    plot_titles = row.split(",")
+                    plot_titles.remove('')                     
+                    line_cnt += 1
+                elif line_cnt > 2:
+                    # remove last column
+                    row = row.replace("\n", '') 
+                    row = row.replace(";", ',') 
+                    column = row.split(",")
+                    column.remove('') 
+                    text.append(column)
+                else:
+                    line_cnt += 1   
+            file.close()
+
+            # convert to float excluding the first row
+            data = []
+            for j in range(len(text[0])):
+                row = []
+                for i in range(len(text)):
+                    row.append(np.float_(text[i][j]))
+                data.append(row)
+            
+            # re-order data
+            measure = []
+            for i in range(1,len(data)):
+                measure.append([data[0], data[i]])
+            
+            self.tab = self.check_tab()
+            self.update_plot(measure)
+            """
 
     def file_save(self):
         title = self.serial_name.text() + self.serial_number.text()
@@ -445,7 +489,7 @@ class GuiCore(Ui_MainWindow):
                     try:
                         # export png files
                         file = open(name + '.png',"wb")
-                        file.write(self.all_files['png'])
+                        file.write(self.all_files['png_file'])
                         file.close()
                         print('png file saved')
                     except Exception as e:
@@ -454,28 +498,46 @@ class GuiCore(Ui_MainWindow):
                 if (self.csv_file.isChecked()):
                     try:
                         # export csv file
+                        """
                         cnt = 0
-                        for csv_file in self.all_files['csv']:
-                            # export sp file
-                            file = open(name + '_' + str(cnt) + '.csv',"wb")
+                        for csv_file in self.all_files['csv_file']:
+                            #file = open(name + '_' + str(cnt) + '.csv',"wb")
+                            file = open(name + '_' + str(cnt) + '.csv',"w")
                             file.write(csv_file)
                             file.close()
                             print('csv file saved ' + str(cnt))
                             cnt += 1
+                        """
+                        csv_file = self.all_files['csv_file']
+                        csv_file = csv_file.replace("\n", '')         
+
+                        file = open(name + '.csv',"w")
+                        file.write(csv_file)
+                        file.close()
+                        print('csv file saved')
                     except Exception as e:
                         print(e, 'No csv file')
 
                 if (self.snp_file.isChecked()):
-                    try:
+                    try:                      
+                        """
                         cnt = 0
                         # export sp file
-                        for snp_file in self.all_files['snp']:
-                            # export sp file
-                            file = open(name + '_' + str(cnt) + '.s{}p'.format(2),"wb")
+                        for snp_file in self.all_files['snp_file']:
+                            #file = open(name + '_' + str(cnt) + '.s{}p'.format(2),"wb")
+                            file = open(name + '_' + str(cnt) + '.s{}p'.format(2),"w")
                             file.write(snp_file)
                             file.close()
                             print('File saved ' + str(cnt))
                             cnt += 1
+                        """
+                        snp_file = self.all_files['snp_file']
+                        snp_file = snp_file.replace("\n", '')  
+
+                        file = open(name + '.s{}p'.format(4),"w")
+                        file.write(snp_file)
+                        file.close()
+                        print('File saved')
                     except Exception as e:
                         print(e, 'No snp file')
                 

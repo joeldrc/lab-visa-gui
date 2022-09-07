@@ -1,6 +1,7 @@
-# Insert measure type:
-Feedthrough
-Cables
-Pick_up
-Phase_and_transmission
-Collimators_commissioning
+# Insert measure type: (use # to comment)
+tdr_4channel_200meters
+#Feedthrough
+#Cables
+#Pick_up
+#Phase_and_transmission
+#Collimators_commissioning
