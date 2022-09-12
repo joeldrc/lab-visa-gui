@@ -13,10 +13,11 @@ calibration =''
 address = ''
                     
 class Instrument_VISA():
-    def __init__(self, address = '', setup = ''):
+    def __init__(self, address = '', setup = '', calib = False):
         super().__init__()
         self.device_address = address
         self.setup_name = setup
+        self.force_calib = calib
 
         self.directory_path = 'C:\\Users\\Public\\Documents\\Network Analyzer\\automatic_tests'
         self.file_name = 'fileData'
@@ -80,7 +81,7 @@ class Instrument_VISA():
 
                     global calibration
                     global address
-                    if ((calibration != self.setup_name) or (self.device_address != address)):
+                    if ((calibration != self.setup_name) or (self.device_address != address) or (self.force_calib == True)):
                         #load calibration
                         print('load calibration')
                         calibration = self.setup_name
