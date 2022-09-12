@@ -212,6 +212,9 @@
            <property name="text">
             <string>Auto save after measure</string>
            </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
           </widget>
           <widget class="QCheckBox" name="cal_file">
            <property name="geometry">
@@ -223,7 +226,10 @@
             </rect>
            </property>
            <property name="text">
-            <string>CAL file</string>
+            <string>CAL ON</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
           <widget class="QCheckBox" name="snp_file">
@@ -237,6 +243,9 @@
            </property>
            <property name="text">
             <string>SNP file</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
           <widget class="QCheckBox" name="csv_file">
@@ -266,6 +275,9 @@
            </property>
            <property name="text">
             <string>PNG file</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </widget>
@@ -452,33 +464,13 @@
          <property name="tabBarAutoHide">
           <bool>false</bool>
          </property>
-         <widget class="QWidget" name="vna">
+         <widget class="QWidget" name="plot">
           <attribute name="title">
-           <string>VNA</string>
+           <string>Plot</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_3">
            <item row="0" column="0">
             <layout class="QVBoxLayout" name="vna_plot"/>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="osc">
-          <attribute name="title">
-           <string>OSC</string>
-          </attribute>
-          <layout class="QGridLayout" name="gridLayout_4">
-           <item row="0" column="0">
-            <layout class="QVBoxLayout" name="osc_plot"/>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="demo">
-          <attribute name="title">
-           <string>Demo</string>
-          </attribute>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0">
-            <layout class="QVBoxLayout" name="demo_plot"/>
            </item>
           </layout>
          </widget>
@@ -489,49 +481,6 @@
           <layout class="QGridLayout" name="gridLayout_5">
            <item row="0" column="0">
             <widget class="QTextEdit" name="textEdit"/>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="visa">
-          <attribute name="title">
-           <string>VISA</string>
-          </attribute>
-          <layout class="QHBoxLayout" name="horizontalLayout">
-           <item>
-            <widget class="QGroupBox" name="otherOptionsBox_4">
-             <property name="minimumSize">
-              <size>
-               <width>280</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="title">
-              <string>SEND</string>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout">
-              <item>
-               <widget class="QTextEdit" name="textEdit_4"/>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="otherOptionsBox_3">
-             <property name="minimumSize">
-              <size>
-               <width>280</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="title">
-              <string>RECEIVE</string>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_2">
-              <item>
-               <widget class="QTextEdit" name="visa_send"/>
-              </item>
-             </layout>
-            </widget>
            </item>
           </layout>
          </widget>
