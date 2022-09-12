@@ -22,10 +22,7 @@ from visa_scpi import *
 
 class GuiCore(Ui_MainWindow):
     all_traces = {}
-    all_traces['VNA'] = []
-    all_traces['OSC'] = []
-    all_traces['Demo'] = []
-    all_traces['VISA'] = []
+    all_traces['plot'] = []
 
     all_files = {}
     all_files['instr_info'] = None
@@ -33,7 +30,6 @@ class GuiCore(Ui_MainWindow):
     all_files['png_file'] = []
     all_files['csv_file'] = []
     all_files['snp_file'] = []
-    #all_files['cal_file'] = []
 
     mem_ref = False
     delRef = False
@@ -104,38 +100,23 @@ class GuiCore(Ui_MainWindow):
 
         # add canvas
         self.figCanvas_0 = FigureCanvas(self.fig_0)
-        self.figCanvas_1 = FigureCanvas(self.fig_1)
-        self.figCanvas_2 = FigureCanvas(self.fig_2)
 
         # add widget
         self.vna_plot.addWidget(self.figCanvas_0)
-        self.osc_plot.addWidget(self.figCanvas_1)
-        self.demo_plot.addWidget(self.figCanvas_2)
 
         # add toolbar
         self.navToolbar_0 = NavigationToolbar(self.figCanvas_0, self.MainWindow)
-        self.navToolbar_1 = NavigationToolbar(self.figCanvas_1, self.MainWindow)
-        self.navToolbar_2 = NavigationToolbar(self.figCanvas_2, self.MainWindow)
         self.vna_plot.addWidget(self.navToolbar_0)
-        self.osc_plot.addWidget(self.navToolbar_1)
-        self.demo_plot.addWidget(self.navToolbar_2)
 
     def launch_measure(self, tab = None):
         if (tab == None):
             tab = self.check_tab()
          
         counter = self.lcd_num.value() 
-        if (tab == "VNA"):       
-            counter += 1
-        elif (tab == "OSC"):
-            pass       
+        if (tab == "Plot"):    
+            counter += 1     
         elif (tab == "Notes"):
-            pass   
-        elif (tab == "Demo"):
-            self.instrument_address.setCurrentText("Demo")
-            pass     
-        elif (tab == "VISA"):
-            pass
+            pass 
         else:
             pass
 
@@ -157,7 +138,11 @@ class GuiCore(Ui_MainWindow):
         address = self.instrument_address.currentText()
         setup = self.comboBox_test_type.currentText()
         #test_name = self.serial_name.text() + self.serial_number.text()
-        vna = Instrument_VISA(address, setup)
+        vna = Instrument_VISA(address, setup, calib = self.cal_file.isChecked())
+        
+        #disable_calibration
+        self.cal_file.setChecked(False)
+        
         return vna.run()
 
     def print_output(self, s):
@@ -176,13 +161,17 @@ class GuiCore(Ui_MainWindow):
         self.timer_refsher.stop()
         self.measure_bar.setValue(100)
 
-        if self.auto_save.isChecked():
-            self.file_save()
-
         # demo plot
         self.tab = self.check_tab()
-        if (self.tab == "Demo"):                
+        addr = self.instrument_address.currentText()
+        if ((self.tab == "Plot") and (addr == "Demo")):
+            self.auto_save.setChecked(False)
+            time.sleep(0.1)             
             self.launch_measure()
+        
+        #save files
+        elif self.auto_save.isChecked():
+            self.file_save()
 
     def instrument_refresh(self):             
         bar_value = self.measure_bar.value()
@@ -266,18 +255,6 @@ class GuiCore(Ui_MainWindow):
             # auto adj
             self.fig_0.tight_layout()
             self.fig_0.canvas.draw()
-
-        elif (tab == "Demo"):  
-            # clearing old figure
-            self.fig_2.clear()
-            self.demoValues = self.figCanvas_2.figure.subplots()
-            del(self.all_traces[tab][:-1])
-            x, y = self.all_traces[tab][-1][0]
-            self.demoValues.plot(x, y)
-            self.fig_2.tight_layout()
-            self.fig_2.canvas.draw()
-        else:
-            pass
     """
 
     def update_plot(self, meas = None):  
@@ -285,10 +262,8 @@ class GuiCore(Ui_MainWindow):
 
         # clear old figure
         self.fig_0.clear()
-        self.fig_1.clear()
-        self.fig_2.clear()
 
-        measures = self.all_traces['VNA']
+        measures = self.all_traces['plot']
         #measures = [[[[0,],[0,]]]]
 
         if(meas != None):
@@ -326,10 +301,7 @@ class GuiCore(Ui_MainWindow):
                         
                 self.subplot = [0]*num_traces
                 for i in range(num_traces):
-                    if (tab == "VNA"): 
-                        self.subplot[i] = self.fig_0.add_subplot(rows, columns, i + 1)
-                    elif (tab == "Demo"):
-                        self.subplot[i] = self.fig_2.add_subplot(rows, columns, i + 1)
+                    self.subplot[i] = self.fig_0.add_subplot(rows, columns, i + 1)
 
             """
             if (tab == "VNA"): 
@@ -357,10 +329,6 @@ class GuiCore(Ui_MainWindow):
         # auto adj
         self.fig_0.tight_layout()
         self.fig_0.canvas.draw()
-        self.fig_1.tight_layout()
-        self.fig_1.canvas.draw()
-        self.fig_2.tight_layout()
-        self.fig_2.canvas.draw()
 
     def compare_trace(self):
         self.addRef = True
