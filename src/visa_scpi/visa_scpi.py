@@ -126,7 +126,13 @@ class Instrument_VISA():
                     self.data_dict['instr_info'] = self.device_address
                     x = np.linspace(1, 301)
                     y = np.sin(x) + np.random.normal(scale=0.1, size = len(x))
-                    self.data_dict['form_data'].append([x, y])      
+                    self.data_dict['form_data'].append([x, y])
+                else:
+                    self.data_dict['instr_info'] = "Instrument not connected"
+                    self.data_dict['form_data'] = ''
+                    self.data_dict['png_file'] = ''
+                    self.data_dict['csv_file'] = ''
+                    self.data_dict['snp_file'] = ''
 
             print('End run')
             return self.data_dict
