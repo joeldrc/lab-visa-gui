@@ -3,7 +3,7 @@
 
 import settings
 from user_gui import *
-from vna_scpi import *
+from visa_scpi import *
 
 import os
 #from openpyxl import *

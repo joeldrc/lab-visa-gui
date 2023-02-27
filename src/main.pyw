@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
-import subprocess
-import sys
-
 import settings
 import platform
 python_version, system_version = platform.architecture()
